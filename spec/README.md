@@ -3,20 +3,15 @@ This document defines the REST API specification implemented by public Go Daddy(
 
 Our goal is to make APIs that are as easy to use as possible. Each service has [documentation](http://docs.cloud.secureserver.net/) available, but this should be a supplement, not required reading. Armed with just the URL and credentials, a user should be able to navigate their way through the API in a web browser to learn about what resources and operations it has. In other words, the API should be _discoverable_. Once you're familar with what's available, requests can be made with simple tools like cURL or any basic HTTP request library.
 
-# Why do I care? #
-If you are a customer/developer looking to make use of one of our services, you probably don't. Head on over to the [documentation page](http://docs.cloud.secureserver.net) for information about the API you want to use or grab a [client library](/godaddy/gdapi) for your favorite language.
-
-If you're looking to build your own client to interface to one of our services, or you want to build an API of your own that matches the same style as ours, keep reading.
-
 # Why are you publishing it? #
 
 Maybe you'd like to build your own tools that work with our services. Or maybe you want to build your own service that follows the same style as ours. We'd love it if you did either one and want to give you all the information you need. This is also the same documentation our internal teams use to build their APIs.
 
 # Contact #
-For questions, comments, corrections, suggestions, or hate mail, you can use the usual tools in GitHub or email [publicapi@godaddy.com](mailto:publicapi@godaddy.com).
+For questions, comments, corrections, suggestions, etc, you can use the usual tools in GitHub or email [publicapi@godaddy.com](mailto:apispec@godaddy.com).  Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API or product.
 
 # Examples #
-Examples demonstrate a fictional file storage API. Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request. Examples generally show JSON request and responses, but several [request](#Request Formats) types are available and other [response](#Response Formats) types may be defined in the future.
+Examples demonstrate a hypothetical file storage API. Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request. Examples generally show JSON request and responses, but several [request](#Request Formats) types are available and other [response](#Response Formats) types may be defined in the future.
 
 # Definitions #
 ### REST ###
@@ -54,30 +49,23 @@ An **action** is an operation that can be performed on a resource but does not f
 
 Since this documentation is in a computer-readable form, it is easy to make a generic client library that will speak to any API that implements this specification, with no code related to a particular service. We provide several [client libraries](/godaddy/gdapi) for different languages, and if you load the API in a browser we respond with a built-in JavaScript client that provides a friendly UI for experimentation.
 
-# Status Codes #
-Every HTTP response contains a **status code**. This is the primary mechanism that a client uses to determine the result of their request, so it is very important that they be clearly defined and used consistently.
-
-- Requests that were successfully handled MUST return a response with a 2XX or 3XX status code.
-- 2XX codes mean the request was successfully handled.
-- 3XX codes are redirects.
-- Requests that cannot be processed MUST return a 4XX or 5XX status code.
-- 4XX codes mean that the *client* did something wrong and they should fix the problem. Sending the request again will result in the same error.
-- 5XX codes mean that something went wrong within the *service*. There is nothing the client can do about it and they should expect that the same request would succeed (or produce a 4XX error) if re-submitted in the future.
+### Status Codes ###
+Every HTTP response contains a **status code**. This is the primary mechanism that a client uses to determine the result of their request, so it is very important that they be clearly defined and used consistently.  Requests that were successfully handled MUST return a response with a 2xx or 3xx status code.  Requests that cannot be processed MUST return a 4xx or 5xx code.
 
 Code | Meaning
 --------------------------|----------------------------
-**2XX** | **Success**
-200 OK | The request has succeeded.
-201 Created | The request has succeeded and a new resource has been created. A Location header SHOULD be included.
-202 Accepted | The request has been received but has not completed. It may (or may not) be completed in the future. This is typically used for requests that produce a long-running process that will be completed asynchronously.
-204 No Content | The request has succeeded, and there is no body portion of the response.
+**2xx** | **Success**
+200 OK | The request was successful.
+201 Created | Success, and a new resource has been created.  A Location header to the resource SHOULD be included.
+202 Accepted | The request has been received but has not completed. It may (or may not) be completed in the future.<br/>This is typically used for requests that produce a long-running process that will be completed asynchronously.
+204 No Content | The request was successful, and the response will have no body portion.
 | 
-**3XX** | **Redirect**
-301 Moved Permanently | The requested resource is somewhere else now, and you should look there for it in the future. The new location should be in a Location header. The important word here is **permanent**; clients may aggressively use the new location and never request the old one again, so be careful what you're redirecting. If in doubt, use 302.
-302 Found | The requested resource isn't here. It might be found here again in the future, but in the meantime you can find it at the address indicated in the Location header.
-304 Not Modified | The client made a conditional GET request for a resource, and that resource matches the condition because it hasn't been modified.
+**3xx** | **Redirect**
+301 Moved Permanently | The requested resource is somewhere else now, and you should look there for it in the future.<br/>The new location MUST be specified in the Location header.<br/>The operative word here is **permanent**; clients may aggressively use the new location and never request the old one again.  If in doubt, use 302.
+302 Found | Temporary redirect.  The requested resource isn't here.  You can find it at the address indicated in the Location header, but check back at this URL next time because it might be somewhere else by then.
+304 Not Modified | The client made a conditional GET request for a resource, and that resource matches the condition so the response body does not need to be sent.
 | 
-**4XX** | **Client Error**
+**4xx** | **Client Error**<br/>&mdash; The **client** did something wrong.  Sending the same request again **will** result in the same error.
 400 Bad Request | The request was malformed in some way or the input did not pass validation; the client should feel bad.
 401 Unauthorized | Authentication information was not sent or is invalid.
 403 Forbidden | Authentication information was validated, but does not give the requestor access to the requested resource.
@@ -88,9 +76,11 @@ Code | Meaning
 410 Gone | The requested API version is no longer supported.
 418 I'm a teapot | The request attempted to brew coffee with a teapot that is not compliant with [RFC2324](http://tools.ietf.org/html/rfc2324).
 | 
-**5XX** | **Service Error**
+**5xx** | **Service Error**<br/>&mdash; Something bad happened in the **service**.  There is nothing the client can do about this, and they can expect that the same request will succeed (or produce a 4xx error) if re-submitted in the future.
 500 Internal Server Error | Something is broken on our side; we should feel bad.
 503 Service Unavailable | The request couldn't be handled due to maintenance or overload.
+
+----------------------------------------
 
 # Representations #
 A representation is the way a resource is, well, represented, in a HTTP request or response. All services MUST support:
