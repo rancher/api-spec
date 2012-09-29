@@ -204,7 +204,7 @@ Resource representations MUST have several attributes:
     - <code>self:</code> The location of the resource itself.
     - <code>schema:</code> The location of the schema definition for this resource type
     - Any related resources/collections, as appropriate.
-  - <code>actions:</code> A map of action names and the URL that can be requested to perform them.
+  - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them.
     - This MAY be omitted if the resource type has no actions.
 
 ```javascript
@@ -237,12 +237,12 @@ Collection representations MUST have:
     - This MUST always be present and be an array, even if there are 0 or 1 entries in it.
 
 And SHOULD have (when appropriate):
-  - <code>resourceTypes:</code> A map of the names of types that can be created in this collection to the URL for their schema.
+  - <code>resourceTypes:</code> A map of the names of types that can be created in this collection &rarr; the URL for their schema.
     - This SHOULD be present if the collection can contain more than one type.
     - Each resourceType should "extend" the type in the <code>resourceSchema</code> link to the "parent" type.
-  - <code>createDefaults:</code> A map of field names and their values.
+  - <code>createDefaults:</code> A map of field names &rarr; their values.
     - This can be used to specify a context-specific default value for fields when the client is creating a new resource.
-  - <code>actions:</code> A map of action names and the URL that can be requested to perform them.
+  - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them.
     - This MAY be omitted if the resource type has no actions.
   - <code>pagination:</code> See [pagination](#pagination).
   - <code>sort:</code> See [sorting](#sorting).
@@ -319,12 +319,49 @@ Actions perform an operation on a resource (or collection) and optionally return
 
 The schema for types that have actions available have an <code>actions</code> and/or <code>collectionActions</code> map in their schema detailing all the actions that are possible and their input/output schema. For example, there may be "share", "encrypt", and "decrypt" actions on a file. See [schemas](#schemas) for more information.
 
-Resources (and collections) of types that have actions defined have a <code>actions</code> attribute that details what actions are available for this particular resource, and what URL is to be accessed to perform them. For example if only one of "encrypt" and "decrypt" are possible for a given file, only one of them would appear in the resource:
+## Schema ##
+Actions are defined by a map with 4 attributes:
+  - <code>input:</code> The ID of the schema that the inputs will conform to
+  - <code>inputSchema:</code> The URL to that schema ID
+  - <code>output:</code> The ID of the schema that the outputs will conform to
+  - <code>outputSchema:</code> The URL to that schema ID
+
+The appropriate pair MAY be omitted if there are no inputs or outputs to the action.
+
+```javascript
+{
+  "id":      "file",
+  "type":    "schema",
+  "actions": {
+    "share": {
+      "input": "shareInput",
+      "inputSchema": "https://base/v1/schemas/shareInput",
+    },
+    "decrypt": {
+      "input": "cryptInput",
+      "inputSchema": "https://base/v1/schemas/cryptInput",
+      "output": "file",
+      "outputSchema": "https://base/v1/schemas/file",
+    },
+    "encrypt": {
+      "input": "cryptInput",
+      "inputSchema": "https://base/v1/schemas/cryptInput",
+      "output": "file",
+      "outputSchema": "https://base/v1/schemas/file",
+    },
+    /* ... other actions ... */
+  },
+  /* ... other schema attributes ... */
+}
+```
+
+## Resource Representations ##
+Resources (and collections) of types that have actions defined have a <code>actions</code> attribute that details what actions are available for this particular resource, and what URL is to be accessed to perform them. For example if only one of "encrypt" and "decrypt" are possible for a given file, only the one currently available would appear in the resource:
 
 ```javascript
 {
   "id": "b1b2e7006be",
-  "type":    "file",
+  "type": "file",
   "actions": {
     "share": "https://base/v1/files/b1b2e7006be?share",
     "encrypt": "https://base/v1/files/b1b2e7006be?encrypt"
@@ -337,34 +374,35 @@ Resources (and collections) of types that have actions defined have a <code>acti
 
 # Schemas #
 
-Each service MUST have a top-level collection called "schemas" which contains a "schema" resource for each resource type. The information contained in the schema provides enough information to build a _smart_ client that knows what actions are available, what fields make up a resource, etc.
+Each service MUST have a top-level collection called "schemas" which contains "schema" resource for each resource type. The information contained in the schema provides enough information to build a smart client that knows what actions are available, what fields make up a resource, etc.
 
-The "schemas" collection MUST also have a link to the root/base URL of the API version. This makes the schema collection (http://base//v1/schemas) a single URL that provides a client everything they need to know about the service, similar to a WSDL in a SOAP service.
+The "schemas" collection MUST also have a link to the base URL of the API version.
+  - This makes the schema collection (https://base//v1/schemas) a single URL that provides a client everything they need to know about the service, similar to a WSDL in a SOAP service.
 
 Each schema resource MUST describe:
-- "id": The name of the resource type.
-- "type": "schema"
-- "methods": An array of HTTP methods that are available to some (but not necessarily all) resources of this type.
-- "fields": A map of field names and descriptions of that field (see [fields](#schema Fields)).
-- "actions": A map detailing the actions that are available to some (but not necessarily all) items of this type, and their input and output schemas (see [actions](#action-schemas)).
-- "collectionMethods": An array of HTTP methods that are available to a collection of this type.
-- "collectionActions": A map detailing the actions that are available to collections of this type.
-- "collectionFields": A map detailing the non-standard attribute fields that the collection has, if any.
-- "collectionFilters": A map detailing the filters that are available to collections of this type.
-- "links": 
-- "self": The URL for this schema
-- "schema": The URL for the schema describing a schema resource (http://base/v1/schemas/schema).
-- "collection": If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders")
+  - <code>id:</code>: The name of the resource type.
+  - <code>type:</code> "schema"
+  - <code>methods:</code>: An array of HTTP methods that are available to some (but not necessarily all) resources of this type.
+  - <code>fields:</code>: A map of attribute names available in *resources* of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
+  - <code>actions:</code>: A map detailing the actions available to *resources of this type (see [actions](#actions)).
+  - <code>collectionMethods:</code>: An array of HTTP methods that are available to a *collection* of this type.
+  - <code>collectionActions:</code>: A map detailing the actions available to *collections* of this type (see [actions](#actions)).
+  - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the collection has, if any (see [fields](#schema-fields)).
+  - <code>collectionFilters:</code>: A map detailing the filters that are available to collections of this type (see [filters](#filtering)).
+  - <code>links:</code>: 
+    - <code>self:</code>: The URL for this schema
+    - <code>schema:</code>: The URL for the schema describing a schema resource (http://base/v1/schemas/schema).
+    - <code>collection": If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders:</code>)
 
 ### Schema Fields ###
-Each field MUST have a "type" attribute, which may be a "simple" type:
-- "string"
-- "password"
-- "int"
-- "float"
-- "date" (as a string)
-- "blob" (binary data)
-- "boolean"
+Each field is defined by a map of properties.  Fields MUST have a <code>type:</code>, which may be a "simple" type:
+  <code>"string"</code>
+  <code>"password"</code>
+  <code>"int"</code>
+  <code>"float"</code>
+  <code>"date"</code> (as a string)
+  <code>"blob"</code> (binary data encoded as a string)
+  <code>"boolean"</code>
 
 Or a non-simple type:
 
