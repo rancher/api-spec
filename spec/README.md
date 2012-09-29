@@ -8,136 +8,137 @@ Our goal is to make APIs that are as easy to use as possible. Each service has [
 Maybe you'd like to build your own tools that work with our services. Or maybe you want to build your own service that follows the same style as ours. We'd love it if you did either one and want to give you all the information you need. This is also the same documentation our internal teams use to build their APIs.
 
 # Contact #
-For questions, comments, corrections, suggestions, etc, you can use the usual tools in GitHub or email [publicapi@godaddy.com](mailto:apispec@godaddy.com).  Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API or product.
+For questions, comments, corrections, suggestions, etc, you can use the usual tools in GitHub or email [apispec@godaddy.com](mailto:apispec@godaddy.com).  Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API or product.
 
 # Examples #
-Examples demonstrate a hypothetical file storage API. Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request. Examples generally show JSON request and responses, but several [request](#Request Formats) types are available and other [response](#Response Formats) types may be defined in the future.
+Examples demonstrate a hypothetical file storage API. Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request. Examples generally show JSON request and responses, but several [request](#request-format) types are available and other [response](#response-format) types may be defined in the future.
 
-# Definitions #
-### REST ###
-A **REST** (**Re**presentational **S**tate **T**ransfer) service is a style of API where a client makes HTTP requests to manipulate resources identified by the request URL. RESTful services are stateless, so session state is stored on the server between requests. Each requests contains all the information needed to service that request.
+----------------------------------------
 
-### Resource ###
+# Terminology #
+**REST:**
+A **RE**presentational **S**tate **T**ransfer service is a style of API where a client makes HTTP requests to manipulate resources identified by the request URL. RESTful services are stateless, so session state is stored on the server between requests. Each requests contains all the information needed to service that request.
+
+**Resource:**
 A **resource** is an object or concept that can be manipulated by the API. In our file storage example, they will be things like a 'Folder' and a 'File'. Resources are the building blocks of an API, the nouns in the language describing the system. All operations in the API manipulate the resources or their state. Resources should be organized in a way that is useful to the client. This is the most important part of the design of an API; if your resources just match your database schema one-to-one, chances are your API is not going to be very easy to use.
 
-### Representation ###
+**Representation:**
 REST APIs transfer **representations** of resources back and forth between the client and the service. These are documnents that describe resources. Representations are most commonly JSON-formatted, but can be of any type.
 
-### Attribute ###
+**Attribute:**
 Representations of resources consist of a series of **attributes** names and values as key-value pairs.
 
-### Collection ###
+**Collection:**
 A **collection** is a special kind of resource that represents a group of related resources. It contains a representation of each resource, and some additional information for things like pagination and filtering.
 
-### Identifier ###
+**Identifier:**
 Every resource in a collection MUST have an **identifier** attribute with a value that is unique within that collection.
 
-### Side Effects ###
+**Side Effects:**
 Requests that change the state of something in the service are said to have **side effects**. It is very important that certain types of requests not have side-effects.
 
-### Idempotent ###
+**Idempotent:**
 An operation is *idempotent* if it can be applied multiple times without changing the result after the first application.
 
-### Opaque ###
+**Opaque:**
 Some pieces of information returned from a service are considered to be **opaque**. Opaque values are a black box that has meaning only to the service; clients should not rely on any particular format, length, or content in an opaque value. They should not change the value or try to parse any meaning out of it. Opaque values MAY change between API revisions or even individual requests, so they should never be stored or compared against. For example, pagination URLs contain a "marker" attribute that identifies the appropriate page to load.
 
-### Action ###
+**Action:**
 An **action** is an operation that can be performed on a resource but does not fit into one the standard create/read/update/delete operations. For example "sharing" or "encrypting" a file resource.
 
-### Discoverability ###
+**Discoverability:**
 **Discoverability** is a method of self-documenting. Each API has a collection of schemas that define what resource types are available and what attributes they have. Each response contains information about how to find related resources and what actions are available.
 
 Since this documentation is in a computer-readable form, it is easy to make a generic client library that will speak to any API that implements this specification, with no code related to a particular service. We provide several [client libraries](/godaddy/gdapi) for different languages, and if you load the API in a browser we respond with a built-in JavaScript client that provides a friendly UI for experimentation.
 
-### Status Codes ###
+----------------------------------------
+
+# Status Codes #
 Every HTTP response contains a **status code**. This is the primary mechanism that a client uses to determine the result of their request, so it is very important that they be clearly defined and used consistently.  Requests that were successfully handled MUST return a response with a 2xx or 3xx status code.  Requests that cannot be processed MUST return a 4xx or 5xx code.
 
 Code | Meaning
 --------------------------|----------------------------
 **2xx** | **Success**
 200 OK | The request was successful.
-201 Created | Success, and a new resource has been created.  A Location header to the resource SHOULD be included.
-202 Accepted | The request has been received but has not completed. It may (or may not) be completed in the future.<br/>This is typically used for requests that produce a long-running process that will be completed asynchronously.
+201 Created | Success, and a new resource has been created.<br/>&bull; A Location header to the resource SHOULD be included.
+202 Accepted | The request has been received but has not completed. It MAY be completed in the future.<br/>&bull; This is typically used for requests that produce a long-running process that will be performed asynchronously.
 204 No Content | The request was successful, and the response will have no body portion.
 | 
 **3xx** | **Redirect**
-301 Moved Permanently | The requested resource is somewhere else now, and you should look there for it in the future.<br/>The new location MUST be specified in the Location header.<br/>The operative word here is **permanent**; clients may aggressively use the new location and never request the old one again.  If in doubt, use 302.
-302 Found | Temporary redirect.  The requested resource isn't here.  You can find it at the address indicated in the Location header, but check back at this URL next time because it might be somewhere else by then.
+301 Moved Permanently | Permanent redirect.  The requested resource is somewhere else now and will never be coming back.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull; The operative word here is *permanent*; clients may remember this and never request the old URL again.<br/>&bull; If in doubt, use 302.
+302 Found | Temporary redirect.  The requested resource isn't here right now.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull;The client will ask for the original URL if it wants this resource again in the future.
 304 Not Modified | The client made a conditional GET request for a resource, and that resource matches the condition so the response body does not need to be sent.
 | 
-**4xx** | **Client Error**<br/>&mdash; The **client** did something wrong.  Sending the same request again **will** result in the same error.
+**4xx** | **Client Error** &mdash; The client did something wrong.<br/>&bull; Sending the same request again **will** result in the same error.
 400 Bad Request | The request was malformed in some way or the input did not pass validation; the client should feel bad.
 401 Unauthorized | Authentication information was not sent or is invalid.
-403 Forbidden | Authentication information was validated, but does not give the requestor access to the requested resource.
+403 Forbidden | Authentication information was validated, but does not give the client access to the requested resource.
 404 Not Found | These are not the droids you are looking for.
-405 Method Not Allowed | The request HTTP method is not allowed for this URL.
+405 Method Not Allowed | The requested HTTP method is not allowed for this URL.
 406 Not Acceptable | The service does not support the representation content type that the client requested/sent.
-409 Conflict | [resource versioning](#Resource Versioning) is enabled and the request conflicts with the current state.
+409 Conflict | [Resource versioning](#resource-versioning) is enabled, and the requested operation conflicts with the current state.
 410 Gone | The requested API version is no longer supported.
-418 I'm a teapot | The request attempted to brew coffee with a teapot that is not compliant with [RFC2324](http://tools.ietf.org/html/rfc2324).
+418 I'm a teapot | The request attempted to brew coffee with a teapot service that is not compliant with [RFC2324](http://tools.ietf.org/html/rfc2324).
 | 
-**5xx** | **Service Error**<br/>&mdash; Something bad happened in the **service**.  There is nothing the client can do about this, and they can expect that the same request will succeed (or produce a 4xx error) if re-submitted in the future.
-500 Internal Server Error | Something is broken on our side; we should feel bad.
+**5xx** | **Service Error** &mdash; Something bad happened within the service.<br/>&bull; There is nothing the client can do about this.<br/>&bull; The same request will succeed (or produce a 4xx error) if re-submitted in the future.
+500&nbsp;Internal&nbsp;Server&nbsp;Error | Something is broken on our side; the service should feel bad.
 503 Service Unavailable | The request couldn't be handled due to maintenance or overload.
 
 ----------------------------------------
 
 # Representations #
-A representation is the way a resource is, well, represented, in a HTTP request or response. All services MUST support:
+A representation is the way a resource is described/serialized in a HTTP request or response. All services MUST support:
 
 - JSON (application/json) for both requests and responses.
-- This is the primary representation used by all APIs.
+  - This is the primary representation used by all APIs.
 - HTML (text/html; charset=utf8) for responses
-- This is a small HTML wrapper around the JSON format which displays the [HTML UI](#HTML UI).
-- The HTML response format is only intended for use in a web browser, not for clients to parse.
-- Forms (multipart/form-data and application/x-www-form-urlencoded) for requests.
-- These are needed for the [HTML UI](#HTML UI) and are easy to create with browsers and command-line tools like cURL.
+  - This is a small HTML wrapper around the JSON format which displays the [HTML UI](#html-ui).
+  - The HTML response format is only intended for use in a web browser, not for clients to parse.
+- Forms ([multipart/form-data](http://tools.ietf.org/html/rfc2388) and [application/x-www-form-urlencoded](http://www.w3.org/TR/html401/interact/forms.html#form-content-type)) for requests.
+  - These are needed for the [HTML UI](#html-ui) and are easy to create with browsers and command-line tools like cURL.
 
-Other representation Content-Types that make sense for the particular application MAY be supported as well.
-
-Services SHOULD be strict in sending back a very specific Content-Type value for each supported type. For example, do not attempt to match the particular way the client asked for JSON, always return "application/json".
+Other representation Content-Types that make sense for the particular application MAY also be supported.
 
 ## Request Format ##
-When clients are sending a representation to the service, they MUST specify the format using the [http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type] header. If the service does not support the specified Content-Type, it SHOULD return a 406 error.
+When clients are sending a representation to the service, they MUST specify the format using the [Content-Type](http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type) header. If the service does not support the specified Content-Type, it SHOULD return a 406 error.
 
 ## Response Format ##
-Clients MAY specify their preferred representation by including an appropriate [Accept header](http://tools.ietf.org/html/rfc2616#section-14.1). Service SHOULD be lenient in mapping this to one of their acceptable formats. For example "application/json", "text/json;charset=utf-8", and "text/json" should all be interpreted as JSON.
+Clients MAY specify their preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header. Service SHOULD be lenient in mapping this to one of their acceptable formats. For example "application/json", "text/json;charset=utf-8", and "text/json" should all be interpreted as JSON.
 
-JSON SHOULD be assumed as the preferred representation, unless the request is from a web browser. The suggested definiton of "a web browser" is that the Accept header contains "*/*" and the User-Agent header contains "mozilla". This matches all the common graphical web browsers but not HTTP request libraries or command-line browsers.
+JSON SHOULD be assumed as the preferred representation, unless the request is from a web browser.
+  - The suggested definiton of "a web browser" is that the Accept header contains "*/*" and the User-Agent header contains "mozilla".
+  - This matches all the common graphical web browsers but not HTTP request libraries or command-line browsers.
 
-A query parameter of <pre style="display:inline;">_format=json</pre> overrides any defaults or Accept header present and MUST make the response representation JSON.
+A query parameter of <code>&#95;format=json</code> overrides any defaults or Accept header present and MUST make the response representation JSON.
 
 In practice, if you only support HTML and JSON, your detection logic should look something like:
 
+```
 if ( query parameter "_format" is present and equals "json" )
-{
-respond with json
-}
-else if ( accepts header contains "*/*" AND user-agent header contains (case-insensitive) "mozilla" )
-{
-respond with html
-}
+  respond with json
+else if ( accepts header contains "*/*" AND user-agent header to lowercase contains "mozilla" )
+  respond with html
 else
-{
-respond with json
-}
+  respond with json
+```
 
 ## JSON ##
 JSON responses SHOULD BE pretty-printed. This adds minimal overhead and makes things much more readable.
 
 Escaping the forward slash ("/") character is optional in the JSON specification. 
-- When responding as raw JSON, slashes SHOULD NOT be escaped, to keep the response as readable as possible.
-- When responding as HTML, strings in the JSON data portion MUST have forward slashes escaped (as "\/", typically).
-- Failure to do this exposes the page to an XSS attack with strings that contain "".
+  - When responding as raw JSON, slashes SHOULD NOT be escaped, to keep the response as readable as possible to humans.
+  - When responding as HTML, strings in the JSON data portion MUST have forward slashes escaped (as "\/", typically).
+  - Failure to do this exposes the page to an XSS attack with strings that contain "".
 
 ## Dates ##
 Dates SHOULD always be in UTC. If you have a very good reason to use something else, the attribute name SHOULD indicate that it is "local" or similar to avoid confusion.
 
 For JSON, dates SHOULD should be returned in 2 formats:
-- An [ISO-8601](http://www.w3.org/TR/NOTE-datetime) formatted UTC string (e.g. created: "2012-02-24T15:42:00Z")
-- The number of milliseconds since 1/1/1970 (a "UNIX timestamp" or "epoch time") as the same name as the string attribute, plus "TS"
-- e.g. createdTS: 1330098120000
-- The "TS" version SHOULD NOT appear in the schema and therefore MUST NOT be writable.
+  - An [ISO-8601](http://www.w3.org/TR/NOTE-datetime) formatted UTC string.
+    - e.g. created: "2012-02-24T15:42:00Z"
+  - The number of milliseconds since 1/1/1970 (a "UNIX timestamp" or "epoch time") as the same name with "TS" appended
+    - e.g. createdTS: 1330098120000
+    - Note: The "TS" version SHOULD NOT appear in the schema and therefore cannot be writable.
 
 ## HTML UI ##
 Services provide a HTML version of their API by wrapping the JSON response with the snippet below. It includes JavaScript and CSS that pretty-prints the response and displays a bar that provides buttons for operations, actions, sorting, filtering, pagination, etc.
@@ -147,154 +148,192 @@ Services provide a HTML version of their API by wrapping the JSON response with 
 <!-- If you are reading this, there is a good chance you would prefer sending an
 "Accept: application/json" header and receiving actual JSON responses. -->
 <link rel="stylesheet" type="text/css" href="https://cloud.secureserver.net/css.php?group=htmlapi" />
-
-
-</pre>
+<script src="https://cloud.secureserver.net/js.php?group=htmlapi"></script>
+<script>
+var docs = "http://docs.cloud.secureserver.net";
+var data = { 
+  /* ... JSON response ... */
+};
+</script>
 ```
 
+----------------------------------------
+
 ## Errors ##
-Error responses MUST have a [[#Resources|resource]] body which gives more information about the error. At a minimum, this MUST include:
-- "type": "error"
-- "status": the HTTP status code of the response
-- "code": A short identifier for the error, suitable for identifying what specific kind of error this is with code.
+Error responses MUST have a [resource](#resources) body which gives more information about the error. At a minimum, this MUST include:
+  - <code>type:</code> "error"
+  - <code>status:</code> the HTTP status code of the response
+  - <code>code:</code> A short identifier for the error, suitable for identifying what specific kind of error this is with code.
 
 Errors SHOULD also include:
-- "message": A short description of the error for a human to read
-- "detail": Additional detail about the error, if available
+- <code>message:</code> A short description of the error for a human to read
+- <code>detail:</code> Additional detail about the error, if available
 - Any other application-specific information that is available.
 
 Error responses MUST be returned in the representation appropriate for what the request asked for.
-- Don't be rude and send a HTML error page back to a client that made a request for JSON.
+- It's rude to send an HTML error page back to a client that made a request for JSON.
 - Also consider responses that might be returned from application servers and web proxies in your stack but outside your API code.
-- If the error is with [[#Content Negotation|content negotiation]] itself, return in the default format (JSON).
+- If the error is with [content negotiation](#content-negotiation) itself, return in the default format (JSON).
 
 ```javascript
 {
-"type": "error",
-"status": 404,
-"code": "FolderNotFound",
-"message": "The specified folder does not exist",
+  "type":    "error",
+  "status":  404,
+  "code":    "FolderNotFound",
+  "message": "The specified folder does not exist",
+  /* ... more application-specific info ... */
 }
 ```
+
+----------------------------------------
 
 ## Resources ##
 
-Resource representations MUST have:
-- A "type" string attribute that identifies the kind of resource it is.
-- Types SHOULD be singular, not plural, and MUST match a [schema](#Schemas) id.
-- An "id" string identifier attribute which uniquely identifies it.
-- The identifier MUST BE unique among other resources of the same type and consist only of URL-safe characters.
-- Identifiers SHOULD be globally unique when practical, but this is not required.
-- Identifiers SHOULD NOT be an auto-incrementing id from a database. Exposing this value reveals information about the size and growth of the service, and easily allows attackers to iterate over the entire valid id range.
-- In general something like a GUID is best if there will be many of the resource (e.g. files), and a short readable string if there is a very limited set of possible resources (e.g. "facebook", "twitter", "myspace", "googleplus" for a social network resource).
-- A "rev" string attribute, only if the resource implements [resource versioning](#Resource Versioning).
-- A "links" map attribute with [links](#Links) to:
-- The URL for the resource itself, as "self",
-- The schema definition for this resource type as "schema"
-- Any related resources/collections, as appropriate.
-- An "actions" map attribute with the name of the action and URL that would be requested to perform it.
-- This MAY be omitted if the resource type has no actions.
+Resource representations MUST have several attributes:
+  - <code>type:</code> A string that uniquely identifies the kind of resource this is.
+    - Types SHOULD be singular, not plural, and MUST correspond to a [schema](#schemas) id.
+  - <code>id:</code> A string which uniquey identifies this resource.
+    - MUST BE unique among other resources of the same type and consist only of URL-safe characters.
+    - SHOULD be globally unique when practical.
+    - SHOULD NOT be an auto-incrementing id from a database. Exposing this value reveals information about the size and growth of the service, and easily allows attackers to iterate over the entire valid id range.
+    - In general something like a GUID is best if there will be many of the resource or they are dynamically created.
+    - If there is a very limited set of possible resources then a short readable string is good.
+      - e.g. "facebook", "twitter", "myspace", "googleplus" for a social network resource.
+  - <code>rev:</code> A string identifying the resource revision, if [resource versioning](#resource-versioning) is implemented.
+  - <code>links:</code> A map with [links](#links) to:
+    - <code>self:</code> The location of the resource itself.
+    - <code>schema:</code> The location of the schema definition for this resource type
+    - Any related resources/collections, as appropriate.
+  - <code>actions:</code> A map of action names and the URL that can be requested to perform them.
+    - This MAY be omitted if the resource type has no actions.
 
 ```javascript
 {
-"id": "b1b2e7006be", 
-"type": "file",
-"rev": "rev0d41cb806a",
-"links": { /*see links*/ },
-"actions": { /*see actions*/ },
-"name": "ultimate_answer.txt",
-"size": 2,
-/*other appplication-specific attributes */
+  "id":      "b1b2e7006be", 
+  "type":    "file",
+  "rev":     "rev0d41cb806a",
+  "links":   { /*see links*/ },
+  "actions": { /*see actions*/ },
+  "name":    "ultimate_answer.txt",
+  "size":    2,
+  /* ... more application-specific attributes ... */
 }
 ```
+
+----------------------------------------
 
 ## Collections ##
 
-Collections are a special case of resource. They do not need to have an identifier attribute, but have a "data" array that contains an array of resources.
+Collections are a special case of resource. They do not need to have an identifier attribute, and have a "data" array that contains an array of resources.
 
 Collection representations MUST have:
-- A "type" string attribute, with the value "collection"
-- A "data" array attribute containing resources
-- This MUST always be present and be an array, even if there are 0 or 1 entries in it.
-- A "links" attribute with [links](#Links) to:
-- Itself, as "self".
-- The [schema](#Schemas) definition for the type (which will always be "collection"), as "schema".
-- The [schema](#Schemas) definition for the primary resourceType (e.g. "file"), as "resourceSchema".
-- Any related resources/collections, as appropriate.
+  - <code>type:</code> "collection"
+  - <code>links:</code> A map with [links](#links) to:
+    - <code>self:</code> The location of the resource itself.
+    - <code>schema:</code> The location of the schema definition for this type (which is always "collection")
+    - <code>resourceSchema:</code> The location of the schema definition for the resources contained in the collection.
+    - Any related resources/collections, as appropriate.
+  - <code>data:</code> An array containing resource representations
+    - This MUST always be present and be an array, even if there are 0 or 1 entries in it.
 
 And SHOULD have (when appropriate):
-- A "resourceTypes" map attribute of the names of types that can be created in this collection and the URL for their schema.
-- A "createDefaults" map of field names and their values.
-- This can be used to specify context-specific default values for field when creating a new resource.
-- An "actions" map attribute, with the name of the action and the URI that would be used to perform it, if any actions are available.
-- A "pagination" map attribute, if the result is [paginated](#Pagination).
-- A "sort" map attribute, if the collection supports [sorting](#Sorting).
-- A "filters" map attribute, if the collection supports [filtering](#Filtering).
+  - <code>resourceTypes:</code> A map of the names of types that can be created in this collection to the URL for their schema.
+    - This SHOULD be present if the collection can contain more than one type.
+    - Each resourceType should "extend" the type in the <code>resourceSchema</code> link to the "parent" type.
+  - <code>createDefaults:</code> A map of field names and their values.
+    - This can be used to specify a context-specific default value for fields when the client is creating a new resource.
+  - <code>actions:</code> A map of action names and the URL that can be requested to perform them.
+    - This MAY be omitted if the resource type has no actions.
+  - <code>pagination:</code> See [pagination](#pagination).
+  - <code>sort:</code> See [sorting](#sorting).
+  - <code>filters:</code> See [filtering](#filtering).
 
-Collections MAY include additional application-specific attributes.
+Collections MAY also include additional application-specific attributes.
 
 ```javascript
 {
-"type": "collection",
-"resourceType": "file",
-"links": { /*see links*/ },
-"actions": { /*see actions*/ },
-"pagination": { /*see pagination*/ },
-"sort": { /*see sorting*/ },
-"filters": { /*see filtering*/ },
-"data": [
-{/*file resource*/},
-{/*file resource*/},
-/*...more resources...*/
-],	
-/* application-specific attributes */
+  "type": "collection",
+  "links": { 
+    "self":           "https://base/v1/files",
+    "schema":         "https://base/v1/schemas/collection",
+    "resourceSchema": "https://base/v1/schemas/file",
+    /* ... more links ... */
+  },
+  "resourceTypes": {
+    "textFile":  "https://base/v1/schemas/textFile",
+    "imageFile": "https://base/v1/schemas/imageFile",
+  },
+  "actions":    { /* see actions */ },
+  "pagination": { /* see pagination */ },
+  "sort":       { /* see sorting */ },
+  "filters":    { /* see filtering */ },
+  "data": [
+    {/* file resource */},
+    {/* file resource */},
+    /* ... more resources ... */
+  ],	
+  /* ... application-specific attributes ... */
 }
 ```
 
+----------------------------------------
+
 ## Links ##
-Links provide a path for the client to follow to get to related collections, resources, and actions not included in the response. Clients SHOULD use the links to retrieve related information without having to hard-code or construct the URL on their own.
+Links provide a trail for the client to follow to get to related information that is not included in the response.  Clients SHOULD use the links to retrieve related information instead of hard-coding or constructing URLs from strings on their own.  Services SHOULD provide the appropriate links so that clients don't have to resort to that sort of thing.
 
-Links in responses should be absolute URLs, including the protocol (https), host, port (if not 443), and [API Version](#API Versioning).
-- This prevents the client having to construct absolute URLs on their own from a relative response.
-- [HTTP compression](#Compression) will make the overhead of transmitting absolute URLs negligible.
+Links in responses MUST BE absolute URLs, including the protocol (https), host, port (if not 443), and [API Version](#api-versioning).
+  - This prevents the client needing resolve relative URLs into absolute ones.
+  - [HTTP compression](#compression) will make the overhead of transmitting absolute URLs negligible.
 
-Trailing slashes SHOULD NOT be included on URLs, but a request MUST produce the same response whether a trailing slash is included or not.
+Slashes:
+  - Trailing slashes SHOULD NOT be included on URLs in responses.
+  - But they SHOULD have no effect on the response produced if a client sends one.
+  - Multiple slashes in a URL SHOULD be treated the same as a single slash.
 
 Guidelines for creating links:
-- Every "id" reference in a resource body should have a corresponding link. For example if a file resource has a "folderId", there should be a "folder" link.
-- Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read. It's much easier for everyone to debug if you can tell what a URL is for just by looking at it.
-- Limit your URL namespace as much as possible. The less surface area you have exposed the less there is that might need to change later.
-- Services SHOULD NOT change the format or construction of URLs within an API version
-- Theoretically everyone uses the discoverability features and follows links, but some users will inevitably ignore this.
-- Therefore if a URL needs to be changed, you SHOULD provide a 301/302 redirect, or increment the [API version](#API Versioning).
+  - Every reference to the "id" of another resource SHOULD have a corresponding link.
+    - For example if a file resource has a "folderId" field, there should be a "folder" link.
+  - Limit your URL namespace as much as possible. The less surface area you have exposed the less there is that might need to change later.
+  - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
+  - Services SHOULD NOT change the format or construction of URLs within an API version
+    - In theory, everyone uses the discoverability features and follows links, so services may change URL formats at any time.
+    - But some clients will inevitably ignore disoverability and hardcode paths into their code.
+    - So if a URL needs to be changed, provide a 301/302 redirect or release a new [API version](#api-versioning).
 
 ```javascript
 {
-"links": {
-"self": "https://basev1/files/b1b2e7006be",
-"schema": "https://base/v1/schemas/file",
-"contents": "https://base/v1/files/b1b2e7006be/contents",
-"folder": "https://base/v1/folders/19c3932wef",
-"public": "http://documents.your-files.com/ultimate_answer.txt"
-},
-/*...other attributes...*/ 
+  "links": {
+    "self":     "https://base/v1/files/b1b2e7006be",
+    "schema":   "https://base/v1/schemas/file",
+    "contents": "https://base/v1/files/b1b2e7006be/contents",
+    "folder":   "https://base/v1/folders/19c3932wef",
+    "public":   "http://documents.your-files.com/ultimate_answer.txt"
+    /* ... more links ... */
+  },
+  /* ...other attributes... */ 
 }
 ```
 
 # Actions #
-Actions perform an operation on a resource (or collection) and optionally returns a result. Actions may have several input values and typically do something that requires application logic beyond what could be done with a simple [create](#Create), [update](#Update), or [delete](#Delete) operation.
+Actions perform an operation on a resource (or collection) and optionally returns a result. Actions may have several inputs and typically do something that requires application logic beyond what could be done with a simple [create](#create), [update](#update), or [delete](#delete) operation.
 
-Resource types that have actions available MUST have a map detailing all the actions that are possible and their inputs/output. For example, there may be "share", "encrypt", and "decrypt" actions on a file. See [schemas](#Schemas) for more information.
+The schema for types that have actions available have an <code>actions</code> and/or <code>collectionActions</code> map in their schema detailing all the actions that are possible and their input/output schema. For example, there may be "share", "encrypt", and "decrypt" actions on a file. See [schemas](#schemas) for more information.
 
-Resource representations MUST indicate what actions actions are actually available for this resource and what the URL to perform them is. For example, if only one of "encrypt" and "decrypt" are possible for a given file resource, only one of them would appear in the resource:
+Resources (and collections) of types that have actions defined have a <code>actions</code> attribute that details what actions are available for this particular resource, and what URL is to be accessed to perform them. For example if only one of "encrypt" and "decrypt" are possible for a given file, only one of them would appear in the resource:
 
+```javascript
 {
-"actions": {
-"share": "https://base/v1/files/b1b2e7006be?share",
-"encrypt": "https://base/v1/files/b1b2e7006be?encrypt"
-},
-/*...other resource attributes...*/ 
+  "id": "b1b2e7006be",
+  "type":    "file",
+  "actions": {
+    "share": "https://base/v1/files/b1b2e7006be?share",
+    "encrypt": "https://base/v1/files/b1b2e7006be?encrypt"
+  },
+  /* ... other resource attributes ... */
 }
+```
+
+----------------------------------------
 
 # Schemas #
 
@@ -306,8 +345,8 @@ Each schema resource MUST describe:
 - "id": The name of the resource type.
 - "type": "schema"
 - "methods": An array of HTTP methods that are available to some (but not necessarily all) resources of this type.
-- "fields": A map of field names and descriptions of that field (see [fields](#Schema Fields)).
-- "actions": A map detailing the actions that are available to some (but not necessarily all) items of this type, and their input and output schemas (see [actions](#Action Schemas)).
+- "fields": A map of field names and descriptions of that field (see [fields](#schema Fields)).
+- "actions": A map detailing the actions that are available to some (but not necessarily all) items of this type, and their input and output schemas (see [actions](#action-schemas)).
 - "collectionMethods": An array of HTTP methods that are available to a collection of this type.
 - "collectionActions": A map detailing the actions that are available to collections of this type.
 - "collectionFields": A map detailing the non-standard attribute fields that the collection has, if any.
