@@ -11,7 +11,7 @@ Maybe you'd like to build your own tools that work with our services.  Or maybe 
 For questions, comments, corrections, suggestions, etc, you can use the usual tools in GitHub or email [apispec@godaddy.com](mailto:apispec@godaddy.com).  Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API or product.
 
 # License #
-Copyright (c) 2012 Go Daddy Operating Company, LLC 
+Copyright &copy; 2012 Go Daddy Operating Company, LLC 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
