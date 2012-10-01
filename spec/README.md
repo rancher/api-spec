@@ -1,67 +1,88 @@
 # What is this thing? #
-This document defines the REST API specification implemented by public Go Daddy(r) APIs.
+This document defines the REST API specification implemented by public Go Daddy&reg; APIs.
 
-Our goal is to make APIs that are as easy to use as possible. Each service has [documentation](http://docs.cloud.secureserver.net/) available, but this should be a supplement, not required reading. Armed with just the URL and credentials, a user should be able to navigate their way through the API in a web browser to learn about what resources and operations it has. In other words, the API should be _discoverable_. Once you're familar with what's available, requests can be made with simple tools like cURL or any basic HTTP request library.
+Our goal is to make APIs that are as easy to use as possible.  Each service has [documentation](http://docs.cloud.secureserver.net/) available, but this should be a supplement, not required reading.  Armed with just the URL and credentials, a user should be able to navigate their way through the API in a web browser to learn about what resources and operations it has.  In other words, the API should be _discoverable_.  Once you're familar with what's available, requests can be made with simple tools like cURL or any basic HTTP request library.
 
 # Why are you publishing it? #
 
-Maybe you'd like to build your own tools that work with our services. Or maybe you want to build your own service that follows the same style as ours. We'd love it if you did either one and want to give you all the information you need. This is also the same documentation our internal teams use to build their APIs.
+Maybe you'd like to build your own tools that work with our services.  Or maybe you want to build your own service that follows the same style as ours.  We'd love it if you did either one and want to give you all the information you need.  This is also the same documentation our internal teams use to build their APIs.
 
 # Contact #
 For questions, comments, corrections, suggestions, etc, you can use the usual tools in GitHub or email [apispec@godaddy.com](mailto:apispec@godaddy.com).  Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API or product.
 
+# License #
+Copyright (c) 2012 Go Daddy Operating Company, LLC 
+
+Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation 
+the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in  
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+
 # Examples #
-Examples demonstrate a hypothetical file storage API. Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request. Examples generally show JSON request and responses, but several [request](#request-format) types are available and other [response](#response-format) types may be defined in the future.
+Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request.  Examples generally show JSON request and responses, but several [request](#request-format) types are available and other [response](#response-format) types may be defined in the future.
 
 ----------------------------------------
 
 # Terminology #
 **REST:**
-A **RE**presentational **S**tate **T**ransfer service is a style of API where a client makes HTTP requests to manipulate resources identified by the request URL. RESTful services are stateless, so session state is stored on the server between requests. Each requests contains all the information needed to service that request.
+A **RE**presentational **S**tate **T**ransfer service is a style of API where a client makes HTTP requests to manipulate resources identified by the request URL.  RESTful services are stateless, so session state is stored on the server between requests.  Each requests contains all the information needed to service that request.
 
 **Resource:**
-A **resource** is an object or concept that can be manipulated by the API. In our file storage example, they will be things like a 'Folder' and a 'File'. Resources are the building blocks of an API, the nouns in the language describing the system. All operations in the API manipulate the resources or their state. Resources should be organized in a way that is useful to the client. This is the most important part of the design of an API; if your resources just match your database schema one-to-one, chances are your API is not going to be very easy to use.
+A **resource** is an object or concept that can be manipulated by the API.  In our file storage example, they will be things like a 'Folder' and a 'File'.  Resources are the building blocks of an API, the nouns in the language describing the system.  All operations in the API manipulate the resources or their state.  Resources should be organized in a way that is useful to the client.  This is the most important part of the design of an API; if your resources just match your database schema one-to-one, chances are your API is not going to be very easy to use.
 
 **Representation:**
-REST APIs transfer **representations** of resources back and forth between the client and the service. These are documnents that describe resources. Representations are most commonly JSON-formatted, but can be of any type.
+REST APIs transfer **representations** of resources back and forth between the client and the service.  These are documnents that describe resources.  Representations are most commonly JSON-formatted, but can be of any type.
 
 **Attribute:**
 Representations of resources consist of a series of **attributes** names and values as key-value pairs.
 
 **Collection:**
-A **collection** is a special kind of resource that represents a group of related resources. It contains a representation of each resource, and some additional information for things like pagination and filtering.
+A **collection** is a special kind of resource that represents a group of related resources.  It contains a representation of each resource, and some additional information for things like pagination and filtering.
 
 **Identifier:**
 Every resource in a collection MUST have an **identifier** attribute with a value that is unique within that collection.
 
 **Side Effects:**
-Requests that change the state of something in the service are said to have **side effects**. It is very important that certain types of requests not have side-effects.
+Requests that change the state of something in the service are said to have **side effects**.  It is very important that certain types of requests not have side-effects.
 
 **Idempotent:**
 An operation is *idempotent* if it can be applied multiple times without changing the result after the first application.
 
 **Opaque:**
-Some pieces of information returned from a service are considered to be **opaque**. Opaque values are a black box that has meaning only to the service; clients should not rely on any particular format, length, or content in an opaque value. They should not change the value or try to parse any meaning out of it. Opaque values MAY change between API revisions or even individual requests, so they should never be stored or compared against. For example, pagination URLs contain a "marker" attribute that identifies the appropriate page to load.
+Some pieces of information returned from a service are considered to be **opaque**.  Opaque values are a black box that has meaning only to the service; clients should not rely on any particular format, length, or content in an opaque value.  They should not change the value or try to parse any meaning out of it.  Opaque values MAY change between API revisions or even individual requests, so they should never be stored or compared against.  For example, pagination URLs contain a "marker" attribute that identifies the appropriate page to load.
 
 **Action:**
-An **action** is an operation that can be performed on a resource but does not fit into one the standard create/read/update/delete operations. For example "sharing" or "encrypting" a file resource.
+An **action** is an operation that can be performed on a resource but does not fit into one the standard create/read/update/delete operations.  For example "sharing" or "encrypting" a file resource.
 
 **Discoverability:**
-**Discoverability** is a method of self-documenting. Each API has a collection of schemas that define what resource types are available and what attributes they have. Each response contains information about how to find related resources and what actions are available.
+**Discoverability** is a method of self-documenting.  Each API has a collection of schemas that define what resource types are available and what attributes they have.  Each response contains information about how to find related resources and what actions are available.
 
-Since this documentation is in a computer-readable form, it is easy to make a generic client library that will speak to any API that implements this specification, with no code related to a particular service. We provide several [client libraries](/godaddy/gdapi) for different languages, and if you load the API in a browser we respond with a built-in JavaScript client that provides a friendly UI for experimentation.
+Since this documentation is in a computer-readable form, it is easy to make a generic client library that will speak to any API that implements this specification, with no code related to a particular service.  We provide several [client libraries](/godaddy/gdapi) for different languages, and if you load the API in a browser we respond with a built-in JavaScript client that provides a friendly UI for experimentation.
 
 ----------------------------------------
 
 # Status Codes #
-Every HTTP response contains a **status code**. This is the primary mechanism that a client uses to determine the result of their request, so it is very important that they be clearly defined and used consistently.  Requests that were successfully handled MUST return a response with a 2xx or 3xx status code.  Requests that cannot be processed MUST return a 4xx or 5xx code.
+Every HTTP response contains a **status code**.  This is the primary mechanism that a client uses to determine the result of their request, so it is very important that they be clearly defined and used consistently.  Requests that were successfully handled MUST return a response with a 2xx or 3xx status code.  Requests that cannot be processed MUST return a 4xx or 5xx code.
 
 Code | Meaning
 --------------------------|----------------------------
 **2xx** | **Success**
 200 OK | The request was successful.
 201 Created | Success, and a new resource has been created.<br/>&bull; A Location header to the resource SHOULD be included.
-202 Accepted | The request has been received but has not completed. It MAY be completed in the future.<br/>&bull; This is typically used for requests that produce a long-running process that will be performed asynchronously.
+202 Accepted | The request has been received but has not completed.  It MAY be completed in the future.<br/>&bull; This is typically used for requests that produce a long-running process that will be performed asynchronously.
 204 No Content | The request was successful, and the response will have no body portion.
 | 
 **3xx** | **Redirect**
@@ -87,7 +108,7 @@ Code | Meaning
 ----------------------------------------
 
 # Representations #
-A representation is the way a resource is described/serialized in a HTTP request or response. All services MUST support:
+A representation is the way a resource is described/serialized in a HTTP request or response.  All services MUST support:
 
 - JSON (application/json) for both requests and responses.
   - This is the primary representation used by all APIs.
@@ -100,10 +121,10 @@ A representation is the way a resource is described/serialized in a HTTP request
 Other representation Content-Types that make sense for the particular application MAY also be supported.
 
 ## Request Format ##
-When clients are sending a representation to the service, they MUST specify the format using the [Content-Type](http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type) header. If the service does not support the specified Content-Type, it SHOULD return a 406 error.
+When clients are sending a representation to the service, they MUST specify the format using the [Content-Type](http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type) header.  If the service does not support the specified Content-Type, it SHOULD return a 406 error.
 
 ## Response Format ##
-Clients MAY specify their preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header. Service SHOULD be lenient in mapping this to one of their acceptable formats. For example "application/json", "text/json;charset=utf-8", and "text/json" should all be interpreted as JSON.
+Clients MAY specify their preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header.  Service SHOULD be lenient in mapping this to one of their acceptable formats.  For example "application/json", "text/json;charset=utf-8", and "text/json" should all be interpreted as JSON.
 
 JSON SHOULD be assumed as the preferred representation, unless the request is from a web browser.
   - The suggested definiton of "a web browser" is that the Accept header contains "*/*" and the User-Agent header contains "mozilla".
@@ -123,15 +144,15 @@ else
 ```
 
 ## JSON ##
-JSON responses SHOULD BE pretty-printed. This adds minimal overhead and makes things much more readable.
+JSON responses SHOULD BE pretty-printed, at least to the extent of having occasional newlines.  This adds minimal overhead and makes it much more readable.
 
-Escaping the forward slash ("/") character is optional in the JSON specification. 
-  - When responding as raw JSON, slashes SHOULD NOT be escaped, to keep the response as readable as possible to humans.
-  - When responding as HTML, strings in the JSON data portion MUST have forward slashes escaped (as "\/", typically).
-  - Failure to do this exposes the page to an XSS attack with strings that contain "".
+Escaping the forward slash ("/") character is not required in the [JSON specification](http://json.org/)
+  - When responding as raw JSON, slashes SHOULD NOT be escaped.
+  - When responding as HTML, strings in the JSON data portion MUST have forward slashes escaped, typically as "\/".
+    - Failure to do this exposes the page to an XSS attack using strings that contain "&lt;/script&gt;".
 
 ## Dates ##
-Dates SHOULD always be in UTC. If you have a very good reason to use something else, the attribute name SHOULD indicate that it is "local" or similar to avoid confusion.
+Dates SHOULD always be in UTC.  If you have a very good reason to use something else, the attribute name SHOULD indicate that it is "local" or similar to avoid confusion.
 
 For JSON, dates SHOULD should be returned in 2 formats:
   - An [ISO-8601](http://www.w3.org/TR/NOTE-datetime) formatted UTC string.
@@ -141,7 +162,7 @@ For JSON, dates SHOULD should be returned in 2 formats:
     - Note: The "TS" version SHOULD NOT appear in the schema and therefore cannot be writable.
 
 ## HTML UI ##
-Services provide a HTML version of their API by wrapping the JSON response with the snippet below. It includes JavaScript and CSS that pretty-prints the response and displays a bar that provides buttons for operations, actions, sorting, filtering, pagination, etc.
+Services provide a HTML version of their API by wrapping the JSON response with the snippet below.  It includes JavaScript and CSS that pretty-prints the response and displays a bar that provides buttons for operations, actions, sorting, filtering, pagination, etc.
 
 ```html
 <!DOCTYPE html>
@@ -160,7 +181,7 @@ var data = {
 ----------------------------------------
 
 ## Errors ##
-Error responses MUST have a [resource](#resources) body which gives more information about the error. At a minimum, this MUST include:
+Error responses MUST have a [resource](#resources) body which gives more information about the error.  At a minimum, this MUST include:
   - <code>type:</code> "error"
   - <code>status:</code> the HTTP status code of the response
   - <code>code:</code> A short identifier for the error, suitable for identifying what specific kind of error this is with code.
@@ -195,7 +216,7 @@ Resource representations MUST have several attributes:
   - <code>id:</code> A string which uniquey identifies this resource.
     - MUST BE unique among other resources of the same type and consist only of URL-safe characters.
     - SHOULD be globally unique when practical.
-    - SHOULD NOT be an auto-incrementing id from a database. Exposing this value reveals information about the size and growth of the service, and easily allows attackers to iterate over the entire valid id range.
+    - SHOULD NOT be an auto-incrementing id from a database.  Exposing this value reveals information about the size and growth of the service, and easily allows attackers to iterate over the entire valid id range.
     - In general something like a GUID is best if there will be many of the resource or they are dynamically created.
     - If there is a very limited set of possible resources then a short readable string is good.
       - e.g. "facebook", "twitter", "myspace", "googleplus" for a social network resource.
@@ -212,11 +233,11 @@ Resource representations MUST have several attributes:
   "id":      "b1b2e7006be", 
   "type":    "file",
   "rev":     "rev0d41cb806a",
-  "links":   { /*see links*/ },
-  "actions": { /*see actions*/ },
+  "links":   { /* see links */ },
+  "actions": { /* see actions */ },
   "name":    "ultimate_answer.txt",
   "size":    2,
-  /* ... more application-specific attributes ... */
+  /* ...  more application-specific attributes ... */
 }
 ```
 
@@ -224,22 +245,24 @@ Resource representations MUST have several attributes:
 
 ## Collections ##
 
-Collections are a special case of resource. They do not need to have an identifier attribute, and have a "data" array that contains an array of resources.
+Collections are a special case of resource.  They do not need to have an identifier attribute, and have a "data" array that contains an array of resources.
 
 Collection representations MUST have:
   - <code>type:</code> "collection"
+  - <code>resourceType:</code> The name of the primary schema type this collection holds.
   - <code>links:</code> A map with [links](#links) to:
     - <code>self:</code> The location of the resource itself.
     - <code>schema:</code> The location of the schema definition for this type (which is always "collection")
-    - <code>resourceSchema:</code> The location of the schema definition for the resources contained in the collection.
+    - <code>resourceSchema:</code> The location of the <code>resourceType</code> schema.
     - Any related resources/collections, as appropriate.
   - <code>data:</code> An array containing resource representations
     - This MUST always be present and be an array, even if there are 0 or 1 entries in it.
 
 And SHOULD have (when appropriate):
-  - <code>resourceTypes:</code> A map of the names of types that can be created in this collection &rarr; the URL for their schema.
-    - This SHOULD be present if the collection can contain more than one type.
-    - Each resourceType should "extend" the type in the <code>resourceSchema</code> link to the "parent" type.
+  - <code>createTypes:</code> A map of the names of types that can be created in this collection &rarr; the URL for their schema.
+    - This SHOULD be present only if a type other than <code>resourceType</code> can be created.
+    - Each entry SHOULD BE an "extension" the primary <code>resourceType</code>.  It should have all the same fields and filters, plus additional info.
+    - If the primary <code>resourceType</code> can be created, it SHOULD also be present in the map.
   - <code>createDefaults:</code> A map of field names &rarr; their values.
     - This can be used to specify a context-specific default value for fields when the client is creating a new resource.
   - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them.
@@ -253,15 +276,17 @@ Collections MAY also include additional application-specific attributes.
 ```javascript
 {
   "type": "collection",
+  "resourceType": "file",
+  "createTypes": {
+    "file":      "https://base/v1/schemas/file",
+    "textFile":  "https://base/v1/schemas/textFile",
+    "imageFile": "https://base/v1/schemas/imageFile",
+  },
   "links": { 
     "self":           "https://base/v1/files",
     "schema":         "https://base/v1/schemas/collection",
     "resourceSchema": "https://base/v1/schemas/file",
     /* ... more links ... */
-  },
-  "resourceTypes": {
-    "textFile":  "https://base/v1/schemas/textFile",
-    "imageFile": "https://base/v1/schemas/imageFile",
   },
   "actions":    { /* see actions */ },
   "pagination": { /* see pagination */ },
@@ -293,7 +318,7 @@ Slashes:
 Guidelines for creating links:
   - Every reference to the "id" of another resource SHOULD have a corresponding link.
     - For example if a file resource has a "folderId" field, there should be a "folder" link.
-  - Limit your URL namespace as much as possible. The less surface area you have exposed the less there is that might need to change later.
+  - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
   - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
   - Services SHOULD NOT change the format or construction of URLs within an API version
     - In theory, everyone uses the discoverability features and follows links, so services may change URL formats at any time.
@@ -314,12 +339,14 @@ Guidelines for creating links:
 }
 ```
 
+----------------------------------------
+
 # Actions #
-Actions perform an operation on a resource (or collection) and optionally returns a result. Actions may have several inputs and typically do something that requires application logic beyond what could be done with a simple [create](#create), [update](#update), or [delete](#delete) operation.
+Actions perform an operation on a resource (or collection) and optionally returns a result.  Actions may have several inputs and typically do something that requires application logic beyond what could be done with a simple [create](#create), [update](#update), or [delete](#delete) operation.
 
-The schema for types that have actions available have an <code>actions</code> and/or <code>collectionActions</code> map in their schema detailing all the actions that are possible and their input/output schema. For example, there may be "share", "encrypt", and "decrypt" actions on a file. See [schemas](#schemas) for more information.
+The schema for types that have actions available have an <code>actions</code> and/or <code>collectionActions</code> map in their schema detailing all the actions that are possible and their input/output schema.  For example, there may be "share", "encrypt", and "decrypt" actions on a file.  See [schemas](#schemas) for more information.
 
-## Schema ##
+### Schema ###
 Actions are defined by a map with 4 attributes:
   - <code>input:</code> The ID of the schema that the inputs will conform to
   - <code>inputSchema:</code> The URL to that schema ID
@@ -355,8 +382,8 @@ The appropriate pair MAY be omitted if there are no inputs or outputs to the act
 }
 ```
 
-## Resource Representations ##
-Resources (and collections) of types that have actions defined have a <code>actions</code> attribute that details what actions are available for this particular resource, and what URL is to be accessed to perform them. For example if only one of "encrypt" and "decrypt" are possible for a given file, only the one currently available would appear in the resource:
+### Resource Representation ###
+Resources (and collections) of types that have actions defined have a <code>actions</code> attribute that details what actions are available for this particular resource, and what URL is to be accessed to perform them.  For example if only one of "encrypt" and "decrypt" are possible for a given file, only the one currently available would appear in the resource:
 
 ```javascript
 {
@@ -374,7 +401,7 @@ Resources (and collections) of types that have actions defined have a <code>acti
 
 # Schemas #
 
-Each service MUST have a top-level collection called "schemas" which contains "schema" resource for each resource type. The information contained in the schema provides enough information to build a smart client that knows what actions are available, what fields make up a resource, etc.
+Each service MUST have a top-level collection called "schemas" which contains "schema" resource for each resource type.  The information contained in the schema provides enough information to build a smart client that knows what actions are available, what fields make up a resource, etc.
 
 The "schemas" collection MUST also have a link to the base URL of the API version.
   - This makes the schema collection (https://base//v1/schemas) a single URL that provides a client everything they need to know about the service, similar to a WSDL in a SOAP service.
@@ -396,103 +423,122 @@ Each schema resource MUST describe:
 
 ### Schema Fields ###
 Each field is defined by a map of properties.  Fields MUST have a <code>type:</code>, which may be a "simple" type:
-  <code>"string"</code>
-  <code>"password"</code>
-  <code>"int"</code>
-  <code>"float"</code>
-  <code>"date"</code> (as a string)
-  <code>"blob"</code> (binary data encoded as a string)
-  <code>"boolean"</code>
+
+type        | description
+------------|------------
+"string"    |
+"password"  | String that should not be displayed
+"float"     | JavaScript uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
+"int"       | "int"s are just floats in JavaScript, so the min/max safe values are &#177; 2<sup>53</sup>
+"date"      | As a string, see [dates](#dates)
+"blob"      | Binary data encoded as a string
+"boolean"   |
 
 Or a non-simple type:
 
-type | description
--------------------------|-------------
-"enum" | One out of a list of possible values
-"reference[schema_name]" | The id of another resource of type "schema_name"
-"array[another_type]" | An array of entries of type "another_type"
-"map[another_type]" | Key/Value pairs where the values are of type "another_type"
+type                                  | description
+--------------------------------------|-------------
+"enum"                                | One choice out of an enumeration of possible values
+"reference[<code>schema_name</code>]" | The id of another resource with type <code>schema_name</code>
+"array[<code>another_type</code>]"    | An array of entries of type <code>another_type</code>
+"map[<code>another_type</code>]"      | Key/value pairs.  Values are of type <code>another_type</code>
 
-Additional information SHOULD be provided for each field when available:
+Additional metadata SHOULD be provided for each field when available:
 
-name | type | description
---------------|----------------------|--------------
-default | Same as field | A default value
-unique | boolean | If the field's value must be unique with its resource type
-nullable | boolean | If null is a valid value for the field
-required | boolean | If the field is required when creating
-create | boolean | If the field can be set when creating
-update | boolean | If the field can be changed on update
-minLength | int | For strings and arrays, the minimum length (inclusive)
-maxLength | int | For strings and arrays, the maximum length (inclusive)
-min | int | For ints and floats, the minimum allowed value (inclusive)
-max | int | For ints and floats, the maximum allowed value (inclusive)
-options | array[Same as field] | For enums, the list of possible values
-regex | string | A regular expression the value must match
+name                    | type                  | description
+------------------------|-----------------------|--------------
+<code>default:</code>       | Same as field         | The default value that will be used if none is specified
+<code>unique:</code>        | boolean               | If true, this field's value must be unique with its resource type
+<code>nullable:</code>      | boolean               | If true, null is a valid value for this field
+<code>create:</code>        | boolean               | If true, this the field can be set when creating a resource
+<code>required:</code>      | boolean               | If true, this field must be set when creating a resource
+<code>update:</code>        | boolean               | If true, this field's value can be changed when updating a resource
+<code>minLength:</code>     | int                   | For strings and arrays, the minimum length (inclusive)
+<code>maxLength:</code>     | int                   | For strings and arrays, the maximum length (inclusive)
+<code>min:</code>           | int                   | For ints and floats, the minimum allowed value (inclusive)
+<code>max:</code>           | int                   | For ints and floats, the maximum allowed value (inclusive)
+<code>options:</code>       | array[Same as field]  | For enums, the list of possible values
+<code>validChars:</code>    | string                | For strings, only these characters are allowed (see [character ranges](#character-ranges))
+<code>invalidChars:</code>  | string                | For strings, these characters are not allwoed (see [character ranges](#character-ranges))
 
-About regexes:
-- They MUST be a _simple_ regex that will work unmodified in the regex engines of JavaScript, PHP and other common languages.
-- It should perform basic validation, but does not need to be absolutely comprehensive.
-- The expression MUST match all values that are acceptable, but it is ok to match some "edge case" values that are not actually acceptable.
-- For example if a field is an email address, don't try to ensure its a valid with [crazy regexes](http://ex-parrot.com/~pdw/Mail-RFC822-Address.html).
+
+### Validation ###
+The additional fields above provide enough info for a client to do basic validation of values before sumbitting them to a service.  They are not intended to be completly comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of it's conditions, it should return a 400 error with enough detail for the client to fix the problem and re-submit the reuqest.
+
+#### Character Ranges ####
+The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive and may contain ranges as in a simple regular expression.  For example alphanumerics may be represented as "a-zA-Z0-9".  Unicode characters should be represented as <code>\uXXXX</code> or <code>\uXXXXXX</code>, where X are the hexadecimal representation of the codepoint.
 
 ```javascript
 {
-"id": "file", 
-"type": "schema",
-"methods": ["GET","DELETE"],
-"fields": {
-"name": {"type": "string", "required": true, "create": true, "update": true},
-"size": {"type": "int"},
-"access": {"type": "enum", "options": ["public","private","passwordprotected"], "default": "private", "create": true, "update": true},
-"owner": {"type": "reference[user]"} /* @TODO resource schema? */
-},
-"actions": {
-"encrypt": {
-"input": "fileEncryptInput",
-"inputSchema": "http://base/v1/schemas/fileEncryptInput",
-"output": "file"
-"outputSchema": "http://base/v1/schemas/file",
-},
-},
-/*...more actions...*/
-},
-"collectionMethods": ["GET","POST"],
-"collectionActions": {
-"truncate" {
-"input": null,
-"inputSchema": null,
-"output": null,
-"outputSchema": null
-}
-},
-"collectionFields": {
-"folderShared": {"type": "boolean"},
-"folderSize": {"type": "int"}
-},
-"collectionFilters": {
-"folderShared": {"modifiers": ["eq"]}
-}
+  "id": "file", 
+  "type": "schema",
+  "methods": ["GET","DELETE"],
+  "fields": {
+    "name":   {"type": "string", "required": true, "create": true, "update": true},
+    "size":   {"type": "int"},
+    "owner":  {"type": "reference[user]"},
+    "access": {
+      "type":    "enum",
+      "options": ["public","private","requirepassword"],
+      "default": "private",
+      "create":  true,
+      "update":  true
+    },
+    /* ... more fields ... */
+  },
+  "actions": {
+    "encrypt": {
+      "input":        "cryptInput",
+      "inputSchema":  "https://base/v1/schemas/cryptInput",
+      "output":       "file",
+      "outputSchema": "https://base/v1/schemas/file",
+    },
+    /* ...more actions... */
+  },
+  "collectionMethods": ["GET","POST"],
+  "collectionActions": {
+    "archive" {
+      "input":        "archiveInput",
+      "inputSchema":  "https://base/v1/schemas/archiveInput",
+      "output":       "file",
+      "outputSchema": "https://base/v1/schemas/file",
+    }
+    /* ...more actions... */
+  },
+  "collectionFields": {
+    "size": {"type": "int"}
+  },
+  "collectionFilters": {
+    "name":   {"modifiers": ["ne","prefix","suffix"], wildcards: true},
+    "date":   {"modifiers": ["lt","gt","lte","gte","prefix"]}
+    "size":   {"modifiers": ["lt","gt","lte","gte"] }
+    "access": {"modifiers": ["eq","ne"], "options": ["public","private","requirepassword"]}
+  }
 }
 ```
+
+----------------------------------------
 
 # Operations #
 
 Operation | HTTP Method | Request URL | Description
 ----------|-----------------|-----------------------------------|--------------------
-[Query](#Query Operation) | GET or HEAD | https://base/v1/{collection_name} | Returns a collection of resources
-[Read](#Read Operation | GET or HEAD | https://base/v1/{collection_name}/{resource id} | Returns a single resource
-[Create](#Create Operation) | POST | https://base/v1/{collection_name} | Creates a single or multiple resources
-[Update](#Update Operation) | PUT | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Changes one ore more existing resources
-[Delete](#Delete Operation) | DELETE | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Deletes one or more existing resources
-[Action](#Action Operation) | POST | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Perform an action on a resource or collection
+[Query](#query-operation) | GET or HEAD | https://base/v1/{collection_name} | Retrieve a collection of resources
+[Read](#read-operation) | GET or HEAD | https://base/v1/{collection_name}/{resource id} | Retrieve a single resource
+[Create](#create-operation) | POST | https://base/v1/{collection_name} | Creates one or more resources
+[Update](#update-operation) | PUT | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Change one or more existing resources
+[Delete](#delete-operation) | DELETE | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Delete one or more existing resources
+[Action](#action-operation) | POST | https://base/v1/{collection_name}/{resource_id}?{action_name}<br>https://base/v1/{collection_name}?{action_name} | Perform an action on a resource or collection
+
+----------------------------------------
 
 # Query Operation #
-The query operation allows a client to list the resources that are in a collection. Query operations MUST NOT incur side effects.
+The query operation allows a client to list the resources that are in a collection.  Query operations MUST NOT incur side effects.
 
 ```http
 GET /v1/folders HTTP/1.1
 Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
 ```http
@@ -500,289 +546,372 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-"type": "collection",
-"resourceType": "folder",
-"data": [
-{"type": "folder", "id": "b1b2e7006be", "name": "Documents", "links": {/*...*/}, "actions": {/*...*/}},
-/*...more folder resources...*/
-],
-"links": {
-"self": "https://base/v1/folders",
-...
-},
-"actions": { 
-"deleteAll": "https://base/v1/folders?deleteAll", 
-...
-},
-"pagination": {/* see pagination*/}
-"sort": {/*see sort*/},
-"filters": {/*see filters*/}
+  "type": "collection",
+  "resourceType": "folder",
+  "links": {
+    "self":           "https://base/v1/folders",
+    "schema":         "https://base/v1/schemas/collection",
+    "resourceSchema": "https://base/v1/schemas/folder",
+    /* ... more links ... */
+  },
+  "resourceType": "folder",
+  "data": [
+    {
+      "type": "folder",
+      "id": "b1b2e7006be",
+      "name": "Documents",
+      "links": { /* see links */ },
+      "actions": { /* see actions */ }
+    },
+    /* ... more folder resources ... */
+  ],
+  "actions": { 
+    "deleteAll": "https://base/v1/folders?deleteAll", 
+  },
+  "pagination": { /* see pagination */ }
+  "sort":       { /* see sorting */ },
+  "filters":    { /* see filters */ }
 }
 ```
 
-## Pagination ##
+### Pagination ###
 Collections that may return a large number of results SHOULD paginate the response.
 
-Pagination SHOULD be controlled by adding a <pre style="display: inline;">marker={opaque_string}</pre> query string parameter. The implementation and meaning of the opaque string is left to the service. A MySQL-style numerical offset is simple, but can return the same entry on 2 subsequent pages if the result set changes between requests. A marker that specifically identifies the last row returned prevents this.
+Pagination SHOULD be controlled by adding a <code>marker={opaque_string}</code> query string parameter.
+  - The implementation and meaning of the opaque string is left to the service.
+  - A MySQL-style numerical offset is simple, but can return the same entry on 2 subsequent pages if the result set changes between requests.
+  - A marker that specifically identifies the last row returned prevents this.
 
-Services MAY allow the client to specify how many results they would like per page with a <pre style="display: inline;">limit={number}</pre> query string parameter. The service SHOULD set (and document) an upper limit on how high this is allowed to go.
+Services SHOULD allow the client to specify how many results they would like per page with a <code>limit={integer}</code> query string parameter.
+  - The service SHOULD enforce (and document) an upper limit on how high this is allowed to go.  At least 1000 is suggested.
+  - Services SHOULD support <code>limit=0</code> so that clients can get just the metadata for a collection (sort, filter, etc).
 
-Services SHOULD support <pre style="display: inline">limit=0</pre> so that clients can get just the metadata for a collection (sort, filter, etc).
-
-If the collection supports pagination, the response SHOULD contain a "pagination" object containing:
-:*limit: The number of items that are returned in each result set.
-:*partial: Whether this result is the complete set or if it's been truncated.
+If the collection supports pagination, the response MUST contain a "pagination" object containing:
+  - <code>limit:</code> The number of items that are returned in each result set.
+  - <code>partial:</code> Whether this result is the complete set or if it's been truncated.
 
 If the result has been truncated, it SHOULD also contain:
-:*first: The URI of a page containing the first resource in the result set (this SHOULD be the same URI, without a marker).
-:*previous: The URI of the page immediately preceding the current result set.
-:*next: The URI of the page immediately following the current result set.
+  - <code>first:</code> The URL of a page containing the first resource in the result set (this SHOULD be the same URL, without a marker).
+  - <code>previous:</code> The URL of the page immediately preceding the current result set.
+  - <code>next:</code> The URL of the page immediately following the current result set.
 
 And MAY additionally contain:
-:*last: The page containing the last resource in the result set, if available. This may be impractical, depending on your data source.
-:*total: The total number of items in the result set, if available. This may also be impractical.
+  - <code>last:</code> The page containing the last resource in the result set.
+    - This may be impractical to implement, depending on your data source.
+  - <code>total:</code> The total number of items in the result set, if available.
+    - This may also be impractical, but is very useful information to a client if possible.
 
-When the current result set contains the first resource, 'first' and 'previous' SHOULD NOT be returned. When the current result set contains the last resource, 'next' and 'last' SHOULD NOT be returned. 
+When the current result set contains the first resource, 'first' and 'previous' SHOULD NOT be returned. 
+When the current result set contains the last resource, 'next' and 'last' SHOULD NOT be returned. 
 
-URIs included in this section SHOULD include all parameters needed to maintain the current [[#Sorting|sort]] and [[#Filtering|filter]].
-
-<pre>
-{
-/*...*/
-"pagination": {
-"first": "https://base/v1/files",
-"previous": "https://base/v1/files?marker=opaque_string1",
-"next": "https://base/v1/files?marker=opaque_string2",
-"last": "https://base/v1/files?marker=opaque_string3",
-"limit": 100,
-"total": 342,
-"partial": true
-},
-/*...*/
-</pre>
-
-===Sorting===
-Services SHOULD allow clients to request a sorted list of resources in a collection by adding <pre style="display: inline">sort={sort name}</pre> and <pre style="display: inline;">order={asc or desc}</pre> query string parameters to the request. Clients MAY use these directly when constructing their query, but SHOULD use the links contained in results when possible.
-
-If a collection can be sorted, the response SHOULD contain a "sortLinks" object, a mapping of attributes that can be sorted ant the URI to produce that sort.
-
-If the response was sorted by something, it SHOULD contain a "sort" object containing:
-* name: The name of the current sort, so that the client knows which column to show as sorted.
-* order: The direction of the current sort so that the client can draw an up/down arrow. This SHOULD be either "asc" or "desc".
-* reverse: The URI of the same query, but with the opposite direction
-
-If no sort is specified by the client, services MAY either choose a default (and include the "sort" attribute as if it were requested), or return results in whatever order it likes (with no "sort" attribute).
-
-Sorts MUST produce a unique and repeatable ordering such that the same query will always return results in the same order. This is what a client would expect, and is also necessary for compatibility with [[#Pagination|pagination]].
-
-URIs included in this section SHOULD include all parameters needed to maintain the current [[#Filtering|filter]], but SHOULD NOT include information about pagination. If the sort is changed, the client SHOULD end up back on the first page of results again.
-
-Multi-level sorting is not defined. Applications SHOULD pick something reasonable to actually sort on, which may include multiple attributes (e.g. "size" is not unique, so sorting by it might actually sort by "size", then "name" in your backend).
+URLs included in this section SHOULD include all query parameters needed to maintain the current [sort](#sorting) and [filter](#filtering).
 
 <pre>
 {
-/*...*/
-"sort": {
-"name": "size",
-"order": "asc",
-"reverse": "https://base/v1/files?sort=size&order=desc",
-},
-"sortLinks": {
-"name": "https://base/v1/files?sort=name",
-"size": "https://base/v1/files?sort=size",
-"upload_date: "https://base/v1/files?sort=upload_date",
-/*...*/
-},
-/*...*/
+  /* ... other collection attributes ... */
+  "pagination": {
+    "first":    "https://base/v1/files",
+    "previous": "https://base/v1/files?marker=opaque_string1",
+    "next":     "https://base/v1/files?marker=opaque_string2",
+    "last":     "https://base/v1/files?marker=opaque_string3",
+    "limit":    100,
+    "total":    342,
+    "partial":  true
+  },
+  /* ... other collection attributes ... */
 }
 </pre>
 
-===Filtering===
-Services MAY support searching/filtering of the collection. Support for this is indicated by the schema of the collection, and the presence of a "filters" object in the collection response.
+### Sorting ###
+Services SHOULD allow clients to request a sorted list of resources in a collection by adding <code>sort={sort name}</code> and <code>order={asc or desc}</code> query string parameters to the request.  Clients MAY use these directly when constructing their query, but SHOULD use the links contained in results.
 
-;Schema
+If a collection can be sorted, the response SHOULD contain a <code>sortLinks:</code> object, a mapping of attributes that can be sorted &rarr; the URL to produce that sort.
+
+If the response was sorted by something, it SHOULD contain a <code>sort:</code> object containing:
+  - <code>name:</code> The name of the current sort, so that the client knows which column to show as sorted.
+  - <code>order:</code> The direction of the current sort.  This SHOULD be either <code>"asc"</code> or <code>"desc"</code>.
+  - <code>reverse:</code> The URL for the same sort in the opposite order.
+
+If no sort is specified by the client, services SHOULD either:
+  - Choose a default, and include the <code>sort:</code> attribute as if it were requested
+  - Or return results in an undefined/unstable order, with no <code>sort:</code> attribute).
+
+Sorts MUST be "stable".  This means they must produce a unique and repeatable ordering so that the same query will always return results in the same order.  This is what a client would expect, and is also necessary for [pagination](#pagination).
+
+URLs included in this section SHOULD include all parameters needed to maintain the current [filter](#filtering), but SHOULD NOT include information about pagination.  When folloing a link to a different sort order, the client SHOULD end up back on the first page of results again.
+
+Multi-level sorting is not defined.  Services SHOULD pick something reasonable to actually sort on.  This may include sorting on multiple attributes for a single sort name.  For example "size" of a file is not unique, so your implementation might actually sort by "size", then "name".
+
+<pre>
+{
+  /* ... other collection attributes ... */
+  "sort": {
+    "name": "size",
+    "order": "asc",
+    "reverse": "https://base/v1/files?sort=size&order=desc",
+  },
+  "sortLinks": {
+    "name": "https://base/v1/files?sort=name",
+    "size": "https://base/v1/files?sort=size",
+    "upload_date: "https://base/v1/files?sort=upload_date",
+    /* ... more sort options ... */
+  },
+  /* ... other collection attributes ... */
+}
+</pre>
+
+### Filtering ###
+Services MAY support searching/filtering of the collection.  Support for this is indicated by <code>collectionFilters</code> in the schema, and the presence of a <code>filters:</code> map in the collection response.
+
+#### Schema ####
 In the schema, the value of each filter attribute SHOULD BE an object describing:
-* modifiers: What modifiers are supported, if any
-* options: What specific values are allowed, if the attribute is enumerable
+  - <code>modifiers:</code> What modifiers are supported, if any
+  - <code>options:</code> What specific values are allowed, if the attribute is enumerable
 
-Modifiers allow things like "greater than" or "not equal to". Any modifiers MAY be defined, but the standard ones are:
-* "eq": equal to (always available, default if no modifier is specified)
-* "ne": not equal to
-* "lt": less than
-* "lte": less than or equal to
-* "gt": greater than
-* "gte": greater than or equal to
-* "prefix": starts with
-* "like": matches (as in SQL, "_" for exactly one character and "%" for 0 or more characters)
-* "notlike": does not match (as above)
-* "null": value is NULL
-* "notnull": value is not NULL
+Modifiers allow things like "greater than" or "not equal to".  The standard modifiers are:
 
-<pre>
-{
-/*...*/
-"filters": {
-"name": {"modifiers": ["ne","prefix","suffix"], wildcards: true},
-"date": {"modifiers: ["lt","gt","lte","gte","prefix"]}
-"size": {"modifiers": ["lt","gt","lte","gte"] }
-"shared: {"options": ["public","private","something else"]}
-/*...*/
-},
-/*...*/
-}
-</pre>
+modifier               | meaning
+-----------------------|---------------------
+<code>"eq"</code>      | equal to<br/>(always available, the default if no modifier is specified)
+<code>"ne"</code>      | not equal to
+<code>"lt"</code>      | less than
+<code>"lte"</code>     | less than or equal to
+<code>"gt"</code>      | greater than
+<code>"gte"</code>     | greater than or equal to
+<code>"prefix"</code>  | starts with
+<code>"like"</code>    | matches, as in SQL:<br/>&bull; "_" for exactly one character<br/>&bull; "%" for 0 or more characters
+<code>"notlike"</code> | does not match (as above)
+<code>"null"</code>    | value is NULL
+<code>"notnull"</code> | value is not NULL
 
-;Client request
-The client performs a search by starting with the URI for a standard query request. If they've already done a query and want to filter the results, the "self" link of the result can be used instead. Then the client adds on query string parameters for <pre style="display:inline">{filter name}{"_"+optional modifier}={value}</pre>.
-* For example to search for files starting with "a" and greater than 1kb, the client could append <pre style="display:inline">&name_prefix=a&size_gt=1024</pre>.
-* To search for non-image files, they could append <pre style="display:inline">&name_notlike=%.jpg&name_notlike=%.png</pre> to the request URI.
-** Note: % characters in the request URI need to be escaped into "%25" according to normal URI rules.
-
-Note: There is no mechanism currently defined for "OR"-ing conditions. All filters are "AND"-ed together.
-
-;Collection response
-Collections that support filtering SHOULD have a "filter" attribute in the response, with an attribute for each field that can be filtered on. If any filter was applied for that field, the value should be an array describing the filters. If no filters were applied for that field, the value should be null.
+Services MAY define (and document) their own modifiers.
 
 <pre>
 {
-/*...*/
-filters: {
-name_prefix: [
-{value:"a"}
-],
-size: [
-{modifier: "gt", value: 1024}
-],
-date: null,
-shared: null
-}
-/*...*/
+  /* ... other collection attributes ... */
+  "filters": {
+    "name":   {"modifiers": ["eq","ne","prefix","suffix"], wildcards: true},
+    "date":   {"modifiers": ["eq","lt","gt","lte","gte","prefix"]}
+    "size":   {"modifiers": ["eq","lt","gt","lte","gte"] }
+    "access": {"modifiers": ["eq","ne"], "options": ["public","private","requirepassword"]}
+    /* ... more filters ... */
+  },
+  /* ... other collection attributes ... */
 }
 </pre>
 
-<pre>
+#### Client request ####
+The client performs a search by starting with the URL for a standard query request.  If they've already done a query and want to filter the results, the <code>self:</code> link of the result can be used instead.  Then the client adds on query string parameters for <code>{filter name}{"_"+modifier}={value}</code>.
+  - The underscore and modifier are optional if the desired modifier is <code>eq</code>.
+  - For example to search for files starting with "a" and greater than 1kb, the client would append:
+    - <code>name_prefix=a&size_gt=1024</code>
+* To search for non-image files, they could append:
+  - <code>name_notlike=%.jpg&name_notlike=%.png</code>
+    - Note: % characters in the request URL need to be escaped into "%25" according to normal URL-encoding rules.
+
+There is no mechanism defined for OR-ing conditions.  All filters are AND-ed together.
+
+#### Collection response ####
+Collections that support filtering SHOULD have a <code>filter:</code> map in the response, with an attribute for each field that can be filtered on.
+  - If any filter was applied for that field, the value should be an array describing the filters.
+  - If no filters were applied for that field, the value should be null.
+
+```
 {
-/*...*/
-filters: {
-name: [
-{modifier:"notlike", value:"%.jpg"},
-{modifier:"notlike", value:"%.png"}
-],
-size: null,
-date: null,
-shared: null
+  /* ... other collection attributes ... */
+  filters: {
+    name:   [ {"modifier": "prefix", "value":"a"  } ],
+    size:   [ {"modifier": "gt",     "value": 1024} ],
+    date:   null,
+    access: null
+    /* ... more filters ... */
+  }
+  /* ... other collection attributes ... */
 }
-/*...*/
+```
+
+```
+{
+  /* ... other collection attributes ... */
+  filters: {
+    name: [
+      {modifier": "notlike", "value": "%.jpg"},
+      {modifier": "notlike", "value": "%.png"}
+    ],
+    size:   null,
+    date:   null,
+    access: null
+    /* ... more filters ... */
+  }
+  /* ... other collection attributes ... */
 }
-</pre>
+```
 
-==Read Operation==
-The read operation allows a client to get a single resource. Read operations MUST NOT incur side effects.
+----------------------------------------
+# Read Operation #
+The read operation allows a client to get a single resource.  Read operations MUST NOT incur side effects.
 
-;Root Level
-GETting the base URL of the API should return a collection of API version resources.
+### Root Level ###
+GETting the base URL of a service SHOULD return a collection of API version resources.  It SHOULD include a link to the <code>latest:<code> stable version of the API.  Links that point to a specific version SHOULD point to this latest version.
 
-<span style="background-color: yellow">@TODO example</span>
+```
+{
+  "type" : "collection",
+  "links" : {
+    "self" : "https://base/",
+    "latest" : "https://base/v3",
+    "schema" : "https://base/v3/schemas/collection",
+    "resourceSchema" : "https://base/v3/schemas/apiversion"
+  },
+  "data" : [ 
+    {
+      "id" : "v1",
+      "type" : "apiversion",
+      "links" : {
+        "self" : "https://base/v1",
+        "schema" : "https://base/v3/schemas/apiversion"
+      }
+    },
+    {
+      "id" : "v2",
+      "type" : "apiversion",
+      "links" : {
+        "self" : "https://base/v2",
+        "schema" : "https://base/v3/schemas/apiversion"
+      }
+    } 
+    {
+      "id" : "v3",
+      "type" : "apiversion",
+      "links" : {
+        "self" : "https://base/v3",
+        "schema" : "https://base/v3/schemas/apiversion"
+      }
+    } 
+  ]
+}
+```
+### Version Root ###
+GETting the root URL of a particular API version SHOULD return a resource containing links to all the collections and resources that are available.  See [API Versioning](#api-versioning) for more info.
 
-;API Version
-GETting the base URL of a particular API version SHOULD return a resource containing links to all the resources that are available. See [[#API Versioning|API Versioning]] for more info.
-
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+```http
 GET /v1 HTTP/1.1
-...
-</pre>
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
+```
+```http
 HTTP/1.1 200 OK
 Content-Type: application/json
-...
 
 {
-"id": "v1",
-"deprecated": true,
-"links": {
-"file": "{base_url}/files",
-"folder": "{base_url}/folders"
-},
+  "id": "v1",
+  "deprecated": true,
+  "links": {
+    "file": "https://base/v1/files",
+    "folder": "https://base/v1/folders"
+    /* ... other collections and resources ... */
+  },
 }
-</pre>
+```
 
-;Individual Resource
-GETting the URI of a resource SHOULD return the representation of that resource.
+### Individual Resource ###
+GETting the URL of a resource SHOULD return the representation of that resource.
 
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+```http
 GET /v1/files/b1b2e7006be HTTP/1.1
-...
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
-</pre>
-
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
+```
+```http
 HTTP/1.1 200 OK
 Content-Type: application/json
-...
 
 {
-"id": "b1b2e7006be",
-"type": "file",
-...
+  "id": "b1b2e7006be",
+  "type": "file",
+  /* ... other resource attributes ... */
 }
-</pre>
+```
 
-;Headers only
-Making a HEAD request to the URI SHOULD return the same response code and header information as a GET of the same URI would, except that it MUST NOT return any message body.
+### Headers only ###
+Making a HEAD request to a URL SHOULD return the same response code and header information as a GET of the same URL would, except that it MUST NOT return any message body.
 
-<pre style="background-color: #ccf; border: 2px solid #66a;">
-HEAD /v1/files/someid HTTP/1.1
-...
+```http
+HEAD /v1/files/b1b2e7006be HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
-</pre>
-
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
-HTTP/1.1 204 No Content
+```
+```
+HTTP/1.1 200 OK
 Content-Type: application/json
-/*other headers*/
+Content-Length: 234
+```
 
-</pre>
 
+```http
+HEAD /v1/files/non-existent-id HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
-==Create Operation==
-The Create operation allows a client to create a new Resource in a Collection. The URI of the request SHOULD NOT contain a query component, to differentiate a Create request from an [[#Action|Action]] request.
+```
+```
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 123
+```
 
-The body of the request MUST contain a representation of the resource to be created. If any of the fields that are required by the schema for this resource are not included or are invalid, a 400 error SHOULD be returned, with information about what specifically is wrong.
+----------------------------------------
+# Create Operation #
+The create operation allows a client to create a new resource in a collection.  The URL of the request SHOULD NOT contain a query component, to differentiate a create request from an [action](#action-operation) request.
 
-If the created resource is immediately available, a 201 Created status code SHOULD be returned, and the body SHOULD be the representation of the new resource. If the resource cannot be created and read immediately, a 202 Accepted status SHOULD be returned instead. At least the resource id should be returned if at all possible.
+The body of the request MUST contain a representation of the resource to be created.  If any of the fields that are required by the schema for this resource are not included or are invalid, a 400 error SHOULD be returned, with information about what specifically is wrong.
 
-;Single resource
-For a single resource, the response SHOULD include a [http://tools.ietf.org/html/rfc2616#section-14.30 Location] header with the URI for the new resource, which is likely the same as the "self" link for the resource. Note that Location headers MUST always be an absolute URI.
+If the created resource is immediately available, a 201 Created status code SHOULD be returned, and the body SHOULD be the representation of the new resource.  If the resource cannot be created and read immediately, a 202 Accepted status SHOULD be returned instead.  At least the resource id should be returned if at all possible.
 
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+### Single resource ###
+For a single resource, the response SHOULD include a [Location](http://tools.ietf.org/html/rfc2616#section-14.30) header with the URL for the new resource. This is likely the same as the <code>self:</code> link in the resource.  Note that Location headers MUST always be an absolute URL.
+
+```http
 POST /v1/folders HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: application/json
-/*...*/
 
 {
-"name": "Documents"
-/*...*/
+  "name": "Documents"
 }
-</pre>
-
-<pre style="background-color: #ffa; border: 2px solid #ff8;">
+```
+```http
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: https://base/v1/folders/b1b2e7006be
-/*...*/
+Location: https://base/v1/folders/ab391827x31
 
-{/*folder resource*/}
-</pre>
+{
+  "id": "ab391827x31",
+  "type": "folder",
+  /* ... more resource attributes ... */
+}
+```
 
-;Form Post
-Services SHOULD also support create calls which are HTML Form encoded, <pre style="display:inline">Content-Type: multipart/form-data</pre> or <pre style="display:inline">Content-Type: application/x-www-form-urlencoded</pre>. These is easy for a client to construct with a HTML form or cURL, and also allow for simple uploading of binary data/files. In our file example we might allow creating a file resource like:
+### Single resource - form post ###
+Services SHOULD also support create calls which are HTML Form encoded, <code>Content-Type: multipart/form-data<code> or <code>Content-Type: application/x-www-form-urlencoded</code>.  These are easy for a client to construct with a HTML form or cURL, and also allow for simple uploading of binary data/files.  A file management API might allow creating a file resource like:
 
-<pre>curl -F name="ultimate_answer.txt" -F file="@mydatafile.txt" "http://api.files.com/v1/folders/b1b2e7006be"</pre>
+<code>
+curl -u access_key:secret_key \
+  -F name="ultimate_answer.txt" \
+  -F file="@mydatafile.txt" \
+  "http://base/v1/folders/ab391827x31"
+</code>
 
-<pre style="background-color: #ccf; border: 2px solid #66a;">
-POST /v1/folders/b1b2e7006be HTTP/1.1
-/*...*/
+Which would make a request like:
+
+```http
+POST /v1/folders/ab391827x31 HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Length: 307
 Content-Type: multipart/form-data; boundary=----------------------------9a41916dd20a
 
@@ -796,378 +925,410 @@ Content-Type: text/plain
 
 42
 ------------------------------9a41916dd20a--
-</pre>
+```
 
+```http
 <pre style="background-color: #ffa; border: 2px solid #ff8;">
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: https://api.files.com/v1/files/b1b2e7006be
-/*...*/
+Location: https://base/v1/files/b1b2e7006be
 
-{/*file resource*/}
-</pre>
+{
+  "id": "b1b2e7006be",
+  "type": "file",
+  /* ... more resource attributes ... */
+}
+```
 
-;Multiple resources
+### Multiple resources ###
 Services MAY allow multiple resources to be created in one request by accepting an array of representations instead of a single one. 
+  - A Location header SHOULD NOT be returned.
+  - The response SHOULD be a collection containing the created resources.
+  - The service MUST ensure that this operation is atomic:
+    - Either ALL the creates succeed and a 2xx response code is returned, 
+    - or NONE of the changes are committed and a 4xx or 5xx code is returned.
+    - If this is not possible then the service SHOULD reject requests for multi-resource create with a 406 error.
 
-A Location header SHOULD NOT be returned. The response SHOULD be a collection containing the created resources. The service MUST ensure that this operation is atomic; either ALL the creates succeed and a 2xx response code is returned, or NONE of the changes are committed and a 4xx or 5xx code is returned. If this is not possible then the service SHOULD reject requests for multi-resource create with a 406 error.
-
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+```http
 POST /v1/folders HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: application/json
-/*...*/
 
 [
-{"name": "Documents", /*...*/},
-{"name": "Pictures", /*...*/},
-...
+  {"name": "Documents", /* ... more resource attributes ... */},
+  {"name": "Pictures", /*... more resource attributes ... */},
+  /* ... more resource representations ... */
 ]
-</pre>
+```
 
-<pre style="background-color: #ffa; border: 2px solid #ff8;">
+```
 HTTP/1.1 201 Created
 Content-Type: application/json
 
 {
-"type": "collection",
-"resourceType": "folder",
-"data": [
-{"name": "Documents", /*...*/},
-{"name": "Pictures", /*...*/},
-/*...*/
-]
-/*...*/
+  "type": "collection",
+  "resourceType": "folder",
+  "data": [
+    {"name": "Documents", /* ... more resource attributes ... */},
+    {"name": "Pictures", /* ... more resource attributes ... */},
+    /* ... more resource representations ... */
+  ]
+  /* ... more collection attributes ... */
 }
-</pre>
+```
 
+----------------------------------------
+# Update Operation #
 
-==Update Operation==
-The update operation allows a client to modify resources. Update operations MUST be idempotent; making the same update request again should have no effect. Any change which does not have this property is an [[#Actions||action]], not an update. Updates can be performed for one or multiple resources.
+The update operation allows a client to modify resources.  Update operations MUST be idempotent; making the same update request again should have no effect.
+  - Any change which does not have this property is an [action](#action-operation), not an update.
 
-Clients may submit just the attributes that they wish to change, or the entire representation of a resource. The "id", and "rev" (if [[#Resource Versioning|resource versioning]] is enabled) attributes MUST always be included.
+Clients may submit just the attributes that they wish to change, or the entire representation of a resource.  The <code>id:</code>, and <code>rev:</code>(if [resource versioning](#resource-versioning) is enabled) attributes MUST always be included.
 
-The response SHOULD include the entire updated resource representation(s), even if the request did not. If the resource is a potentially large binary file instead of a JSON document, a 204 status and no body SHOULD be returned.
+The response SHOULD include the entire updated resource representation(s), even if the request did not.  If the resource is a potentially large binary file instead of a JSON document, a 204 status and no body SHOULD be returned.
 
-===Single resource===
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+### Single resource ###
+```http
 PUT /v1/folders/b1b2e7006be HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: application/json
-/*...*/
 
 {
-"id": "b1b2e7006be",
-"_rev": "8d2e54afd",
-"name": "Documents",
-"public": false,
-{/*ALL other attributes of a folder*/}
+  "id": "b1b2e7006be",
+  "rev": "8d2e54afd",
+  "access": "private
 }
-</pre>
+```
 
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
+```http
 HTTP/1.1 200 OK
 Content-Type: application/json
-/*...*/
 
-{/*updated folder resource*/}
-</pre>
+{
+  "id": "b1b2e7006be",
+  "rev": "8d2e54afd",
+  "name": "Documents",
+  "access": "private"
+}
+```
 
-===Multiple resources===
-When updating multiple resources, the service MUST ensure that the operation is atomic; That is, either ALL the changes succeed and a 2xx response code is returned, or NONE of the changes are committed and a 4xx or 5xx code is returned. If this is not possible, do not allow multiple updates. The service SHOULD limit the number of resources that may be included in a batch update to a documented amount, and return a 400 error if this limit is exceeded.
+### Multiple resources ###
+When updating multiple resources, the service MUST ensure that the operation is atomic.
+  - Either ALL the changes succeed and a 2xx response code is returned,
+  - or NONE of the changes are committed and a 4xx or 5xx code is returned.
+  - If this is not possible, do not allow multiple updates.
+  - The service SHOULD document and limit the number of resources that may be updated in one request and return a 400 error if the limit is exceeded.
 
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+```http
 PUT /v1/folders HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: application/json
 
 [
-{
-"id": "b1b2e7006be",
-"type":"folder",
-"rev": "8d2e54afd",
-"name": "Documents",
-"public": false
-},
-{
-"id": "d5a80ee7",
-"type":"folder", 
-"rev": "9586f36z",
-"name": "Pictures",
-"public": true
-}
-
+  {
+    "id":     "b1b2e7006be",
+    "rev":    "8d2e54afd",
+    "access": "private"
+  },
+  {
+    "id":     "d5a80ee7",
+    "type":   "folder", 
+    "rev":    "9586f36z",
+    "name":   "Pictures",
+    "access": "public"
+  }
 ]
-</pre>
+```
 
-==Delete Operation==
-The delete operation deletes the item given by the request URI.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
 
-;Single resource
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+{
+  "type": "collection",
+  "resourceType": "folder",
+  "data": [
+    {
+      "id":     "b1b2e7006be",
+      "type":   "folder",
+      "rev":    "8d2e54afd",
+      "name":   "Documents",
+      "access": "private"
+    },
+    {
+      "id":     "d5a80ee7",
+      "type":   "folder", 
+      "rev":    "9586f36z",
+      "name":   "Pictures",
+      "access": "public"
+    }
+  ]
+  /* ... other collection attributes ... */
+}
+```
+
+----------------------------------------
+# Delete Operation #
+The delete operation deletes the item given by the request URL.
+
+### Single resource ###
+```http
 HTTP/1.1 DELETE /v1/folders/b1b2e7006be
-/*...*/
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
-</pre>
+```
+```http
+HTTP/1.1 204 No Content
+```
 
-;Multiple resources
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+### Multiple Resources
+When deleting multiple resources, the service MUST ensure that the operation is atomic.
+  - Either ALL the deletes succeed and a 2xx response code is returned,
+  - or NONE of the deletes are committed and a 4xx or 5xx code is returned.
+  - If this is not possible, do not allow multiple deletes.
+  - The service SHOULD document and limit the number of resources that may be deletes in one request and return a 400 error if the limit is exceeded.
+
+```http
 DELETE /v1/folders/ HTTP/1.1
 Content-Type: text/json
-/*...*/
 
-["b1b2e7006be","another_folder_id",/*...*/]
-</pre>
+[
+  "b1b2e7006be",
+  "another_folder_id",
+  /* ... more resource IDs ... */
+]
+```
+```http
+HTTP/1.1 204 No Content
+```
 
-;All resources in a collection
-If appropriate for your data, collections MAY support:
-:* A "truncate" action to delete all the resources in the collection (but not delete the collection itself).
-:* A "recursiveDelete" action to truncate and then delete the collection itself.
+### All resources in a collection ###
+If appropriate for your service, collections MAY support:
+  - A "truncate" action to delete all the resources in the collection (but not the collection itself).
+  - A "recursiveDelete" action to truncate and then delete the collection itself.
 
-===Deleted Resources===
-Services MAY continue to return resources that have been recently deleted in [[#Query|query]] and [[#Read|read]] operations. This is a suggestion from RightScale; It is easier for some use cases for the client to explicitly see that a resource has been removed than it is to infer that it is gone because it no longer comes back in responses.
+### Deleted Resources ###
+Services MAY continue to return resources that have been recently deleted in [query](#query-operation) and [read](#read-operation) operations.  This is a [suggestion from RightScale](http://blog.rightscale.com/2010/02/13/top-cloud-api-sins/); It is easier for some use cases for the client to explicitly see that a resource has been removed than it is to infer that it is gone because it no longer comes back in query responses.
 
 Deleted resources:
-:* MUST have a "removed" or similar attribute that the client can use to differentiate them from resources that still exist.
-:* SHOULD support filtering on the attribute so clients that don't want them can get results that omit removed results.
-:* SHOULD stop being returned in query results after a document period of time on the order of an hour to a couple days.
+  - MUST have a <code>removed:</code> or similar attribute that the client can use to differentiate them from resources that still exist.
+  - SHOULD support filtering on that attribute so clients that don't want them can get results that omit removed results.
+  - SHOULD stop being returned in query results after a documented period of time on the order of a few hours to days.
 
-==Replace Operation==
-The replace operation is a combination of [[#Query Operation|query]], [[#Delete Operation|delete]], and [[#Create Operation|create]]. 
-* The request URI is treated as a query operation
-* Any matching resources are deleted.
-* New resources described in the request body are created. 
 
-Replace is most useful when updating a many-to-many relationship. For example in Cloud Servers the user can associate a firewall rule to a list of IP addresses. Updating this list would require the UI to:
-* Perform a query to get the current associations.
-* Diff the result against what the new entries should be.
-* Issue delete operation(s) for the ones that need to be removed.
-* Issue create operation(s) for the ones that need to be added.
-* Deal with being in an inconsistent state if an error occurs part-way through this process.
+----------------------------------------
+# Replace Operation #
+The replace operation is an atomic combination of the [query](#query-operation), [delete](#delete-operation), and [create](#create-operation) operations.
+  - The request URL is treated as a query operation.
+  - Any matching resources are deleted.
+  - New resources described in the request body are created. 
 
-Replace performs all this in one convenient and atomic action for the client. The service MUST ensure that this entire operation is atomic; That is, either ALL the changes succeed and a 2xx response code is returned, or NONE of the changes are committed and a 4xx or 5xx code is returned.
+Services MAY implement replace for any collections where they see fit.  It is most useful when updating a many-to-many relationship.  For example, associating a list of IP addresses to a firewall rule.  Updating this list would require a client UI to:
+  - Perform a query to get the current associations.
+  - Diff the result against what the new entries should be.
+  - Issue delete operation(s) for the ones that need to be removed.
+  - Issue create operation(s) for the ones that need to be added.
+  - Somehow resolve being in an inconsistent state if an error occurs partway through this process.
 
-Note: this operation uses a non-standard HTTP method. Not that there's anything wrong with that.
+Replace performs all this in one convenient and atomic action for the client.
+  - The service MUST ensure that this entire operation is atomic.
+  - Either ALL the changes succeed and a 2xx response code is returned,
+  - or NONE of the changes are committed and a 4xx or 5xx code is returned.
 
-;Request
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+The response SHOULD return the list of newly created resources, just as if the request were a normal create.
+
+Note: this operation uses a non-standard HTTP method.  There's nothing wrong with that, but some clients may not support abitrary methods.
+
+```http
 REPLACE /v1/firewalls/42/allow HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: application/json
-/*...*/
 
 [
-{"ip": "172.16.234.12"},
-{"ip": "10.1.2.3"}
+  {"ip": "172.16.234.12"},
+  {"ip": "10.1.2.3"}
 ]
-</pre>
-
-;Response
-The response SHOULD return the list of newly created resources, just as if the original query operation from the request URI were performed again.
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
+```
+```http
 HTTP/1.1 200 OK
 Content-Type: application/json
-/*...*/
 
-[
-{/*full representation of ip resource*/},
-{/*full representation of ip resource*/}
-]
-</pre>
+{
+  "type": "collection",
+  "data": [
+    {"id": "1234", "ip": "172.16.234.12"},
+    {"id": "1235", "ip": "10.1.2.3"},
+  }
+  /* ... more collection attributes ... */
+}
+```
 
 
-==Action Operation==
-The action operation allows a client to manipulate a resource or collection in a way that cannot be done with any of the other standard operations. The request MAY include a body with additional information (arguments), and the response MAY contain a response body with result info.
+----------------------------------------
+# Action Operation #
+The action operation allows a client to manipulate a resource or collection in a way that cannot be done with any of the other standard operations.  The request MAY include a body with additional information (arguments), and the response MAY contain a response body with result info.
 
-Actions MAY (and probably SHOULD) incur side effects. The request URI for an operation MUST contain a query component, to distinguish it from a [[#Create|Create]] operation. The actions that are available for a resource are defined in the [[#Schemas|schema]], and the URI to perform each action in the "actions" attribute in responses.
+Actions MAY (and generally SHOULD) incur side effects.  The request URL for an operation MUST contain a query component, to distinguish it from a [create](#create-operation) operation.  The actions that may be possible for given a resource type are defined in its [schema](#schemas).  The <code>actions:</code> attribute in a resource specifies which actions are actually available for this particular resource and the URL to request to perform them.
 
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+```http
 POST /v1/folders/b1b2e7006be?encrypt HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: application/json
 
 {
-"password": "purple monkey dishwasher"
+  "password": "purple monkey dishwasher"
 }
-</pre>
+```
 
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
+```
 HTTP/1.1 202 Accepted
 Content-Type: application/json
-/*...*/
-
-{/*probably an updated representation of the object in this case*/}
-</pre>
-
-===Nesting===
-Resources and collections MAY be nested. For example, folders might be associated to files, and files to a collection of tags:
-
-<pre style="background-color: #ccf; border: 2px solid #66a;">
-GET /v1/folder/d5a80ee7/files/b1b2e7006be/tags HTTP/1.1
-/*...*/
-
-</pre>
-
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
-HTTP/1.1 204 No Content
-Content-Type: application/json
 
 {
-"type": "collection",
-"resourceType": "tag",
-"data": [
-{"type: "tag", /*...*/},
-/*...*/
-]
+  /* ... updated representation of the resource ... */
 }
 </pre>
 
+
+----------------------------------------
+# Nesting #
+Resources and collections MAY be nested.  For example, folders might be associated to files, and files to a collection of tags:
+
+```http
+GET /v1/folder/d5a80ee7/files/b1b2e7006be/tags HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
+
+```
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "type": "collection",
+  "resourceType": "tag",
+  "data": [
+    {"type: "tag", /*...*/},
+    /* ... more tag resources ... */
+  ]
+  /* ... more collection attributes ... */
+}
+```
+
 Or the contents of the files stored might be exposed as a sub-resource:
-<pre style="background-color: #ccf; border: 2px solid #66a;">
+```http
 PUT /v1/files/b1b2e7006be/contents HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: text/plain
 Content-Length: 2
 
 42
-</pre>
-
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
+```
+```http
 HTTP/1.1 204 No Content
 Content-Type: application/json
+```
 
-</pre>
-
-===Include===
-Services MAY allow <pre style="display: inline;">include={link name}</pre> query string parameter(s) on [[#Query Operation|query]] or [[#Read Operation|read]] operations. These request that the service include the representation of the specified link name in the body instead of just providing a link. This can be used to get in one request what might otherwise take the client several.
-
-The use of Include is discouraged. A need for this often indicates that your Resources and Collections are mirroring your database instead of a presenting a model that gives the client the information that is important to them. Services SHOULD carefully consider if there is a better way to model their resources, for example by always including the information instead of making a link. Only allow include in cases where it is the best choice.
-
-The value of each include SHOULD be the name of a link attribute. Multiple parameters MAY be included, but services SHOULD limit the number of includes that may be requested and the number of sub-resources that it responds with.
-
-For example if "folders" contained "files" which have "tags" associated to them, getting the tags and parent folder for all files would normally require many API calls. Instead, adding <pre style="display:inline">include=tags&include=folder</pre> would return:
-
-Read a file resource:
-<pre>
-{
-"id": "/*...*/",
-"type": "file",
-"links": {
-"self": "/*...*/",
-/*other links, but not the "tags" or "folder" ones*/
-},
-"name": "/*...*/",
-"tags": [
-{"type":"tag", /*tag resource"}
-/*more tag resources*/
-],
-"folder": {
-"type": "folder",
-/*folder resource*/
-},
-/*...*/
-}
-</pre>
-
-==Resource Versioning==
-Some (or all) resources MAY implement resource versioning. Versioning allows for the client to perform multiple concurrent updates on a resource and resolve conflicts when they occur.
+----------------------------------------
+# Resource Versioning #
+Some (or all) resources MAY implement resource versioning.  Versioning allows for the client to perform multiple concurrent updates on a resource and resolve conflicts when they occur.
 
 For resources that implement versioning:
-* The service MUST return resource version in responses as the "rev" attribute in query and read operations.
-* The client MUST include the "rev" attribute in update, patch, and action operations.
-**If the revision given does not match the current revision when the request is processed, the service MUST return a 409 error.
+  - The service MUST return resource version in responses as the "rev" attribute in query and read operations.
+  - The client MUST include the "rev" attribute in update, patch, and action operations.
+    - If the revision given does not match the current revision when the request is processed, the service MUST return a 409 error.
+  - The service MUST change the "rev" attribute whenever a field in the resource changes.
 
-==Base URL and Versioning==
+----------------------------------------
+# Base URL and Versioning #
 The base URL that users access your API with SHOULD be of the form
-<pre>
-https://api{-optional-region-code}.{your product domain}/
-</pre>
+<code>https://api{-optional-region-code}.{your product domain}/</code>
 
-APIs SHOULD have a separate DNS record from the your web/app load balancers, so that the API can be scaled separately from the rest of your stack. The name MAY resolve to the same set of machines if this scale is not needed yet.
+APIs SHOULD have a separate DNS record from the your web/app load balancers, so that the API can be scaled separately from the rest of your stack.
+  - The name MAY resolve to the same set of machines if this scale is not needed yet.
 
-All APIs that require authentication MUST be accessible to the public ONLY over HTTPS. Unauthenticated public APIs MAY be provided over HTTP, but SHOULD offer HTTPS too.
+All APIs that require authentication MUST be accessible to the public ONLY over HTTPS.  Unauthenticated public APIs MAY be provided over HTTP, but SHOULD offer HTTPS too.
 
-===API Versioning===
-APIs MUST support more than one version of their implementation. Clients MUST specify the particular version they want, and the application MUST NOT make changes that are not backwards compatible to that version.
+## API Versioning ##
+APIs MUST support more than one version of their implementation.  Clients MUST specify the particular version they want, and the application MUST NOT make changes that are not backwards compatible to that version.
 
-Breaking changes should be avoided if at all possible, but you are eventually going to have to make a breaking change, so it is far better to build in a way to handle this from the start. The suggested format for the version string is the letter "v" followed by a single number which increases by one for each revision. The version SHOULD be treated as an opaque string to the client, so any other format MAY be used.
+Breaking changes should be avoided when possible, but you are eventually going to have to make a breaking change so it is far better to have a way to handle this built in from the start.  The suggested format for the version string is the letter "v" followed by a single integer which increases by one for each revision.  The version SHOULD be treated as an opaque string to the client, so any other format MAY be used.
 
-Versions MAY also have a "revision" string attribute that SHOULD change on any release that changes request/response structure.
+Versions MAY also have a "revision" string attribute that changes on each release.  This can be useful to help debug issues caused by changes made within a version that are supposed to be compatible with each other.
 
-Outdated versions SHOULD be deprecated and eventually removed from the service. A request for a version that has been deprecated and removed SHOULD return a 410 error.
+Outdated versions SHOULD be deprecated and eventually removed from the service.  A request for a version that has been removed SHOULD return a 410 error.
 
-;Listing
-Clients MUST be able to make a GET request to the base URL (without a version fragment) to find out what versions are available. This request SHOULD NOT require authentication. Clients SHOULD check the "latest" link and notify the user if they are no longer using the latest version.
+### Listing ###
+Clients MUST be able to make a GET request to the base URL (without a version fragment) to find out what versions are available.  This request SHOULD NOT require authentication.  Clients SHOULD check the "latest" link periodically and take action if they are no longer using the latest version.
 
-<pre style="background-color: #ccf; border: 2px solid #66a;">
-GET / HTTP/1.1
-</pre>
+See [root-level](#root-level) and [individual version](#individual-version) read operation for more info.
 
-<pre style="background-color: #ffa; border: 2px solid #aa6;">
-HTTP/1.1 200 OK
-Content-Type: application/json
+----------------------------------------
+# Authentication #
+Most APIs that do something useful will need some form of authentication to determine what user is making the request and validate that they should be allowed to make it.  A user is identified by a set of credentials called an API Key pair.
 
-{
-"type": "collection",
-"resourceType": "apiversion",
-"links": {
-"latest": "https://base/v3"
-},
-"data": [
-{"id": "v1", "type": "apiversion", "links": {self: "https://base/v1"}},
-{"id": "v2", "type": "apiversion", "links": {self: "https://base/v2"}},
-{"id": "v3", "type": "apiversion", "links": {self: "https://base/v3"}},
-]
-}
-</pre>
+### API Keys ###
+An API Key consists of a pair of strings called an **access key** and **secret key**.  These are randomly generated opaque strings assigned by the service to each API user.  The access key is analogous to a username and the secret key to a password.
 
-===Naming Conventions===
-Several keywords are reserved by this standard and have specific meanings. These words MUST ONLY be used for their documented purpose:
+### HTTP Basic ###
+Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic auth, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
 
-- In resources: id, type, rev, links, actions
-- In collections: links, actions, filters, pagination, sort, sortLinks, data
-- In resource and collection "links": self
-- In query strings:
-- For pagination: marker, limit
-- For sorting: sort, order
+----------------------------------------
+# Design Considerations #
+
+### Naming Conventions ###
+Several keywords are reserved by this standard and have specific meanings.  These words MUST ONLY be used for their documented purpose:
+  - In resources: <code>id:</code>, <code>type:</code>, <code>rev</code>, <code>links:</code>, <code>actions:</code>
+  - In collections: 
+    - (Everything reserved for resources)
+    - <code>filters:</code>, <code>pagination:</code>,
+    - <code>sort:</code>, <code>sortLinks:</code>,
+    - <code>createTypes:</code>, <code>createDefaults:</code>
+    - <code>data:</code>
+  - In resource and collection <code>links:</code>:
+    - <code>self:</code>, <code>schema:<code>, <code>resourceSchema:</code>
+  - In query strings:
+    - For pagination: <code>marker</code>, <code>limit</code>
+    - For sorting: <code>sort</code>, <code>order</code>
 
 Some additional guidelines:
+  - Names and attribute keys should be a single word when practical.
+  - Single-word collection, resource, attribute names SHOULD BE all lowercase.
+  - Multiple words SHOULD BE interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
+  - Resource names SHOULD BE singular, not plural (e.g. a "file").
+  - Collection names SHOULD BE plural, not singular (e.g a collection of "folders", not "folder").
 
-- Names and attribute keys should be a single word when practical.
-- Single-word collection, resource, attribute names SHOULD BE all lowercase.
-- Multiple words SHOULD BE interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
-- Resource names SHOULD BE singular, not plural (e.g. a "file").
-- Collection names SHOULD BE plural, not singular (e.g a collection of "folders", not "folder").
+### Regions ###
+Many services have resources that exist in multiple geographic regions.
 
-
-
-===Regions===
-Many services have resources that exist in multiple regions (Phoenix, Amsterdam, Singapore, etc).
-
-To provide the easiest management for the user, APIs SHOULD provide a single unified endpoint that can manage resources in all regions. This endpoint MAY have servers in each region and use GSS load balancing to direct the requests to the closest region.
+To provide the easiest management for the user, APIs SHOULD provide a single unified endpoint that can manage resources in all regions.  This endpoint MAY have servers in each region and use geographic load balancing to direct the requests to the closest region.
 
 In applications where centralized management is not possible, each region MAY have a separate endpoint with a region code identified in the base URL.
 
-==Caching==
+### Caching ###
 Services SHOULD do everything they can to enable the clients to take advantage of caching as much as possible.
 
-;ETag
-Read operations SHOULD return a HTTP [http://tools.ietf.org/html/rfc2616#section-14.19 ETag] header with an opaque value. The opaque value must uniquely describe the entire resource, and change if any part of the resource is changed. This can often be done as a hash of the serialized resource representation, e.g. convert the resource to a JSON string and return the MD5 sum of the string.
+#### ETag ####
+Read operations SHOULD return a HTTP [ETag](http://tools.ietf.org/html/rfc2616#section-14.19) header with an opaque value.  The opaque value MUST uniquely describe the entire resource, and change if any part of the resource is changed.  This can often be done as a hash of the serialized resource representation, e.g. convert the resource to a JSON string and return a sha-sum of the string.
 
-Query operations SHOULD also return an ETag. The opaque value must uniquely describe the entire result set and change if any of the resources or metadata are changed.
+Query operations SHOULD also return an ETag.  The opaque value MUST uniquely describe the entire result set and change if any of the resources or metadata are changed/added/removed.
 
-Clients MAY send an [http://tools.ietf.org/html/rfc2616#section-14.26 If-None-Match] header along with their query or read operation. The service SHOULD compute its response, and if that response has the same ETag value, return a 304 Not Modified status instead of transmitting the entire response again.
+Clients MAY send an [If-None-Match](http://tools.ietf.org/html/rfc2616#section-14.26) header along with their query or read operation.  The service SHOULD compute its response, and if that response has the same ETag value, return a 304 status instead of transmitting the entire response again.
 
-;Last-Modified
-Whenver possible, services SHOULD keep a last modified date and return a [http://tools.ietf.org/html/rfc2616#section-13.3 Last-Modified] header on Read and Query operations.
+#### Last-Modified ####
+Whenver possible, services SHOULD keep a last modified date and return a [Last-Modified](http://tools.ietf.org/html/rfc2616#section-13.3) header on Read and Query operations.
 
-Clients MAY send an [http://tools.ietf.org/html/rfc2616#section-14.25 If-Modified-Since] header. The service SHOULD return a 304 status instead of transmitting the entire response again if it hasn't changed since the time given.
+Clients MAY send an [If-Modified-Since](http://tools.ietf.org/html/rfc2616#section-14.25) header.  The service SHOULD return a 304 status instead of transmitting the entire response again if it hasn't changed since the time given.
 
-;Cache-Control
-Read and Query operations SHOULD return a [http://tools.ietf.org/html/rfc2616#section-14.9 Cache-Control] header with values that are appropriate for the information being returned. If the data changes infrequently, allow clients to cache it for a reasonable period of time.
+#### Cache-Control ####
+Read and Query operations SHOULD return a [Cache-Control](http://tools.ietf.org/html/rfc2616#section-14.9) header with values that are appropriate for the information being returned.  If the data changes infrequently, allow clients to cache it for a reasonable period of time.
 
-==Compression==
-API Services SHOULD support gzip and deflate compression and deliver responses with an appropriate [http://tools.ietf.org/html/rfc2616#section-14.11 Content-Encoding] header according to the [http://tools.ietf.org/html/rfc2616#section-14.3 Accept-Encoding] requested.
-
-==Authentication==
-Most APIs that do something useful will need some form of authentication to determine what user is making the request and validate that they should be allowed to make it. A user is identified by a set of credentials called an API Key pair.
-
-===API Keys===
-An API Key consists of a pair of strings called an '''access key''' and '''secret key'''. These are randomly generated opaque strings assigned by the service to each API user. The access key is analogous to a username and the secret key to a password.
-
-===HTTP Basic===
-Services MUST support [http://tools.ietf.org/html/rfc2617#section-2 HTTP Basic] authentication. In Basic auth, the client sends their access key and secret key in the Authorization header. The service then reads these and validates the keys.
+### Compression ###
+API Services SHOULD support gzip and deflate compression and deliver responses with an appropriate [Content-Encoding](http://tools.ietf.org/html/rfc2616#section-14.11) header according to the [Accept-Encoding](http://tools.ietf.org/html/rfc2616#section-14.3) requested by the client.
