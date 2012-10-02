@@ -387,32 +387,32 @@ The "schemas" collection MUST also have a link to the base URL of the API versio
   - This makes the schema collection (https://base//v1/schemas) a single URL that provides a client everything they need to know about the service, similar to a WSDL in a SOAP service.
 
 Each schema resource MUST describe:
-  - <code>id:</code>: The name of the resource type.
+  - <code>id:</code>: The name of the resource type (e.g. "files").
   - <code>type:</code> "schema"
-  - <code>methods:</code>: An array of HTTP methods that are available to some (but not necessarily all) resources of this type.
-  - <code>fields:</code>: A map of attribute names available in *resources* of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
-  - <code>actions:</code>: A map detailing the actions available to *resources of this type (see [actions](#actions)).
-  - <code>collectionMethods:</code>: An array of HTTP methods that are available to a *collection* of this type.
-  - <code>collectionActions:</code>: A map detailing the actions available to *collections* of this type (see [actions](#actions)).
-  - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the collection has, if any (see [fields](#schema-fields)).
-  - <code>collectionFilters:</code>: A map detailing the filters that are available to collections of this type (see [filters](#filtering)).
+  - <code>methods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
+  - <code>fields:</code>: A map of attribute names available in **resources** of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
+  - <code>actions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
+  - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
+  - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
+  - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has, if any (see [fields](#schema-fields)).
+  - <code>collectionFilters:</code>: A map detailing the filters that are available to **collections** of this type (see [filters](#filtering)).
   - <code>links:</code>: 
     - <code>self:</code>: The URL for this schema
     - <code>schema:</code>: The URL for the schema describing a schema resource (http://base/v1/schemas/schema).
-    - <code>collection": If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders:</code>)
+    - <code>collection:</code> If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders")
 
 ### Schema Fields ###
 Each field is defined by a map of properties.  Fields MUST have a <code>type:</code>, which may be a "simple" type:
 
 type        | description
 ------------|------------
-"string"    |
+"string"    | UTF-8 string
 "password"  | String that should not be displayed
 "float"     | JavaScript uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
 "int"       | "int"s are just floats in JavaScript, so the min/max safe values are &#177; 2<sup>53</sup>
 "date"      | As a string, see [dates](#dates)
-"blob"      | Binary data encoded as a string
-"boolean"   |
+"blob"      | Binary data, encoded as a string
+"boolean"   | Boolean
 
 Or a non-simple type:
 
@@ -425,21 +425,21 @@ type                                  | description
 
 Additional metadata SHOULD be provided for each field when available:
 
-name                    | type                  | description
-------------------------|-----------------------|--------------
-<code>default:</code>       | Same as field         | The default value that will be used if none is specified
-<code>unique:</code>        | boolean               | If true, this field's value must be unique with its resource type
-<code>nullable:</code>      | boolean               | If true, null is a valid value for this field
-<code>create:</code>        | boolean               | If true, this the field can be set when creating a resource
-<code>required:</code>      | boolean               | If true, this field must be set when creating a resource
-<code>update:</code>        | boolean               | If true, this field's value can be changed when updating a resource
-<code>minLength:</code>     | int                   | For strings and arrays, the minimum length (inclusive)
-<code>maxLength:</code>     | int                   | For strings and arrays, the maximum length (inclusive)
-<code>min:</code>           | int                   | For ints and floats, the minimum allowed value (inclusive)
-<code>max:</code>           | int                   | For ints and floats, the maximum allowed value (inclusive)
-<code>options:</code>       | array[Same as field]  | For enums, the list of possible values
-<code>validChars:</code>    | string                | For strings, only these characters are allowed (see [character ranges](#character-ranges))
-<code>invalidChars:</code>  | string                | For strings, these characters are not allwoed (see [character ranges](#character-ranges))
+name                        | type                              | description
+----------------------------|-----------------------------------|--------------
+<code>default:</code>       | <code>same as field</code>        | The default value that will be used if none is specified
+<code>unique:</code>        | boolean                           | If true, this field's value must be unique with its resource type
+<code>nullable:</code>      | boolean                           | If true, null is a valid value for this field
+<code>create:</code>        | boolean                           | If true, this the field can be set when creating a resource
+<code>required:</code>      | boolean                           | If true, this field must be set when creating a resource
+<code>update:</code>        | boolean                           | If true, this field's value can be changed when updating a resource
+<code>minLength:</code>     | int                               | For strings and arrays, the minimum length (inclusive)
+<code>maxLength:</code>     | int                               | For strings and arrays, the maximum length (inclusive)
+<code>min:</code>           | int                               | For ints and floats, the minimum allowed value (inclusive)
+<code>max:</code>           | int                               | For ints and floats, the maximum allowed value (inclusive)
+<code>options:</code>       | array[<code>same as field</code>] | For enums, the list of possible values
+<code>validChars:</code>    | string                            | For strings, only these characters are allowed (see [character ranges](#character-ranges))
+<code>invalidChars:</code>  | string                            | For strings, these characters are not allwoed (see [character ranges](#character-ranges))
 
 
 ### Validation ###
@@ -1283,8 +1283,8 @@ Some additional guidelines:
 
 ### What to link ###
 Guidelines for creating links:
-  - Every reference to the "id" of another resource SHOULD have a corresponding link.
-    - For example if a file resource has a "folderId" field, there should be a "folder" link.
+  - Every reference to the <code>id:</code> of another resource SHOULD have a corresponding link.
+    - For example if a file resource has a <code>folderId:</code> field, there should be a <code>folder:</code> link.
   - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
   - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
   - Services SHOULD NOT change the format or construction of URLs within an API version
