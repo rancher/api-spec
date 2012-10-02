@@ -594,7 +594,7 @@ When the current result set contains the last resource, 'next' and 'last' SHOULD
 
 URLs included in this section SHOULD include all query parameters needed to maintain the current [sort](#sorting) and [filter](#filtering).
 
-<pre>
+```javascript
 {
   /* ... other collection attributes ... */
   "pagination": {
@@ -608,7 +608,7 @@ URLs included in this section SHOULD include all query parameters needed to main
   },
   /* ... other collection attributes ... */
 }
-</pre>
+```
 
 ### Sorting ###
 Services SHOULD allow clients to request a sorted list of resources in a collection by adding <code>sort={sort name}</code> and <code>order={asc or desc}</code> query string parameters to the request.  Clients MAY use these directly when constructing their query, but SHOULD use the links contained in results.
@@ -630,7 +630,7 @@ URLs included in this section SHOULD include all parameters needed to maintain t
 
 Multi-level sorting is not defined.  Services SHOULD pick something reasonable to actually sort on.  This may include sorting on multiple attributes for a single sort name.  For example "size" of a file is not unique, so your implementation might actually sort by "size", then "name".
 
-<pre>
+```javascript
 {
   /* ... other collection attributes ... */
   "sort": {
@@ -646,7 +646,7 @@ Multi-level sorting is not defined.  Services SHOULD pick something reasonable t
   },
   /* ... other collection attributes ... */
 }
-</pre>
+```
 
 ### Filtering ###
 Services MAY support searching/filtering of the collection.  Support for this is indicated by <code>collectionFilters</code> in the schema, and the presence of a <code>filters:</code> map in the collection response.
@@ -674,7 +674,7 @@ modifier               | meaning
 
 Services MAY define (and document) their own modifiers.
 
-<pre>
+```javascript
 {
   /* ... other collection attributes ... */
   "filters": {
@@ -686,7 +686,7 @@ Services MAY define (and document) their own modifiers.
   },
   /* ... other collection attributes ... */
 }
-</pre>
+```
 
 #### Client request ####
 The client performs a search by starting with the URL for a standard query request.  If they've already done a query and want to filter the results, the <code>self:</code> link of the result can be used instead.  Then the client adds on query string parameters for <code>{filter name}{"_"+modifier}={value}</code>.
@@ -704,7 +704,7 @@ Collections that support filtering SHOULD have a <code>filter:</code> map in the
   - If any filter was applied for that field, the value should be an array describing the filters.
   - If no filters were applied for that field, the value should be null.
 
-```
+```javascript
 {
   /* ... other collection attributes ... */
   filters: {
@@ -718,7 +718,7 @@ Collections that support filtering SHOULD have a <code>filter:</code> map in the
 }
 ```
 
-```
+```javascript
 {
   /* ... other collection attributes ... */
   filters: {
@@ -742,7 +742,7 @@ The read operation allows a client to get a single resource.  Read operations MU
 ### Root Level ###
 GETting the base URL of a service SHOULD return a collection of API version resources.  It SHOULD include a link to the <code>latest:<code> stable version of the API.  Links that point to a specific version SHOULD point to this latest version.
 
-```
+```javascript
 {
   "type" : "collection",
   "links" : {
@@ -779,6 +779,7 @@ GETting the base URL of a service SHOULD return a collection of API version reso
   ]
 }
 ```
+
 ### Version Root ###
 GETting the root URL of a particular API version SHOULD return a resource containing links to all the collections and resources that are available.  See [API Versioning](#api-versioning) for more info.
 
@@ -916,7 +917,6 @@ Content-Type: text/plain
 ```
 
 ```http
-<pre style="background-color: #ffa; border: 2px solid #ff8;">
 HTTP/1.1 201 Created
 Content-Type: application/json
 Location: https://base/v1/files/b1b2e7006be
@@ -949,7 +949,6 @@ Content-Type: application/json
   /* ... more resource representations ... */
 ]
 ```
-
 ```
 HTTP/1.1 201 Created
 Content-Type: application/json
@@ -989,7 +988,6 @@ Content-Type: application/json
   "access": "private
 }
 ```
-
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -1030,7 +1028,6 @@ Content-Type: application/json
   }
 ]
 ```
-
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -1173,7 +1170,6 @@ Content-Type: application/json
   "password": "purple monkey dishwasher"
 }
 ```
-
 ```
 HTTP/1.1 202 Accepted
 Content-Type: application/json
@@ -1181,7 +1177,7 @@ Content-Type: application/json
 {
   /* ... updated representation of the resource ... */
 }
-</pre>
+```
 
 
 ----------------------------------------
