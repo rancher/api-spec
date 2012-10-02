@@ -303,16 +303,6 @@ Slashes:
   - But they SHOULD have no effect on the response produced if a client sends one.
   - Multiple slashes in a URL SHOULD be treated the same as a single slash.
 
-Guidelines for creating links:
-  - Every reference to the "id" of another resource SHOULD have a corresponding link.
-    - For example if a file resource has a "folderId" field, there should be a "folder" link.
-  - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
-  - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
-  - Services SHOULD NOT change the format or construction of URLs within an API version
-    - In theory, everyone uses the discoverability features and follows links, so services may change URL formats at any time.
-    - But some clients will inevitably ignore disoverability and hardcode paths into their code.
-    - So if a URL needs to be changed, provide a 301/302 redirect or release a new [API version](#api-versioning).
-
 ```javascript
 {
   "links": {
@@ -326,6 +316,8 @@ Guidelines for creating links:
   /* ...other attributes... */ 
 }
 ```
+
+See also: [What to link](#what-to-link)
 
 ----------------------------------------
 
@@ -1277,7 +1269,7 @@ Several keywords are reserved by this standard and have specific meanings.  Thes
     - <code>createTypes:</code>, <code>createDefaults:</code>
     - <code>data:</code>
   - In resource and collection <code>links:</code>:
-    - <code>self:</code>, <code>schema:<code>, <code>resourceSchema:</code>
+    - <code>self:</code>, <code>schema:</code>, <code>resourceSchema:</code>
   - In query strings:
     - For pagination: <code>marker</code>, <code>limit</code>
     - For sorting: <code>sort</code>, <code>order</code>
@@ -1288,6 +1280,17 @@ Some additional guidelines:
   - Multiple words SHOULD BE interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
   - Resource names SHOULD BE singular, not plural (e.g. a "file").
   - Collection names SHOULD BE plural, not singular (e.g a collection of "folders", not "folder").
+
+### What to link ###
+Guidelines for creating links:
+  - Every reference to the "id" of another resource SHOULD have a corresponding link.
+    - For example if a file resource has a "folderId" field, there should be a "folder" link.
+  - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
+  - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
+  - Services SHOULD NOT change the format or construction of URLs within an API version
+    - In theory, everyone uses the discoverability features and follows links, so services may change URL formats at any time.
+    - But some clients will inevitably ignore disoverability and hardcode paths into their code.
+    - So if a URL needs to be changed, provide a 301/302 redirect or release a new [API version](#api-versioning).
 
 ### Regions ###
 Many services have resources that exist in multiple geographic regions.
