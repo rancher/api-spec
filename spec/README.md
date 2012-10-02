@@ -548,7 +548,7 @@ Content-Type: application/json
   "actions": { 
     "deleteAll": "https://base/v1/folders?deleteAll", 
   },
-  "pagination": { /* see pagination */ }
+  "pagination": { /* see pagination */ },
   "sort":       { /* see sorting */ },
   "filters":    { /* see filters */ }
 }
