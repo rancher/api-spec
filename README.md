@@ -139,7 +139,7 @@ else
 ```
 
 ## JSON ##
-JSON responses SHOULD BE pretty-printed, at least to the extent of having occasional newlines.  This adds minimal overhead and makes it much more readable.
+JSON responses SHOULD be pretty-printed, at least to the extent of having occasional newlines.  This adds minimal overhead and makes it much more readable.
 
 Escaping the forward slash ("/") character is not required in the [JSON specification](http://json.org/)
   - When responding as raw JSON, slashes SHOULD NOT be escaped.
@@ -209,7 +209,7 @@ Resource representations MUST have several attributes:
   - <code>type:</code> A string that uniquely identifies the kind of resource this is.
     - Types SHOULD be singular, not plural, and MUST correspond to a [schema](#schemas) id.
   - <code>id:</code> A string which uniquey identifies this resource.
-    - MUST BE unique among other resources of the same type and consist only of URL-safe characters.
+    - MUST be unique among other resources of the same type and consist only of URL-safe characters.
     - SHOULD be globally unique when practical.
     - SHOULD NOT be an auto-incrementing id from a database.  Exposing this value reveals information about the size and growth of the service, and easily allows attackers to iterate over the entire valid id range.
     - In general something like a GUID is best if there will be many of the resource or they are dynamically created.
@@ -256,7 +256,7 @@ Collection representations MUST have:
 And SHOULD have (when appropriate):
   - <code>createTypes:</code> A map of the names of types that can be created in this collection &rarr; the URL for their schema.
     - This SHOULD be present only if a type other than <code>resourceType</code> can be created.
-    - Each entry SHOULD BE an "extension" the primary <code>resourceType</code>.  It should have all the same fields and filters, plus additional info.
+    - Each entry SHOULD be an "extension" the primary <code>resourceType</code>.  It should have all the same fields and filters, plus additional info.
     - If the primary <code>resourceType</code> can be created, it SHOULD also be present in the map.
   - <code>createDefaults:</code> A map of field names &rarr; their values.
     - This can be used to specify a context-specific default value for fields when the client is creating a new resource.
@@ -301,7 +301,7 @@ Collections MAY also include additional application-specific attributes.
 ## Links ##
 Links provide a trail for the client to follow to get to related information that is not included in the response.  Clients SHOULD use the links to retrieve related information instead of hard-coding or constructing URLs from strings on their own.  Services SHOULD provide the appropriate links so that clients don't have to resort to that sort of thing.
 
-Links in responses MUST BE absolute URLs, including the protocol (https), host, port (if not 443), and [API Version](#api-versioning).
+Links in responses MUST be absolute URLs, including the protocol (https), host, port (if not 443), and [API Version](#api-versioning).
   - This prevents the client needing resolve relative URLs into absolute ones.
   - [HTTP compression](#compression) will make the overhead of transmitting absolute URLs negligible.
 
@@ -651,7 +651,7 @@ Multi-level sorting is not defined.  Services SHOULD pick something reasonable t
 Services MAY support searching/filtering of the collection.  Support for this is indicated by <code>collectionFilters</code> in the schema, and the presence of a <code>filters:</code> map in the collection response.
 
 #### Schema ####
-In the schema, the value of each filter attribute SHOULD BE an object describing:
+In the schema, the value of each filter attribute SHOULD be an object describing:
   - <code>modifiers:</code> What modifiers are supported, if any
   - <code>options:</code> What specific values are allowed, if the attribute is enumerable
 
@@ -1296,7 +1296,7 @@ Several keywords are reserved by this standard and have specific meanings.  Thes
 
 Some additional guidelines:
   - Names and attribute keys should be a single word when practical.
-  - Single-word collection, resource, attribute names SHOULD BE all lowercase.
+  - Single-word collection, resource, attribute names SHOULD be all lowercase.
   - Multiple words SHOULD be interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
   - Resource names SHOULD be singular, not plural.
     - These appear in a [resources's](#resources) <code>type:</code> and [schema's](#schemas) <code>id:</code>.
@@ -1307,7 +1307,7 @@ Guidelines for creating links:
     - For example if a file resource has a <code>folderId:</code> field, there should be a <code>folder:</code> link.
   - Links to a single resource SHOULD be singular.
     - e.g. <code>"content": "https://base/v1/files/b1b2e7006be/content"</code>
-  - Links to a collection SHOULD BE plural.
+  - Links to a collection SHOULD be plural.
     - e.g. <code>"files": "https://base/v1/folders/d5a80ee7/files"</code>
   - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
   - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
