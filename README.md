@@ -315,7 +315,7 @@ Slashes:
   "links": {
     "self":     "https://base/v1/files/b1b2e7006be",
     "schema":   "https://base/v1/schemas/file",
-    "contents": "https://base/v1/files/b1b2e7006be/contents",
+    "content": "https://base/v1/files/b1b2e7006be/content",
     "folder":   "https://base/v1/folders/19c3932wef",
     "public":   "http://documents.your-files.com/ultimate_answer.txt"
     /* ... more links ... */
@@ -1204,9 +1204,9 @@ Content-Type: application/json
 }
 ```
 
-Or the contents of the files stored might be exposed as a sub-resource:
+Or the content of the files stored might be exposed as a sub-resource:
 ```http
-PUT /v1/files/b1b2e7006be/contents HTTP/1.1
+PUT /v1/files/b1b2e7006be/content HTTP/1.1
 Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: text/plain
@@ -1217,6 +1217,19 @@ Content-Length: 2
 ```http
 HTTP/1.1 204 No Content
 Content-Type: application/json
+```
+
+```http
+GET /v1/files/b1b2e7006be/content HTTP/1.1
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
+
+```
+```http
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Conetent-Length: 2
+
+42
 ```
 
 ----------------------------------------
@@ -1284,20 +1297,75 @@ Several keywords are reserved by this standard and have specific meanings.  Thes
 Some additional guidelines:
   - Names and attribute keys should be a single word when practical.
   - Single-word collection, resource, attribute names SHOULD BE all lowercase.
-  - Multiple words SHOULD BE interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
-  - Resource names SHOULD BE singular, not plural (e.g. a "file").
-  - Collection names SHOULD BE plural, not singular (e.g a collection of "folders", not "folder").
+  - Multiple words SHOULD be interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
+  - Resource names SHOULD be singular, not plural.
+    - These appear in a [resources's](#resources) <code>type:</code> and [schema's](#schemas) <code>id:</code>.
 
-### What to link ###
+### What to Link ###
 Guidelines for creating links:
   - Every reference to the <code>id:</code> of another resource SHOULD have a corresponding link.
     - For example if a file resource has a <code>folderId:</code> field, there should be a <code>folder:</code> link.
+  - Links to a single resource SHOULD be singular.
+    - e.g. <code>"content": "https://base/v1/files/b1b2e7006be/content"</code>
+  - Links to a collection SHOULD BE plural.
+    - e.g. <code>"files": "https://base/v1/folders/d5a80ee7/files"</code>
   - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
   - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
   - Services SHOULD NOT change the format or construction of URLs within an API version
     - In theory, everyone uses the discoverability features and follows links, so services may change URL formats at any time.
     - But some clients will inevitably ignore disoverability and hardcode paths into their code.
     - So if a URL needs to be changed, provide a 301/302 redirect or release a new [API version](#api-versioning).
+
+### Canonical Links ###
+Each resource SHOULD have a single canonical URL and the representation of that resource SHOULD NOT change depending on how the client got to it.
+  
+If a file resource is accessible at <code>https://base/v1/files/b1b2e7006be</code> and as a data item in a collection <code>https://base/v1/folders/d5a80ee7/files), both representations SHOULD be exactly the same.  The links inside the resource will reflect the canonical URL.  This prevents services from generating arbitrarily long link URLs that contain the history of how the client got to where they are.
+
+```http
+GET /v1/files/b1b2e7006be HTTP/1.1
+Accept: application/json
+
+```
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id":      "b1b2e7006be", 
+  "type":    "file",
+  "links":   { 
+    "self":     "https://base/v1/files/b1b2e7006be",
+    "schema":   "https://base/v1/schemas/file",
+    "content": "https://base/v1/files/b1b2e7006be/content",
+    "folder":   "https://base/v1/folders/19c3932wef",
+    "public":   "http://documents.your-files.com/ultimate_answer.txt"
+  },
+  "actions": {
+      "encrypt": "htps://base/v1/files/b1b2e7006be?encrypt"
+    },
+  "name":    "ultimate_answer.txt",
+  /* ...  more attributes ... */
+}
+```
+
+```http
+GET /v1/folders/d5a80ee7/files HTTP/1.1
+Accept: application/json
+
+```
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  type: "collection",
+  data: [
+    { /* exactly the same JSON for file b1b2e7006be, as above */ }
+    /* ... more resources ... */
+  ],
+  /* ... more attributes ... */
+}
+```
 
 ### Regions ###
 Many services have resources that exist in multiple geographic regions.
