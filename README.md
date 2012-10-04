@@ -1361,12 +1361,16 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  type: "collection",
-  data: [
-    { /* exactly the same JSON for file b1b2e7006be, as above */ }
-    /* ... more resources ... */
-  ],
+  "type": "collection",
   /* ... more attributes ... */
+  "data": [
+    { 
+      "id":      "b1b2e7006be", 
+      "type":    "file",
+      /* exactly the same JSON for file b1b2e7006be, as above */
+    }
+    /* ... more resources ... */
+  ]
 }
 ```
 
