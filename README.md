@@ -1319,7 +1319,10 @@ Guidelines for creating links:
 ### Canonical Links ###
 Each resource SHOULD have a single canonical URL and the representation of that resource SHOULD NOT change depending on how the client got to it.
   
-If a file resource is accessible at <code>https://base/v1/files/b1b2e7006be</code> and as a data item in a collection <code>https://base/v1/folders/d5a80ee7/files), both representations SHOULD be exactly the same.  The links inside the resource will reflect the canonical URL.  This prevents services from generating arbitrarily long link URLs that contain the history of how the client got to where they are.
+If a file resource is accessible at <code>https://base/v1/files/b1b2e7006be</code> and as a data item in a collection <code>https://base/v1/folders/d5a80ee7/files</code>, both representations SHOULD be exactly the same.
+  - The links inside the resource will reflect the canonical URL.
+    - This prevents the service from generating arbitrarily long link URLs that contain unnecessary history of how the client got to where they are.
+  - The representations will be exactly the same, so comparison of the two by the client to determine they are the same is possible.
 
 ```http
 GET /v1/files/b1b2e7006be HTTP/1.1
