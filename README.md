@@ -1184,7 +1184,7 @@ Content-Type: application/json
 Resources and collections MAY be nested.  For example, folders might be associated to files, and files to a collection of tags:
 
 ```http
-GET /v1/folder/d5a80ee7/files/b1b2e7006be/tags HTTP/1.1
+GET /v1/folders/d5a80ee7/files/b1b2e7006be/tags HTTP/1.1
 Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
