@@ -329,7 +329,7 @@ See also: [What to link](#what-to-link)
 ----------------------------------------
 
 # Actions #
-Actions perform an operation on a resource (or collection) and optionally returns a result.  Actions may have several inputs and typically do something that requires application logic beyond what could be done with a simple [create](#create), [update](#update), or [delete](#delete) operation.
+Actions perform an operation on a resource (or collection) and optionally returns a result.  Actions may have several inputs and typically do something that requires application logic beyond what could be done with a simple [create](#create-operation), [update](#update-operation), or [delete](#delete-operation) operation.
 
 The schema for types that have actions available have an <code>actions</code> and/or <code>collectionActions</code> map in their schema detailing all the actions that are possible and their input/output schema.  For example, there may be "share", "encrypt", and "decrypt" actions on a file.  See [schemas](#schemas) for more information.
 
@@ -496,7 +496,7 @@ The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive a
     "size": {"type": "int"}
   },
   "collectionFilters": {
-    "name":   {"modifiers": ["ne","prefix","suffix"], wildcards: true},
+    "name":   {"modifiers": ["ne","prefix","suffix"]},
     "date":   {"modifiers": ["lt","gt","lte","gte","prefix"]}
     "size":   {"modifiers": ["lt","gt","lte","gte"] }
     "access": {"modifiers": ["eq","ne"], "options": ["public","private","requirepassword"]}
@@ -648,7 +648,7 @@ Multi-level sorting is not defined.  Services SHOULD pick something reasonable t
 ```
 
 ### Filtering ###
-Services MAY support searching/filtering of the collection.  Support for this is indicated by <code>collectionFilters</code> in the schema, and the presence of a <code>filters:</code> map in the collection response.
+Services MAY support searching/filtering of the collection.  Support for this is indicated by <code>collectionFilters:</code> in the schema, and the presence of a <code>filters:</code> map in the collection response.
 
 #### Schema ####
 In the schema, the value of each filter attribute SHOULD be an object describing:
@@ -677,7 +677,7 @@ Services MAY define (and document) their own modifiers.
 {
   /* ... other collection attributes ... */
   "filters": {
-    "name":   {"modifiers": ["eq","ne","prefix","suffix"], wildcards: true},
+    "name":   {"modifiers": ["eq","ne","prefix","suffix"]},
     "date":   {"modifiers": ["eq","lt","gt","lte","gte","prefix"]}
     "size":   {"modifiers": ["eq","lt","gt","lte","gte"] }
     "access": {"modifiers": ["eq","ne"], "options": ["public","private","requirepassword"]}
@@ -692,9 +692,9 @@ The client performs a search by starting with the URL for a standard query reque
   - The underscore and modifier are optional if the desired modifier is <code>eq</code>.
   - For example to search for files starting with "a" and greater than 1kb, the client would append:
     - <code>name_prefix=a&size_gt=1024</code>
-* To search for non-image files, they could append:
-  - <code>name_notlike=%.jpg&name_notlike=%.png</code>
-    - Note: % characters in the request URL need to be escaped into "%25" according to normal URL-encoding rules.
+  - To search for non-image files, they could append:
+    - <code>name_notlike=%.jpg&name_notlike=%.png</code>
+  - Note: % characters are shown here for clarity.  In an actual request they need to be escaped into "%25" according ot normal [URL-encoding rules](http://tools.ietf.org/html/rfc3986#section-2.4).
 
 There is no mechanism defined for OR-ing conditions.  All filters are AND-ed together.
 
@@ -722,8 +722,8 @@ Collections that support filtering SHOULD have a <code>filter:</code> map in the
   /* ... other collection attributes ... */
   filters: {
     name: [
-      {modifier": "notlike", "value": "%.jpg"},
-      {modifier": "notlike", "value": "%.png"}
+      {"modifier": "notlike", "value": "%.jpg"},
+      {"modifier": "notlike", "value": "%.png"}
     ],
     size:   null,
     date:   null,
@@ -739,7 +739,7 @@ Collections that support filtering SHOULD have a <code>filter:</code> map in the
 The read operation allows a client to get a single resource.  Read operations MUST NOT incur side effects.
 
 ### Root Level ###
-GETting the base URL of a service SHOULD return a collection of API version resources.  It SHOULD include a link to the <code>latest:<code> stable version of the API.  Links that point to a specific version SHOULD point to this latest version.
+GETting the base URL of a service SHOULD return a collection of API version resources.  It SHOULD include a link to the <code>latest:</code> stable version of the API.  Links that point to a specific version at this level (e.g. schemas) SHOULD point to this latest version.
 
 ```javascript
 {
@@ -885,14 +885,14 @@ Location: https://base/v1/folders/ab391827x31
 ```
 
 ### Single resource - form post ###
-Services SHOULD also support create calls which are HTML Form encoded, <code>Content-Type: multipart/form-data<code> or <code>Content-Type: application/x-www-form-urlencoded</code>.  These are easy for a client to construct with a HTML form or cURL, and also allow for simple uploading of binary data/files.  A file management API might allow creating a file resource like:
+Services SHOULD also support create calls which are HTML Form encoded, <code>Content-Type: multipart/form-data</code> or <code>Content-Type: application/x-www-form-urlencoded</code>.  These are easy for a client to construct with a HTML form or cURL, and also allow for simple uploading of binary data/files.  A file management API might allow creating a file resource like:
 
-<code>
+```bash
 curl -u access_key:secret_key \
   -F name="ultimate_answer.txt" \
   -F file="@mydatafile.txt" \
   "http://base/v1/folders/ab391827x31"
-</code>
+```
 
 Which would make a request like:
 
@@ -948,7 +948,7 @@ Content-Type: application/json
   /* ... more resource representations ... */
 ]
 ```
-```
+```http
 HTTP/1.1 201 Created
 Content-Type: application/json
 
@@ -1060,13 +1060,14 @@ The delete operation deletes the item given by the request URL.
 
 ### Single resource ###
 ```http
-HTTP/1.1 DELETE /v1/folders/b1b2e7006be
+DELETE /v1/folders/b1b2e7006be HTTP/1.1
 Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
 ```http
 HTTP/1.1 204 No Content
+
 ```
 
 ### Multiple Resources
@@ -1088,6 +1089,7 @@ Content-Type: text/json
 ```
 ```http
 HTTP/1.1 204 No Content
+
 ```
 
 ### All resources in a collection ###
@@ -1127,7 +1129,7 @@ The response SHOULD return the list of newly created resources, just as if the r
 
 Note: this operation uses a non-standard HTTP method.  There's nothing wrong with that, but some clients may not support abitrary methods.
 
-```http
+```
 REPLACE /v1/firewalls/42/allow HTTP/1.1
 Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
@@ -1169,7 +1171,7 @@ Content-Type: application/json
   "password": "purple monkey dishwasher"
 }
 ```
-```
+```http
 HTTP/1.1 202 Accepted
 Content-Type: application/json
 
@@ -1197,7 +1199,7 @@ Content-Type: application/json
   "type": "collection",
   "resourceType": "tag",
   "data": [
-    {"type: "tag", /*...*/},
+    {"type: "tag", /*... more tag attributes ... */},
     /* ... more tag resources ... */
   ]
   /* ... more collection attributes ... */
@@ -1217,6 +1219,7 @@ Content-Length: 2
 ```http
 HTTP/1.1 204 No Content
 Content-Type: application/json
+
 ```
 
 ```http
@@ -1237,34 +1240,33 @@ Conetent-Length: 2
 Some (or all) resources MAY implement resource versioning.  Versioning allows for the client to perform multiple concurrent updates on a resource and resolve conflicts when they occur.
 
 For resources that implement versioning:
-  - The service MUST return resource version in responses as the "rev" attribute in query and read operations.
-  - The client MUST include the "rev" attribute in update, patch, and action operations.
+  - The service MUST return resource version in responses as the <code>rev:</code> attribute in query and read operations.
+  - The client MUST include the <code>rev:</code> attribute in update, patch, and action operations.
     - If the revision given does not match the current revision when the request is processed, the service MUST return a 409 error.
-  - The service MUST change the "rev" attribute whenever a field in the resource changes.
+  - The service MUST change the <code>rev:</code> attribute whenever a field in the resource changes.
 
 ----------------------------------------
 # Base URL and Versioning #
-The base URL that users access your API with SHOULD be of the form
+The base URL that users access your API with SHOULD be of the form:
 <code>https://api{-optional-region-code}.{your product domain}/</code>
 
-APIs SHOULD have a separate DNS record from the your web/app load balancers, so that the API can be scaled separately from the rest of your stack.
-  - The name MAY resolve to the same set of machines if this scale is not needed yet.
+APIs SHOULD have a separate DNS record from the your web/app load balancers, so that the API can be scaled separately from the rest of your stack.  The name can always point to the web/app servers if this scale is not needed yet
 
-All APIs that require authentication MUST be accessible to the public ONLY over HTTPS.  Unauthenticated public APIs MAY be provided over HTTP, but SHOULD offer HTTPS too.
+All APIs that require authentication MUST be accessible to the public **only** over HTTPS.  Unauthenticated public APIs MAY be provided over HTTP, but SHOULD also offer HTTPS.
 
 ## API Versioning ##
 APIs MUST support more than one version of their implementation.  Clients MUST specify the particular version they want, and the application MUST NOT make changes that are not backwards compatible to that version.
 
 Breaking changes should be avoided when possible, but you are eventually going to have to make a breaking change so it is far better to have a way to handle this built in from the start.  The suggested format for the version string is the letter "v" followed by a single integer which increases by one for each revision.  The version SHOULD be treated as an opaque string to the client, so any other format MAY be used.
 
-Versions MAY also have a "revision" string attribute that changes on each release.  This can be useful to help debug issues caused by changes made within a version that are supposed to be compatible with each other.
+Versions resources  MAY also have a "revision" string attribute that changes on each release.  This can be useful to help debug issues caused by changes made within a version that are supposed to be compatible with each other.
 
 Outdated versions SHOULD be deprecated and eventually removed from the service.  A request for a version that has been removed SHOULD return a 410 error.
 
 ### Listing ###
 Clients MUST be able to make a GET request to the base URL (without a version fragment) to find out what versions are available.  This request SHOULD NOT require authentication.  Clients SHOULD check the "latest" link periodically and take action if they are no longer using the latest version.
 
-See [root-level](#root-level) and [individual version](#individual-version) read operation for more info.
+See the [root level](#root-level) and [individual version](#individual-version) read operation for more info.
 
 ----------------------------------------
 # Authentication #
