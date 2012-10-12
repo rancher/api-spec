@@ -119,7 +119,7 @@ Other representation Content-Types that make sense for the particular applicatio
 When clients are sending a representation to the service, they MUST specify the format using the [Content-Type](http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type) header.  If the service does not support the specified Content-Type, it SHOULD return a 406 error.
 
 ## Response Format ##
-Clients MAY specify their preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header.  Service SHOULD be lenient in mapping this to one of their acceptable formats.  For example "application/json", "text/json;charset=utf-8", and "text/json" should all be interpreted as JSON.
+Clients MAY specify their preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header.  Service SHOULD be lenient in mapping this to one of their acceptable formats.  For example <code>application/json</code>, <code>text/json;charset=utf-8</code>, and <code>text/json</code> should all be interpreted as JSON.
 
 JSON SHOULD be assumed as the preferred representation, unless the request is from a web browser.
   - The suggested definiton of "a web browser" is that the Accept header contains "*/*" and the User-Agent header contains "mozilla".
