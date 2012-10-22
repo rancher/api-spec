@@ -166,7 +166,7 @@ Services provide a HTML version of their API by wrapping the JSON response with 
 <link rel="stylesheet" type="text/css" href="https://cloud.secureserver.net/css.php?group=htmlapi" />
 <script src="https://cloud.secureserver.net/js.php?group=htmlapi"></script>
 <script>
-var docs = "http://docs.cloud.secureserver.net";
+var docs = "http://url-to-your-docs/site";
 var data = { 
   /* ... JSON response ... */
 };
@@ -218,7 +218,8 @@ Resource representations MUST have several attributes:
   - <code>rev:</code> A string identifying the resource revision, if [resource versioning](#resource-versioning) is implemented.
   - <code>links:</code> A map with [links](#links) to:
     - <code>self:</code> The location of the resource itself.
-    - <code>schema:</code> The location of the schema definition for this resource type
+    - <code>schemas:</code> The location of the schemas collection.
+      - This is required **only** at the root level of the response.  If it contains nested resources (e.g. a collection) they do not need this link.
     - Any related resources/collections, as appropriate.
   - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them.
     - This MAY be omitted if the resource type has no actions.
@@ -247,18 +248,19 @@ Collection representations MUST have:
   - <code>resourceType:</code> The name of the primary schema type this collection holds.
   - <code>links:</code> A map with [links](#links) to:
     - <code>self:</code> The location of the resource itself.
-    - <code>schema:</code> The location of the schema definition for this type (which is always "collection")
-    - <code>resourceSchema:</code> The location of the <code>resourceType</code> schema.
+    - <code>schemas:</code> The location of the schemas collection.
+      - This is required **only** at the top level of the response.  The resources within the collection do not need this link.
     - Any related resources/collections, as appropriate.
   - <code>data:</code> An array containing resource representations
     - This MUST always be present and be an array, even if there are 0 or 1 entries in it.
 
 And SHOULD have (when appropriate):
-  - <code>createTypes:</code> A map of the names of types that can be created in this collection &rarr; the URL for their schema.
+  - <code>createTypes:</code> A map of the names of types that can be created in this collection &rarr; the URL where the resource SHOULD be posted.
     - This SHOULD be present only if a type other than <code>resourceType</code> can be created.
-    - Each entry SHOULD be an "extension" the primary <code>resourceType</code>.  It should have all the same fields and filters, plus additional info.
+    - Each entry/type SHOULD be an "extension" the primary <code>resourceType</code>.  That is, it should have all the same fields and filters, plus additional info.
     - If the primary <code>resourceType</code> can be created, it SHOULD also be present in the map.
-  - <code>createDefaults:</code> A map of field names &rarr; their values.
+    - The URL can just be the same as the "self" link, but MAY also be any other location, and different for each createType to provide additional flexibility.
+    - <code>createDefaults:</code> A map of field names &rarr; their values.
     - This can be used to specify a context-specific default value for fields when the client is creating a new resource.
   - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them.
     - This MAY be omitted if the resource type has no actions.
@@ -273,14 +275,13 @@ Collections MAY also include additional application-specific attributes.
   "type": "collection",
   "resourceType": "file",
   "createTypes": {
-    "file":      "https://base/v1/schemas/file",
-    "textFile":  "https://base/v1/schemas/textFile",
-    "imageFile": "https://base/v1/schemas/imageFile",
+    "file":      "https://base/v1/files",
+    "textFile":  "https://base/v1/files",
+    "imageFile": "https://base/v1/files",
   },
   "links": { 
-    "self":           "https://base/v1/files",
-    "schema":         "https://base/v1/schemas/collection",
-    "resourceSchema": "https://base/v1/schemas/file",
+    "self":     "https://base/v1/files",
+    "schemas":  "https://base/v1/schemas"
     /* ... more links ... */
   },
   "actions":    { /* see actions */ },
@@ -314,8 +315,8 @@ Slashes:
 {
   "links": {
     "self":     "https://base/v1/files/b1b2e7006be",
-    "schema":   "https://base/v1/schemas/file",
-    "content": "https://base/v1/files/b1b2e7006be/content",
+    "schemas":  "https://base/v1/schemas",
+    "content":  "https://base/v1/files/b1b2e7006be/content",
     "folder":   "https://base/v1/folders/19c3932wef",
     "public":   "http://documents.your-files.com/ultimate_answer.txt"
     /* ... more links ... */
@@ -336,9 +337,7 @@ The schema for types that have actions available have an <code>actions</code> an
 ### Schema ###
 Actions are defined by a map with 4 attributes:
   - <code>input:</code> The ID of the schema that the inputs will conform to
-  - <code>inputSchema:</code> The URL to that schema ID
   - <code>output:</code> The ID of the schema that the outputs will conform to
-  - <code>outputSchema:</code> The URL to that schema ID
 
 The appropriate pair MAY be omitted if there are no inputs or outputs to the action.
 
@@ -349,19 +348,14 @@ The appropriate pair MAY be omitted if there are no inputs or outputs to the act
   "actions": {
     "share": {
       "input": "shareInput",
-      "inputSchema": "https://base/v1/schemas/shareInput",
     },
     "decrypt": {
       "input": "cryptInput",
-      "inputSchema": "https://base/v1/schemas/cryptInput",
       "output": "file",
-      "outputSchema": "https://base/v1/schemas/file",
     },
     "encrypt": {
       "input": "cryptInput",
-      "inputSchema": "https://base/v1/schemas/cryptInput",
       "output": "file",
-      "outputSchema": "https://base/v1/schemas/file",
     },
     /* ... other actions ... */
   },
@@ -377,7 +371,7 @@ Resources (and collections) of types that have actions defined have a <code>acti
   "id": "b1b2e7006be",
   "type": "file",
   "actions": {
-    "share": "https://base/v1/files/b1b2e7006be?share",
+    "share":   "https://base/v1/files/b1b2e7006be?share",
     "encrypt": "https://base/v1/files/b1b2e7006be?encrypt"
   },
   /* ... other resource attributes ... */
@@ -396,16 +390,15 @@ The "schemas" collection MUST also have a link to the base URL of the API versio
 Each schema resource MUST describe:
   - <code>id:</code>: The name of the resource type (e.g. "files").
   - <code>type:</code> "schema"
-  - <code>methods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
-  - <code>fields:</code>: A map of attribute names available in **resources** of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
-  - <code>actions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
+  - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
+  - <code>resourceFields:</code>: A map of attribute names available in **resources** of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
+  - <code>resourceActions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
   - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
   - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
   - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has, if any (see [fields](#schema-fields)).
   - <code>collectionFilters:</code>: A map detailing the filters that are available to **collections** of this type (see [filters](#filtering)).
   - <code>links:</code>: 
     - <code>self:</code>: The URL for this schema
-    - <code>schema:</code>: The URL for the schema describing a schema resource (http://base/v1/schemas/schema).
     - <code>collection:</code> If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders")
 
 ### Schema Fields ###
@@ -427,6 +420,7 @@ type                                  | description
 --------------------------------------|-------------
 "enum"                                | One choice out of an enumeration of possible values
 "reference[<code>schema_name</code>]" | The id of another resource with type <code>schema_name</code>
+"type[<code>schema_name</code>]"      | The actual representation of a resource with type <code>schema_name</code>
 "array[<code>another_type</code>]"    | An array of entries of type <code>another_type</code>
 "map[<code>another_type</code>]"      | Key/value pairs.  Values are of type <code>another_type</code>
 
@@ -475,20 +469,16 @@ The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive a
   },
   "actions": {
     "encrypt": {
-      "input":        "cryptInput",
-      "inputSchema":  "https://base/v1/schemas/cryptInput",
-      "output":       "file",
-      "outputSchema": "https://base/v1/schemas/file",
+      "input":  "cryptInput",
+      "output": "file",
     },
     /* ...more actions... */
   },
   "collectionMethods": ["GET","POST"],
   "collectionActions": {
     "archive" {
-      "input":        "archiveInput",
-      "inputSchema":  "https://base/v1/schemas/archiveInput",
-      "output":       "file",
-      "outputSchema": "https://base/v1/schemas/file",
+      "input":  "archiveInput",
+      "output": "file",
     }
     /* ...more actions... */
   },
@@ -536,18 +526,17 @@ Content-Type: application/json
   "type": "collection",
   "resourceType": "folder",
   "links": {
-    "self":           "https://base/v1/folders",
-    "schema":         "https://base/v1/schemas/collection",
-    "resourceSchema": "https://base/v1/schemas/folder",
+    "self":    "https://base/v1/folders",
+    "schemas": "https://base/v1/schemas"
     /* ... more links ... */
   },
   "resourceType": "folder",
   "data": [
     {
-      "type": "folder",
-      "id": "b1b2e7006be",
-      "name": "Documents",
-      "links": { /* see links */ },
+      "type":    "folder",
+      "id":      "b1b2e7006be",
+      "name":    "Documents",
+      "links":   { /* see links */ },
       "actions": { /* see actions */ }
     },
     /* ... more folder resources ... */
@@ -633,13 +622,13 @@ Multi-level sorting is not defined.  Services SHOULD pick something reasonable t
 {
   /* ... other collection attributes ... */
   "sort": {
-    "name": "size",
-    "order": "asc",
+    "name":    "size",
+    "order":   "asc",
     "reverse": "https://base/v1/files?sort=size&order=desc",
   },
   "sortLinks": {
-    "name": "https://base/v1/files?sort=name",
-    "size": "https://base/v1/files?sort=size",
+    "name":       "https://base/v1/files?sort=name",
+    "size":       "https://base/v1/files?sort=size",
     "upload_date: "https://base/v1/files?sort=upload_date",
     /* ... more sort options ... */
   },
@@ -743,38 +732,34 @@ GETting the base URL of a service SHOULD return a collection of API version reso
 
 ```javascript
 {
-  "type" : "collection",
-  "links" : {
-    "self" : "https://base/",
-    "latest" : "https://base/v3",
-    "schema" : "https://base/v3/schemas/collection",
-    "resourceSchema" : "https://base/v3/schemas/apiversion"
+  "type": "collection",
+  "links": {
+    "self":   "https://base/",
+    "latest": "https://base/v3",
+    "schemas": "https://base/v3/schemas"
   },
-  "data" : [ 
+  "data": [ 
     {
-      "id" : "v1",
-      "type" : "apiversion",
-      "links" : {
-        "self" : "https://base/v1",
-        "schema" : "https://base/v3/schemas/apiversion"
+      "id":    "v1",
+      "type":  "apiversion",
+      "links": {
+        "self": "https://base/v1"
       }
     },
     {
-      "id" : "v2",
-      "type" : "apiversion",
-      "links" : {
-        "self" : "https://base/v2",
-        "schema" : "https://base/v3/schemas/apiversion"
+      "id":    "v2",
+      "type":  "apiversion",
+      "links": {
+        "self": "https://base/v2"
       }
-    } 
+    },
     {
-      "id" : "v3",
-      "type" : "apiversion",
-      "links" : {
-        "self" : "https://base/v3",
-        "schema" : "https://base/v3/schemas/apiversion"
+      "id":    "v3",
+      "type":  "apiversion",
+      "links": {
+        "self": "https://base/v3"
       }
-    } 
+    }
   ]
 }
 ```
@@ -796,8 +781,9 @@ Content-Type: application/json
   "id": "v1",
   "deprecated": true,
   "links": {
-    "file": "https://base/v1/files",
-    "folder": "https://base/v1/folders"
+    "schemas": "https://base/v1/schemas",
+    "file":    "https://base/v1/files",
+    "folder":  "https://base/v1/folders"
     /* ... other collections and resources ... */
   },
 }
@@ -836,6 +822,7 @@ Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 234
+
 ```
 
 
@@ -849,6 +836,7 @@ Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 Content-Length: 123
+
 ```
 
 ----------------------------------------
@@ -878,7 +866,7 @@ Content-Type: application/json
 Location: https://base/v1/folders/ab391827x31
 
 {
-  "id": "ab391827x31",
+  "id":   "ab391827x31",
   "type": "folder",
   /* ... more resource attributes ... */
 }
@@ -921,7 +909,7 @@ Content-Type: application/json
 Location: https://base/v1/files/b1b2e7006be
 
 {
-  "id": "b1b2e7006be",
+  "id":   "b1b2e7006be",
   "type": "file",
   /* ... more resource attributes ... */
 }
@@ -944,7 +932,7 @@ Content-Type: application/json
 
 [
   {"name": "Documents", /* ... more resource attributes ... */},
-  {"name": "Pictures", /*... more resource attributes ... */},
+  {"name": "Pictures",  /*... more resource attributes ... */},
   /* ... more resource representations ... */
 ]
 ```
@@ -957,7 +945,7 @@ Content-Type: application/json
   "resourceType": "folder",
   "data": [
     {"name": "Documents", /* ... more resource attributes ... */},
-    {"name": "Pictures", /* ... more resource attributes ... */},
+    {"name": "Pictures",  /* ... more resource attributes ... */},
     /* ... more resource representations ... */
   ]
   /* ... more collection attributes ... */
@@ -982,8 +970,8 @@ Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 Content-Type: application/json
 
 {
-  "id": "b1b2e7006be",
-  "rev": "8d2e54afd",
+  "id":     "b1b2e7006be",
+  "rev":    "8d2e54afd",
   "access": "private
 }
 ```
@@ -992,9 +980,9 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "id": "b1b2e7006be",
-  "rev": "8d2e54afd",
-  "name": "Documents",
+  "id":     "b1b2e7006be",
+  "rev":    "8d2e54afd",
+  "name":   "Documents",
   "access": "private"
 }
 ```
@@ -1283,7 +1271,9 @@ Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2)
 
 ### Naming Conventions ###
 Several keywords are reserved by this standard and have specific meanings.  These words MUST ONLY be used for their documented purpose:
-  - In resources: <code>id:</code>, <code>type:</code>, <code>rev</code>, <code>links:</code>, <code>actions:</code>
+  - In resources: 
+    - <code>id:</code>, <code>type:</code>, <code>rev</code>
+    - <code>links:</code>, <code>actions:</code>
   - In collections: 
     - (Everything reserved for resources)
     - <code>filters:</code>, <code>pagination:</code>,
@@ -1291,7 +1281,7 @@ Several keywords are reserved by this standard and have specific meanings.  Thes
     - <code>createTypes:</code>, <code>createDefaults:</code>
     - <code>data:</code>
   - In resource and collection <code>links:</code>:
-    - <code>self:</code>, <code>schema:</code>, <code>resourceSchema:</code>
+    - <code>self:</code>, <code>schemas:</code>
   - In query strings:
     - For pagination: <code>marker</code>, <code>limit</code>
     - For sorting: <code>sort</code>, <code>order</code>
@@ -1324,7 +1314,7 @@ Each resource SHOULD have a single canonical URL and the representation of that 
 If a file resource is accessible at <code>https://base/v1/files/b1b2e7006be</code> and as a data item in a collection <code>https://base/v1/folders/d5a80ee7/files</code>, both representations SHOULD be exactly the same.
   - The links inside the resource will reflect the canonical URL.
     - This prevents the service from generating arbitrarily long link URLs that contain unnecessary history of how the client got to where they are.
-  - The representations will be exactly the same, so comparison of the two by the client to determine they are the same is possible.
+  - One exception is that the "schemas" link MUST be present in the former response, but does not have to be in the latter, as it is only required at the top-level of the response.
 
 ```http
 GET /v1/files/b1b2e7006be HTTP/1.1
@@ -1340,8 +1330,8 @@ Content-Type: application/json
   "type":    "file",
   "links":   { 
     "self":     "https://base/v1/files/b1b2e7006be",
-    "schema":   "https://base/v1/schemas/file",
-    "content": "https://base/v1/files/b1b2e7006be/content",
+    "schemas":  "https://base/v1/schemas",
+    "content":  "https://base/v1/files/b1b2e7006be/content",
     "folder":   "https://base/v1/folders/19c3932wef",
     "public":   "http://documents.your-files.com/ultimate_answer.txt"
   },
@@ -1364,12 +1354,16 @@ Content-Type: application/json
 
 {
   "type": "collection",
+  "links": {
+    "self": "https://base/v1/folders/d5a80ee7/files",
+    "schemas": "https://base/v1/schemas"
+  }
   /* ... more attributes ... */
   "data": [
     { 
       "id":      "b1b2e7006be", 
       "type":    "file",
-      /* exactly the same JSON for file b1b2e7006be, as above */
+      /* the same JSON for file b1b2e7006be, as above */
     }
     /* ... more resources ... */
   ]
