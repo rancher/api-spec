@@ -10,9 +10,9 @@ Maybe you'd like to build your own tools that work with our services.  Or maybe 
 # What if I just want to use one of your APIs? #
 There is information about each API on our [documentation page](http://docs.cloud.secureserver.net/).  We also have clients for various languages:
   -  [PHP](https://github.com/godaddy/gdapi-php)
+  - [C#](https://github.com/godaddy/gdapi-csharp)
   - Node.js &mdash; coming soon
   - Java &mdash; coming soon
-  - C# &mdash; coming soon
 
 # Contact #
 For questions, comments, corrections, suggestions, etc, you can use the usual tools in GitHub or email us at [apispec@godaddy.com](mailto:apispec@godaddy.com).  Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API, product, or account.
@@ -1272,7 +1272,7 @@ Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2)
 ### Naming Conventions ###
 Several keywords are reserved by this standard and have specific meanings.  These words MUST ONLY be used for their documented purpose:
   - In resources: 
-    - <code>id:</code>, <code>type:</code>, <code>rev</code>
+    - <code>id:</code>, <code>type:</code>, <code>rev:</code>
     - <code>links:</code>, <code>actions:</code>
   - In collections: 
     - (Everything reserved for resources)
