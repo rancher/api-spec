@@ -11,6 +11,8 @@ Maybe you'd like to build your own tools that work with our services.  Or maybe 
 There is information about each API on our [documentation page](http://docs.cloud.secureserver.net/).  We also have clients for various languages:
   -  [PHP](https://github.com/godaddy/gdapi-php)
   - [C#](https://github.com/godaddy/gdapi-csharp)
+  - Python &mdash; coming soon
+  - Command Line &mdash; coming soon
   - Node.js &mdash; coming soon
   - Java &mdash; coming soon
 
