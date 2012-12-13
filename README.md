@@ -401,7 +401,9 @@ Each schema resource MUST describe:
   - <code>collectionFilters:</code>: A map detailing the filters that are available to **collections** of this type (see [filters](#filtering)).
   - <code>links:</code>: 
     - <code>self:</code>: The URL for this schema
-    - <code>collection:</code> If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders")
+    - <code>collection:</code> If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders").
+      - These links are used by API clients to generate object stubs and use this URL to fetch data.
+      - This SHOULD correspond to the collections that are linked at the [version root](#version-root).
 
 ### Schema Fields ###
 Each field is defined by a map of properties.  Fields MUST have a <code>type:</code>, which may be a "simple" type:
