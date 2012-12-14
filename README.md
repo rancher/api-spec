@@ -734,6 +734,8 @@ The read operation allows a client to get a single resource.  Read operations MU
 ### Root Level ###
 GETting the base URL of a service SHOULD return a collection of API version resources.  It SHOULD include a link to the <code>latest:</code> stable version of the API.  Links that point to a specific version at this level (e.g. schemas) SHOULD point to this latest version.
 
+Versions that are not the latest MAY have a <code>deprecated: true</code> flag to indicate support for this version will be removed in the near future.
+
 ```javascript
 {
   "type": "collection",
@@ -746,22 +748,34 @@ GETting the base URL of a service SHOULD return a collection of API version reso
     {
       "id":    "v1",
       "type":  "apiversion",
+      "deprecated": true,
       "links": {
-        "self": "https://base/v1"
+        "self": "https://base/v1",
+        "file":    "https://base/v1/files",
+        "folder":  "https://base/v1/folders"
+        /* ... other collections and resources ... */
       }
     },
     {
       "id":    "v2",
       "type":  "apiversion",
+      "deprecated": false,
       "links": {
         "self": "https://base/v2"
+        "file":    "https://base/v2/files",
+        "folder":  "https://base/v2/folders"
+        /* ... other collections and resources ... */
       }
     },
     {
       "id":    "v3",
       "type":  "apiversion",
+      "deprecated": false,
       "links": {
-        "self": "https://base/v3"
+        "self": "https://base/v3",
+        "file":    "https://base/v3/files",
+        "folder":  "https://base/v3/folders"
+        /* ... other collections and resources ... */
       }
     }
   ]
@@ -783,8 +797,10 @@ Content-Type: application/json
 
 {
   "id": "v1",
+  "type":  "apiversion",
   "deprecated": true,
   "links": {
+    "self":    "https://base/v1",
     "schemas": "https://base/v1/schemas",
     "file":    "https://base/v1/files",
     "folder":  "https://base/v1/folders"
