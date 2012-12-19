@@ -457,8 +457,8 @@ The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive a
 {
   "id": "file", 
   "type": "schema",
-  "methods": ["GET","DELETE"],
-  "fields": {
+  "resourceMethods": ["GET","DELETE"],
+  "resourceFields": {
     "name":   {"type": "string", "required": true, "create": true, "update": true},
     "size":   {"type": "int"},
     "owner":  {"type": "reference[user]"},
@@ -471,7 +471,7 @@ The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive a
     },
     /* ... more fields ... */
   },
-  "actions": {
+  "resourceActions": {
     "encrypt": {
       "input":  "cryptInput",
       "output": "file",
