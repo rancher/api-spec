@@ -35,7 +35,7 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
 
 # Terminology #
 **REST:**
-A **RE**presentational **S**tate **T**ransfer service is a style of API where a client makes HTTP requests to manipulate resources identified by the request URL.  RESTful services are stateless, so session state is stored on the server between requests.  Each requests contains all the information needed to service that request.
+A **RE**presentational **S**tate **T**ransfer service is a style of API where a client makes HTTP requests to manipulate resources identified by the request URL.  RESTful services are stateless, so no session state is stored on the server between requests.  Each requests contains all the information needed to service that request.
 
 **Resource:**
 A **resource** is an object or concept that can be manipulated by the API.  In our file storage example, they will be things like a 'Folder' and a 'File'.  Resources are the building blocks of an API, the nouns in the language describing the system.  All operations in the API manipulate the resources or their state.  Resources should be organized in a way that is useful to the client.  This is the most important part of the design of an API; if your resources just match your database schema one-to-one, chances are your API is not going to be very easy to use.
