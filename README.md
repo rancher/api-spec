@@ -337,7 +337,7 @@ Actions perform an operation on a resource (or collection) and optionally return
 The schema for types that have actions available have an <code>actions</code> and/or <code>collectionActions</code> map in their schema detailing all the actions that are possible and their input/output schema.  For example, there may be "share", "encrypt", and "decrypt" actions on a file.  See [schemas](#schemas) for more information.
 
 ### Schema ###
-Actions are defined by a map with 4 attributes:
+Actions are defined by a map with 2 attributes:
   - <code>input:</code> The ID of the schema that the inputs will conform to
   - <code>output:</code> The ID of the schema that the outputs will conform to
 
@@ -347,7 +347,7 @@ The appropriate pair MAY be omitted if there are no inputs or outputs to the act
 {
   "id":      "file",
   "type":    "schema",
-  "actions": {
+  "resourceActions": {
     "share": {
       "input": "shareInput",
     },
