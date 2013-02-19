@@ -326,6 +326,8 @@ Slashes:
   /* ...other attributes... */ 
 }
 ```
+Link entries SHOULD only be included if they lead to a valid destination.  
+  - For example, if this resource does not have a public link, the public field SHOULD be omitted, rather than having a null value or a URL that will lead to a 404 response.
 
 See also: [What to link](#what-to-link)
 
