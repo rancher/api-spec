@@ -394,19 +394,23 @@ The "schemas" collection MUST also have a link to the base URL of the API versio
 Each schema resource MUST describe:
   - <code>id:</code>: The name of the resource type (e.g. "files").
   - <code>type:</code> "schema"
-  - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
-  - <code>resourceFields:</code>: A map of attribute names available in **resources** of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
-  - <code>resourceActions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
-  - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
-  - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
-  - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has, if any (see [fields](#schema-fields)).
-  - <code>collectionFilters:</code>: A map detailing the filters that are available to **collections** of this type (see [filters](#filtering)).
   - <code>links:</code>: 
     - <code>self:</code>: The URL for this schema
     - <code>collection:</code> If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders").
       - This SHOULD correspond to the collections that are linked at the [version root](#version-root).
       - This link is used by API clients to generate object stubs as the URL to fetch data from.
-      - This link is used by the [HTML UI](#html-ui) to provide a dropdown of choices for fields that are of type reference.
+      - This link is used by the [HTML UI](#html-ui) to provide a dropdown of choices for fields that are of type reference.  - 
+
+And MUST describe if applicable:
+  - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
+  - <code>resourceFields:</code>: A map of attribute names available in **resources** of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
+  - <code>resourceActions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
+  - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
+  - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
+  - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has. (see [fields](#schema-fields)).
+  - <code>collectionFilters:</code>: A map detailing the filters that are available to **collections** of this type (see [filters](#filtering)).
+
+Entries here the value would be an empty map/array MAY be omitted from the response.
 
 ### Schema Fields ###
 Each field is defined by a map of properties.  Fields MUST have a <code>type:</code>, which may be a "simple" type:
