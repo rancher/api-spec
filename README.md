@@ -455,7 +455,7 @@ name                        | type                              | description
 
 
 ### Validation ###
-The additional fields above provide enough info for a client to do basic validation of values before sumbitting them to a service.  They are not intended to be completly comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of it's conditions, it should return a 400 error with enough detail for the client to fix the problem and re-submit the reuqest.
+The additional fields above provide enough info for a client to do basic validation of values before submitting them to a service.  They are not intended to be completly comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of it's conditions, it should return a 400 error with enough detail for the client to fix the problem and re-submit the reuqest.
 
 #### Character Ranges ####
 The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive and may contain ranges as in a simple regular expression.  For example alphanumerics may be represented as "a-zA-Z0-9".  Unicode characters should be represented as <code>\uXXXX</code> or <code>\uXXXXXX</code>, where X are the hexadecimal representation of the codepoint.
@@ -541,7 +541,6 @@ Content-Type: application/json
     "schemas": "https://base/v1/schemas"
     /* ... more links ... */
   },
-  "resourceType": "folder",
   "data": [
     {
       "type":    "folder",
