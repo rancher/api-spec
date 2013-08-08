@@ -9,7 +9,7 @@ Maybe you'd like to build your own tools that work with our services.  Or maybe 
 
 # What if I just want to use one of your APIs? #
 There is information about each API on our [documentation page](http://docs.cloud.secureserver.net/).  We also have clients for various languages:
-  -  [PHP](https://github.com/godaddy/gdapi-php)
+  - [PHP](https://github.com/godaddy/gdapi-php)
   - [C#](https://github.com/godaddy/gdapi-csharp)
   - Python &mdash; coming soon
   - Command Line &mdash; coming soon
@@ -30,6 +30,64 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 # Examples #
 Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request.  Examples generally show JSON request and responses, but several [request](#request-format) types are available and other [response](#response-format) types may be defined in the future.
+
+----------------------------------------
+
+# Table of Contents #
+
+- [Terminology](#terminology)
+- [Status Codes](#status-codes)
+- [Representations](#representations)
+  - [Request Format](#request-format)
+  - [Response Format](#response-format)
+  - [JSON](#json)
+  - [Dates](#dates)
+  - [HTML UI](#html-ui)
+- [Errors](#errors)
+- [Resources](#resources)
+- [Collections](#collections)
+- [Links](#links)
+- [Actions](#actions)
+- [Schemas](#schemas)
+- [Operations](#operations)
+  - [Query](#query-operation)
+      - [Pagination](#pagination)
+      - [Sorting](#sorting)
+      - [Filtering](#filtering)
+      - [Client Request](#client-request)
+      - [Collection Response](#collection-response)
+  - [Read](#read-operation)
+      - [Root Level](#root-level)
+      - [Version Root](#version-root)
+      - [Individual Resource](#individual-resource)
+      - [Headers Only](#headers-only)
+  - [Create](#create-operation)
+      - [Individual Resource](#single-resource)
+        - [Form Post](#single-resource---form-post)
+      - [Multiple Resources](#multiple-resources)
+  - [Update](#update-operation)
+      - [Individual Resource](#single-resource-1)
+      - [Multiple Resources](#multiple-resources-1)
+  - [Delete](#delete-operation)
+      - [Individual Resource](#single-resource-2)
+      - [Multiple Resources](#multiple-resources-2)
+      - [Deleted Resources](#deleted-resources)
+  - [Replace](#replace-operation)
+  - [Action](#action-operation)
+- [Nesting](#nesting)
+- [Resource Versioning](#resource-versioning)
+- [Base URL and Versioning](#base-url-and-versioning)
+- [Authentication](#authentication)
+- [Design Considerations](#design-considerations)
+  - [Naming Conventions](#naming-conventions)
+  - [What to Link](#what-to-link)
+  - [Canonical Links](#canonical-links)
+  - [Regions](#regions)
+  - [Caching](#caching)
+  - [ETag](#etag)
+  - [Last-Modified](#last-modified)
+  - [Cache-Control](#cache-control)
+  - [Compression](#compression)
 
 ----------------------------------------
 
