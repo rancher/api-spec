@@ -478,7 +478,7 @@ type        | description
 "string"    | UTF-8 string
 "password"  | String that should not be displayed
 "float"     | JavaScript uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
-"int"       | "int"s are just floats in JavaScript, so the min/max safe values are &#177; 2<sup>53</sup>
+"int"       | "int"s are just floats in JavaScript, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may have signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
 "date"      | As a string, see [dates](#dates)
 "blob"      | Binary data, encoded as a string
 "boolean"   | Boolean
