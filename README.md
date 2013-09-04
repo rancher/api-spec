@@ -457,7 +457,7 @@ Each schema resource MUST describe:
     - <code>collection:</code> If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders").
       - This SHOULD correspond to the collections that are linked at the [version root](#version-root).
       - This link is used by API clients to generate object stubs as the URL to fetch data from.
-      - This link is used by the [HTML UI](#html-ui) to provide a dropdown of choices for fields that are of type reference.  - 
+      - This link is used by the [HTML UI](#html-ui) to provide a dropdown of choices for fields that are of type reference.
 
 And MUST describe if applicable:
   - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
@@ -495,22 +495,22 @@ type                                  | description
 
 Additional metadata SHOULD be provided for each field when available:
 
-name                        | type                              | description
-----------------------------|-----------------------------------|--------------
-<code>default:</code>       | <code>same as field</code>        | The default value that will be used if none is specified
-<code>unique:</code>        | boolean                           | If true, this field's value must be unique with its resource type
-<code>nullable:</code>      | boolean                           | If true, null is a valid value for this field
-<code>create:</code>        | boolean                           | If true, this the field can be set when creating a resource
-<code>required:</code>      | boolean                           | If true, this field must be set when creating a resource
-<code>update:</code>        | boolean                           | If true, this field's value can be changed when updating a resource
-<code>minLength:</code>     | int                               | For strings and arrays, the minimum length (inclusive)
-<code>maxLength:</code>     | int                               | For strings and arrays, the maximum length (inclusive)
-<code>min:</code>           | int                               | For ints and floats, the minimum allowed value (inclusive)
-<code>max:</code>           | int                               | For ints and floats, the maximum allowed value (inclusive)
-<code>options:</code>       | array[<code>same as field</code>] | For enums, the list of possible values
-<code>validChars:</code>    | string                            | For strings, only these characters are allowed (see [character ranges](#character-ranges))
-<code>invalidChars:</code>  | string                            | For strings, these characters are not allwoed (see [character ranges](#character-ranges))
-
+name                              | type                              | description
+----------------------------------|-----------------------------------|--------------
+<code>default:</code>             | <code>same as field</code>        | The default value that will be used if none is specified
+<code>unique:</code>              | boolean                           | If true, this field's value must be unique with its resource type
+<code>nullable:</code>            | boolean                           | If true, null is a valid value for this field
+<code>create:</code>              | boolean                           | If true, this the field can be set when creating a resource
+<code>required:</code>            | boolean                           | If true, this field must be set when creating a resource
+<code>update:</code>              | boolean                           | If true, this field's value can be changed when updating a resource
+<code>minLength:</code>           | int                               | For strings and arrays, the minimum length (inclusive)
+<code>maxLength:</code>           | int                               | For strings and arrays, the maximum length (inclusive)
+<code>min:</code>                 | int                               | For ints and floats, the minimum allowed value (inclusive)
+<code>max:</code>                 | int                               | For ints and floats, the maximum allowed value (inclusive)
+<code>options:</code>             | array[<code>same as field</code>] | For enums, the list of possible values
+<code>validChars:</code>          | string                            | For strings, only these characters are allowed (see [character ranges](#character-ranges))
+<code>invalidChars:</code>        | string                            | For strings, these characters are not allwoed (see [character ranges](#character-ranges))
+<code>referenceCollection:</code> | string                            | For references, a query URL that can be used to find valid resources of the reference type
 
 ### Validation ###
 The additional fields above provide enough info for a client to do basic validation of values before submitting them to a service.  They are not intended to be completly comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of it's conditions, it should return a 400 error with enough detail for the client to fix the problem and re-submit the reuqest.
