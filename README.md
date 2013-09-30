@@ -692,7 +692,7 @@ Sorts MUST be "stable".  This means they must produce a unique and repeatable or
   - For example the "size" of a file is not unique, so the results should be sorted by something else to make it stable.
   - A simple way to do this is to always sort by what the user wants, then by ID or unique name.
 
-URLs included in this section SHOULD include all parameters needed to maintain the current [filter](#filtering), but SHOULD NOT include information about pagination.  When folloing a link to a different sort order, the client SHOULD end up back on the first page of results again.
+URLs included in this section SHOULD include all parameters needed to maintain the current [filter](#filtering), but SHOULD NOT include information about pagination.  When following a link to a different sort order, the client SHOULD end up back on the first page of results again.
 
 Multi-level sorting is not defined.
 
