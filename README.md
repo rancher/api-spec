@@ -141,27 +141,30 @@ Code | Meaning
 **2xx** | **Success**
 200 OK | The request was successful.
 201 Created | Success, and a new resource has been created.<br/>&bull; A Location header to the resource SHOULD be included.
-202 Accepted | The request has been received but has not completed.  It MAY be completed in the future.<br/>&bull; This is typically used for requests that produce a long-running process that will be performed asynchronously.
+202 Accepted | The request has been received but has not completed.  It MAY be completed in the future.<br/>&bull; This is typically used for requests that produce a long-running process that will be performed asynchronously and could fail later.
 204 No Content | The request was successful, and the response will have no body portion.
 | 
 **3xx** | **Redirect**
-301 Moved Permanently | Permanent redirect.  The requested resource is somewhere else now and will never be coming back.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull; The operative word here is *permanent*; clients may remember this and never request the old URL again.<br/>&bull; If in doubt, use 302.
-302 Found | Temporary redirect.  The requested resource isn't here right now.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull;The client will ask for the original URL if it wants this resource again in the future.
+301 Moved Permanently | Permanent redirect.  The requested resource is somewhere else now and will never be coming back.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull; The operative word here is *permanent*.  If in doubt, use 302.<br/>&bull; Clients may remember this and never request the old URL again.
+302 Found | Temporary redirect.  The requested resource isn't here right now.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull; The client will ask for the original URL if it wants this resource again in the future.
 304 Not Modified | The client made a conditional GET request for a resource, and that resource matches the condition so the response body does not need to be sent.
 | 
 **4xx** | **Client Error** &mdash; The client did something wrong.<br/>&bull; Sending the same request again **will** result in the same error.
-400 Bad Request | The request was malformed in some way or the input did not pass validation; the client should feel bad.
+400 Bad Request | The request was malformed in some way; the client should feel bad.
 401 Unauthorized | Authentication information was not sent or is invalid.
 403 Forbidden | Authentication information was validated, but does not give the client access to the requested resource.
 404 Not Found | These are not the droids you are looking for.
 405 Method Not Allowed | The requested HTTP method is not allowed for this URL.
-406 Not Acceptable | The service does not support the representation content type that the client requested/sent.
+406 Not Acceptable | The service does not support responding the representation type that the client **requested**.
 409 Conflict | [Resource versioning](#resource-versioning) is enabled, and the requested operation conflicts with the current state.
-413 Entity Too Large | The requested URL is longer than is accepted by the service.
+413 Entity Too Large | The request body is bigger than is accepted by the service.
+414 Request-URI Too Long | The requested URL is longer than is accepted by the service.
+415 Unsuported Media Type | The service does not support handling the representation type that the client **sent**.
 418 I'm a teapot | The request attempted to brew coffee with a teapot service that is not compliant with [RFC2324](http://tools.ietf.org/html/rfc2324).
+422 Unprocessable Entity | The request was well-formed (400) and in a supported format (415), but cannot be processed.<br/>&bull; This is typically used for application-specific validation errors.
 | 
-**5xx** | **Service Error** &mdash; Something bad happened within the service.<br/>&bull; There is nothing the client can do about this.<br/>&bull; The same request will succeed (or produce a 4xx error) if re-submitted in the future.
-500&nbsp;Internal&nbsp;Server&nbsp;Error | Something is broken on our side; the service should feel bad.
+**5xx** | **Service Error** &mdash; Something bad happened within the service.<br/>&bull; There is nothing the client can do about this.<br/>&bull; The same request may succeed (or produce a 4xx error) if re-submitted in the future.
+500&nbsp;Internal&nbsp;Server&nbsp;Error | Generic something is broken in the service; the service should feel bad.
 503 Service Unavailable | The request couldn't be handled due to maintenance or overload.
 
 ----------------------------------------
