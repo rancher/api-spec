@@ -1,4 +1,4 @@
-# What is this thing? #
+#/ What is this thing? #
 This document defines the REST API specification implemented by public Go Daddy&reg; APIs.
 
 Our goal is to make APIs that are as easy to use as possible.  Each service has documentation available, but this should be a supplement, not required reading.  Armed with just the URL and credentials, a user should be able to navigate their way through the API in a web browser to learn about what resources and operations it has.  In other words, the API should be _discoverable_.  Once you're familar with what's available, requests can be made with simple tools like cURL or any basic HTTP request library.
@@ -460,7 +460,7 @@ name                              | type                              | descript
 <code>max:</code>                 | int                               | For ints and floats, the maximum allowed value (inclusive)
 <code>options:</code>             | array[<code>same as field</code>] | For enums, the list of possible values
 <code>validChars:</code>          | string                            | For strings, only these characters are allowed (see [character ranges](#character-ranges))
-<code>invalidChars:</code>        | string                            | For strings, these characters are not allwoed (see [character ranges](#character-ranges))
+<code>invalidChars:</code>        | string                            | For strings, these characters are not allowed (see [character ranges](#character-ranges))
 <code>referenceCollection:</code> | string                            | For references, a query URL that can be used to find valid resources of the reference type
 
 ### Validation ###
@@ -536,8 +536,9 @@ Resources have a <code>actions:</code> attribute that details what actions are a
 }
 ```
 
-Action URLs MUST be considered an opaque string to the client.  A simple query parameter is suggested, but services MAY be construct URLs in any format they desire.  For example:
+Action URLs MUST be considered opaque strings to the client.  A simple query parameter is suggested, but services may construct URLs in any format they desire.  Examples:
   - "https://base/v1/files/b1b2e7006be?encrypt"
+  - "https://base/v1/files/b1b2e7006be?action=encrypt"
   - "https://base/v1/files/b1b2e7006be/encrypt"
   - "https://base/v1/actions/encryptFile/b1b2e7006be"
 
