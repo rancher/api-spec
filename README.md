@@ -1,4 +1,4 @@
-#/ What is this thing? #
+# What is this thing? #
 This document defines the REST API specification implemented by public Go Daddy&reg; APIs.
 
 Our goal is to make APIs that are as easy to use as possible.  Each service has documentation available, but this should be a supplement, not required reading.  Armed with just the URL and credentials, a user should be able to navigate their way through the API in a web browser to learn about what resources and operations it has.  In other words, the API should be _discoverable_.  Once you're familar with what's available, requests can be made with simple tools like cURL or any basic HTTP request library.
@@ -218,8 +218,8 @@ Services provide a HTML version of their API by wrapping the JSON response with 
 <!DOCTYPE html>
 <!-- If you are reading this, there is a good chance you would prefer sending an
 "Accept: application/json" header and receiving actual JSON responses. -->
-<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/1.2.8/ui.css" />
-<script src="http://img1.wsimg.com/ucp/api/1.2.8/ui.js"></script>
+<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/1.2.10/ui.css" />
+<script src="http://img1.wsimg.com/ucp/api/1.2.10/ui.js"></script>
 <script>
 var docs = "http://url-to-your-docs/site";
 var schemas = "http://url-to-your-api/v1/schemas";
