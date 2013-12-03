@@ -625,7 +625,7 @@ X-API-Schemas: https://base/v1/schemas
   },
   "pagination": { /* see pagination */ },
   "sort":       { /* see sorting */ },
-  "filters":    { /* see filters */ }
+  "filters":    { /* see filtering */ }
 }
 ```
 
@@ -796,7 +796,7 @@ Services MAY define (and document) their own modifiers.
 ```javascript
 {
   /* ... other collection attributes ... */
-  "filters": {
+  "collectionFilters": {
     "name":   {"modifiers": ["eq","ne","prefix","suffix"]},
     "date":   {"modifiers": ["eq","lt","gt","lte","gte","prefix"]}
     "size":   {"modifiers": ["eq","lt","gt","lte","gte"] }
