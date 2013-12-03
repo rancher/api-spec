@@ -813,7 +813,7 @@ Services MAY define (and document) their own modifiers.
 The read operation allows a client to get a single resource.  Read operations MUST NOT incur side effects.
 
 ### Root Level ###
-GETting the base URL of a service SHOULD return a collection of API version resources.  It SHOULD include a link to the <code>latest:</code> stable version of the API.
+GETting the base URL of a service SHOULD return a collection of <code>apiVersion</code> resources.  It SHOULD include a link to the <code>latest:</code> stable version of the API.
 
 Versions that are not the latest MAY have a <code>deprecated: true</code> flag to indicate support for this version will be removed in the near future.
 
@@ -827,7 +827,7 @@ Versions that are not the latest MAY have a <code>deprecated: true</code> flag t
   "data": [ 
     {
       "id":    "v1",
-      "type":  "apiversion",
+      "type":  "apiVersion",
       "deprecated": true,
       "links": {
         "self": "https://base/v1",
@@ -838,7 +838,7 @@ Versions that are not the latest MAY have a <code>deprecated: true</code> flag t
     },
     {
       "id":    "v2",
-      "type":  "apiversion",
+      "type":  "apiVersion",
       "deprecated": false,
       "links": {
         "self": "https://base/v2"
@@ -849,7 +849,7 @@ Versions that are not the latest MAY have a <code>deprecated: true</code> flag t
     },
     {
       "id":    "v3",
-      "type":  "apiversion",
+      "type":  "apiVersion",
       "deprecated": false,
       "links": {
         "self": "https://base/v3",
@@ -878,7 +878,7 @@ X-API-Schemas: https://base/v1/schemas
 
 {
   "id": "v1",
-  "type":  "apiversion",
+  "type":  "apiVersion",
   "deprecated": true,
   "links": {
     "self":    "https://base/v1",
