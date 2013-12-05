@@ -134,6 +134,7 @@ An **action** is an operation that can be performed on a resource but does not f
 
 **Discoverability:**
 **Discoverability** is a method of self-documenting.  Each API has a collection of schemas that define what resource types are available and what attributes they have.  Each response contains information about how to find related resources and what actions are available.
+
 ----------------------------------------
 
 ## Dates ##
