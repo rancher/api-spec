@@ -32,7 +32,7 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
 
 # Table of Contents #
 
-- [Terminology](./terminology.md)
+- [Terminology](#terminology)
 - [Representations](#representations)
   - [Dates](#dates)
   - [Format](#format)
