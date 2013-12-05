@@ -2,6 +2,8 @@
 
 Situations fall outside of the technical specification but are listed to provide guidance for edge cases while remaining within the specification.  This document is not meant to be an all-inclusive list but rather provide a way to use the specification to accommodate specific needs.
 
+----------------------------------------
+
 # Errors #
 
 ## Client Error Messages ##
@@ -44,6 +46,7 @@ X-API-Schemas: https://base/v1/schemas
   }
 }
 ```
+----------------------------------------
 
 # Usability # 
 
