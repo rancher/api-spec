@@ -48,7 +48,7 @@ X-API-Schemas: https://base/v1/schemas
 ```
 ----------------------------------------
 
-# Usability # 
+# Usability 
 
 ## Alternative Formats ##
 Often a service will expose a piece of data that may have multiple representations such as retrieving a domain name in its ASCII (Punycode) or Unicode representation.  Alternative formats may be specified using the links section of the [Resources](./specification.md#resources).
