@@ -431,9 +431,9 @@ type        | description
 ------------|------------
 "string"    | UTF-8 string
 "password"  | String that should not be displayed
-"float"     | JavaScript uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
-"int"       | "int"s are just floats in JavaScript, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may have signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
-"date"      | As a string, see [dates](#dates)
+"float"     | JSON uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
+"int"       | "int"s are really floats in JSON, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may have signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
+"date"      | As an ISO-8601 string, see [dates](#dates)
 "blob"      | Binary data, encoded as a string
 "boolean"   | Boolean
 
@@ -442,8 +442,8 @@ Or a non-simple type:
 type                                  | description
 --------------------------------------|-------------
 "enum"                                | One choice out of an enumeration of possible values
+"<code>schema_name</code>"            | The value is the representation of a resource of type <code>schema_name</code>
 "reference[<code>schema_name</code>]" | The value is the id of a resource of type <code>schema_name</code>
-"type[<code>schema_name</code>]"      | The value is the representation of a resource of type <code>schema_name</code>
 "array[<code>another_type</code>]"    | The value is an array of entries of type <code>another_type</code>
 "map[<code>another_type</code>]"      | Key/value pairs.  Keys are strings, Values are of type <code>another_type</code>
 
@@ -467,7 +467,7 @@ name                              | type                              | descript
 <code>referenceCollection:</code> | string                            | For references, a query URL that can be used to find valid resources of the reference type
 
 ### Validation ###
-The additional fields above provide enough info for a client to do basic validation of values before submitting them to a service.  They are not intended to be completly comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of it's conditions, it should return a 400 error with enough detail for the client to fix the problem and re-submit the reuqest.
+The additional fields above provide enough info for a client to do basic validation of values before submitting them to a service.  They are not intended to be completly comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of it's conditions, it should return a 422 error with enough detail for the client to fix the problem and re-submit the reuqest.
 
 #### Character Ranges ####
 The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive and may contain ranges as in a simple regular expression.  For example alphanumerics may be represented as "a-zA-Z0-9".  Unicode characters should be represented as <code>\uXXXX</code> or <code>\uXXXXXX</code>, where X are the hexadecimal representation of the codepoint.
