@@ -1435,6 +1435,7 @@ Once an asynchronous action has been fulfilled, the URI provided to the client w
 
 Asynchronous actions MAY fail after having been accepted.
 
+See also: [Batch Processing](./situations.md#batch-processing)
 
 ## Identifiers ##
 Resource Identifiers
