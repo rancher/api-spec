@@ -129,12 +129,6 @@ An **action** is an operation that can be performed on a resource but does not f
 
 ----------------------------------------
 
-## Dates ##
-Dates MUST be represented as an [ISO-8601](http://www.w3.org/TR/NOTE-datetime) formatted string.
-  - If a time component is included, a time zone designator MUST BE included and SHOULD always be UTC ("Z").
-  - If you have a very good reason to use something other than UTC, the attribute name SHOULD indicate that it is "local", "user", or similar to avoid confusion.
-  - e.g. "birthday": "1982-02-24", "created": "2012-09-27T18:39:53Z", "yourLocalTime": "2013-09-27T11:30:42-07:00"
-
 # Representations #
 A representation is the way a resource is described/serialized in a HTTP request or response.  All services MUST support:
 
@@ -146,7 +140,15 @@ A representation is the way a resource is described/serialized in a HTTP request
 - Forms ([multipart/form-data](http://tools.ietf.org/html/rfc2388) and [application/x-www-form-urlencoded](http://www.w3.org/TR/html401/interact/forms.html#form-content-type)) for requests.
   - These are needed for the [HTML UI](#html-ui) and are easy to create with browsers and command-line tools like cURL.
 
-Applications MAY support other representations that make sense for the particular application.  These will be defined in the service documentation and returned in the <code>Content-Type</code> header of the response.
+Applications MAY support other representations that make sense for the particular application.  These will be defined in the schema of the resource in the <code>resourceRepresentations:</code> attribute (see [Schemas](#schemas)).
+
+The representation is returned in the <code>Content-Type</code> header of the response.
+
+## Dates ##
+Dates MUST be represented as an [ISO-8601](http://www.w3.org/TR/NOTE-datetime) formatted string.
+  - If a time component is included, a time zone designator MUST BE included and SHOULD always be UTC ("Z").
+  - If you have a very good reason to use something other than UTC, the attribute name SHOULD indicate that it is "local", "user", or similar to avoid confusion.
+  - e.g. "birthday": "1982-02-24", "created": "2012-09-27T18:39:53Z", "yourLocalTime": "2013-09-27T11:30:42-07:00"
 
 ## Format ##
 Clients MAY request a preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header.
@@ -429,6 +431,7 @@ Each schema resource MUST describe:
 And SHOULD describe if applicable:
   - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
   - <code>resourceActions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
+  - <code>resourceRepresentations:</code>: An array of representations the **resource** is willing to support.  If not specificed <code>application/json</code> is implied (see [representations](#representations)).
   - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
   - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
   - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has. (see [fields](#schema-fields)).
