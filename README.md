@@ -3,6 +3,12 @@ This document defines the REST API specification implemented by public Go Daddy&
 
 Our goal is to make APIs that are as easy to use as possible.  Each service has documentation available, but this should be a supplement, not required reading.  Armed with just the URL and credentials, a user should be able to navigate their way through the API in a web browser to learn about what resources and operations it has.  In other words, the API should be _discoverable_.  Once you're familiar with what's available, requests can be made with simple tools like cURL or any basic HTTP request library.
 
+# The Specification #
+The full [technical specification](./specification.md) contains the complete details that drive the development of [clients and libraries](#what-if-i-just-want-to-use-one-of-your-apis) which handle many nuances automatically so you can worry about what you want to do and not catering to the specification.
+
+# Common Use Cases #
+Several use cases require a bit more guidance but are not appropriate for inclusion into the technical specification but are worth review.  These can be found in the [scenarios guide](./scenarios.md) and establish a set of best practices of common situations while remaining compliant with the specification.
+
 # Why are you publishing it? #
 Maybe you'd like to build your own tools that work with our services.  Or maybe you want to build your own service that follows the same style as ours.  We'd love it if you did either one and want to give you all the information you need.  This is also the same documentation our internal teams use to build their APIs.
 
@@ -14,12 +20,6 @@ See the documentation for the specific API you are interested in.  There are cli
   - Command Line &mdash; coming soon
   - Node.js &mdash; coming soon
   - Java &mdash; coming soon
-
-# What else is here? #
-Most will be interested in the client libraries above but for those interested in the inner workings of the technical specification or guidance for addressing common situations.  
-
-- [Technical Specification](./specification.md)
-- [Common Situations](./situations.md)
 
 # Why not use other RESTful API Specifications? #
 This is a good question, but difficult to answer.  In short, we needed a specification to ensure a common experience across all of our services that was general enough to create clients and libraries that implemented the boiler plate code allowing information to be consumed or exposed consistently and more rapidly.
