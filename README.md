@@ -431,7 +431,7 @@ Each schema resource MUST describe:
 And SHOULD describe if applicable:
   - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
   - <code>resourceActions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
-  - <code>resourceRepresentations:</code>: An array of representations the **resource** is willing to support.  If not specificed <code>application/json</code> is implied (see [representations](#representations)).
+  - <code>resourceRepresentations:</code>: An array of representations the **resource** is willing to support.  If not present <code>application/json</code> is implied, if specified <code>application/json</code> MUST be present (see [representations](#representations)).
   - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
   - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
   - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has. (see [fields](#schema-fields)).
