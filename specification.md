@@ -140,7 +140,7 @@ A representation is the way a resource is described/serialized in a HTTP request
 - Forms ([multipart/form-data](http://tools.ietf.org/html/rfc2388) and [application/x-www-form-urlencoded](http://www.w3.org/TR/html401/interact/forms.html#form-content-type)) for requests.
   - These are needed for the [HTML UI](#html-ui) and are easy to create with browsers and command-line tools like cURL.
 
-Applications MAY support other representations that make sense for the particular application.  These will be defined in the schema of the resource in the <code>resourceRepresentations:</code> attribute (see [Schemas](#schemas)).
+Services MAY support other representations that make sense for the particular application.  These will be defined in the schema of the resource in the <code>resourceRepresentations:</code> attribute (see [Schemas](#schemas)) which a client can specifify by sending the value in the <code>Accept</code> header of the request.
 
 The representation is returned in the <code>Content-Type</code> header of the response.
 
@@ -431,7 +431,7 @@ Each schema resource MUST describe:
 And SHOULD describe if applicable:
   - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
   - <code>resourceActions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
-  - <code>resourceRepresentations:</code>: An array of representations the **resource** is willing to support.  If not specificed <code>application/json</code> is implied (see [representations](#representations)).
+  - <code>resourceRepresentations:</code>: An array of representations the **resource** is willing to support.  If not present <code>application/json</code> is implied, if specified <code>application/json</code> MUST be present (see [representations](#representations)).
   - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
   - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
   - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has. (see [fields](#schema-fields)).
@@ -490,6 +490,7 @@ The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive a
   "id": "file", 
   "type": "schema",
   "resourceMethods": ["GET","DELETE"],
+  "resourceRepresentations": ["application/json", "text/xml"],
   "resourceFields": {
     "name":   {"type": "string", "required": true, "create": true, "update": true},
     "size":   {"type": "int"},
