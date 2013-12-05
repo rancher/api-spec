@@ -4,6 +4,18 @@ Situations fall outside of the technical specification but are listed to provide
 
 ----------------------------------------
 
+# Table of Contents #
+
+- [Errors](#errors)
+  - [Client Error Messages](#client-error-messages)
+  - [Multipart Errors](#multipart-errors)
+- [Processing](#processing)
+  - [Batch Processing](#batch-processing)
+- [Usability](#usability)
+  - [Alternative Formats](#alternative-formats)
+  - [Clients with Limitations](#clients-with-limitations)
+
+----------------------------------------
 # Errors #
 
 ## Client Error Messages ##
@@ -48,7 +60,16 @@ X-API-Schemas: https://base/v1/schemas
 ```
 ----------------------------------------
 
-# Usability 
+# Processing #
+
+## Batch Processing ##
+A special type of asynchronous interaction, batch processing, involves a client sending multiple actions in a single request for the service to process and respond with results.  These interactions follow the asynchronous behavior outlined within the [specification](./specification.md#asynchronous-actions) but the service must decide how to respond in the event of an error.  
+
+It is RECOMMENDEED that the service treat each action in the batch independently rather than aborting after a single failure and respond accordingly.  If a batch is treated as an atomic unit the service MUST respond with a clear error message defining that the entire batch was not processed.
+
+----------------------------------------
+
+# Usability # 
 
 ## Alternative Formats ##
 Often a service will expose a piece of data that may have multiple representations such as retrieving a domain name in its ASCII (Punycode) or Unicode representation.  Alternative formats may be specified using the links section of the [Resources](./specification.md#resources).
