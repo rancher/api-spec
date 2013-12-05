@@ -221,14 +221,14 @@ Code | Meaning
 201 Created | Success, and a new resource has been created.  A Location header to the resource SHOULD be included.
 302 Found | Temporary redirect.  The requested resource has moved and clients should request this URI again for future requests.
 304 Not Modified | The client requested a resource that allows a previous version to be used.  No response will be sent.
-400 Bad Request | The request was malformed in some way.
+400 Bad Request | The request was malformed in some way.  Used for general errors that can be corrected by the client.
 401 Unauthorized | Authentication information was not sent or is invalid.
 403 Forbidden | The authenticated user is not allowed access to the requested resource.
 404 Not Found | These are not the droids you are looking for.
 409 Conflict | [Resource versioning](#resource-versioning) is enabled, and the requested operation conflicts with the current state.
 410 Gone | The resource requested has left.  It will not come back.
 422 Unprocessable Entity | The request was well-formed (400) and in a supported format (415), but cannot be processed.  Typically used for application-specific validation errors.
-500&nbsp;Internal&nbsp;Server&nbsp;Error | A generic message for an error on the server.  
+500&nbsp;Internal&nbsp;Server&nbsp;Error | A generic message for an error on the server.  The client should try their request again later at which point it **may** succeed (or produce a 4xx error).
 
 ## Extended Codes ##
 The remaining HTTP Status Codes will be used under certain specific circumstances.
