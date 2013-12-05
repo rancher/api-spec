@@ -3,14 +3,6 @@ This document defines the technical specification implemented by public Go Daddy
 
 If you are interested in communicating or exposing a service, see our list of [clients and libraries](./#what-if-i-just-want-to-use-one-of-your-apis) as they include all the details in this specification.
 
-# Why are you publishing it? #
-Maybe you'd like to build your own tools that work with our services.  Or maybe you want to build your own service that follows the same style as ours.  We'd love it if you did either one and want to give you all the information you need.  This is also the same documentation our internal teams use to build their APIs.
-
-# Why not use other RESTful API Specifications? #
-This is a good question, one difficult to answer.  In short, we needed a specification to ensure a common experience across all of our services that was general enough to create clients and libraries that implemented the boiler plate code allowing information to be consumed or exposed consistently and more rapidly.
-
-Until a true standard emerges for RESTful API's we will continue to use and evolve this specification with the help of industry best practices and core concepts.  This specification may not apply for every API out there, but it works for us and hope it will for you.
-
 # Contact #
 For questions, comments, corrections, suggestions, etc., open an [issue](https://github.com/godaddy/gdapi/issues) or email us at [apispec@godaddy.com](mailto:apispec@godaddy.com).  
 
