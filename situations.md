@@ -50,14 +50,14 @@ X-API-Schemas: https://base/v1/schemas
 
 # Usability # 
 
-### Alternative Formats ### 
+## Alternative Formats ##
 Often a service will expose a piece of data that may have multiple representations such as retrieving a domain name in its ASCII (Punycode) or Unicode representation.  Alternative formats may be specified using the links section of the [Resources](./specification.md#resources).
 
 It is RECOMMENDED to allow a client to add a query string identifying the behavior desired for the field in question.  For example, if a service returned a domain name in a <code>domain</code> field, the client should be allowed to specify <code>?domain_format=xxxxxx</code>.  Where xxxxx is the identifier of the representation requested.  
 
 The service MUST default to a logical choice if no presentation is requested and MUST result in an error if a requested representation is invalid or not possible.  
 
-### Clients with Limitations ###
+## Clients with Limitations ##
 In some cases, clients may be limited by HTTP verbs or status codes requiring special care to enable interoperability.  Clients may provide query string parameters to override standard behavior:
 
   - <code>suppress_response_code</code> is reserved for clients that override error-handling, such as Flash.  When this flag is present in the query string the service must always respond with HTTP status 200. Special care must be made that the HTTP Status Code remains in the response body.
