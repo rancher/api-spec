@@ -1417,8 +1417,7 @@ Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2)
 ----------------------------------------
 # Localization #
 
-
-With the exception of [client error messages](./situations.md#client-error-messages) all textual information in a service response MUST be formatted with respect to the value of the Accept-Language header in the request.   A service MAY not support the language requested and will identify the language chosen in the Content-Language value of the response.
+With the exception of [client error messages](./situations.md#client-error-messages) all textual information in a service response SHOULD be formatted with respect to the value of the Accept-Language header in the request, and MUST when the service handles localized strings.   A service MAY not support the language requested and will identify the language chosen in the Content-Language value of the response.
 
 ----------------------------------------
 # Design Considerations #
