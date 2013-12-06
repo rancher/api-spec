@@ -812,7 +812,7 @@ modifier               | meaning
 <code>"gt"</code>      | greater than
 <code>"gte"</code>     | greater than or equal to
 <code>"prefix"</code>  | starts with
-<code>"like"</code>    | matches, as in SQL:<br/>&bull; underscore ("\_") for exactly one character<br/>&bull; percent ("\%") for 0 or more characters<br/>&bull; "\_" for one underscore character<br/>&bull;"\%" for one percent character.
+<code>"like"</code>    | matches, as in SQL:<br/>&bull; underscore ("\_") for exactly one character<br/>&bull; percent ("%") for 0 or more characters<br/>&bull; "\_" for one underscore character<br/>&bull;"%" for one percent character.
 <code>"notlike"</code> | does not match (as above)
 <code>"null"</code>    | value is NULL
 <code>"notnull"</code> | value is not NULL
