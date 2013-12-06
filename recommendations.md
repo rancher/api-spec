@@ -67,7 +67,7 @@ X-API-Schemas: https://base/v1/schemas
 ## Batch Processing ##
 A special type of asynchronous interaction, batch processing, involves a client sending multiple actions in a single request for the service to process and respond with results.  These interactions follow the asynchronous behavior outlined within the [specification](./specification.md#asynchronous-actions) but the service must decide how to respond in the event of an error.  
 
-It is RECOMMENDEED that the service treat each action in the batch independently rather than aborting after a single failure and respond accordingly.  If a batch is treated as an atomic unit the service MUST respond with a clear error message defining that the entire batch was not processed.
+Each batch service is unique and a recommendation cannot be easily made.  Services MUST describe in documentation how batches are processed.
 
 ----------------------------------------
 
