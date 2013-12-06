@@ -19,12 +19,14 @@ Situations fall outside of the technical specification but are listed to provide
 # Errors #
 
 ## Client Error Messages ##
-Error messages are for developer use only and are not intended to be displayed to an end user to prevent accidental disclosure.  However, in the event that an error message is the preferred delivery of messages to an end user (as is often the case in mobile applications) the server MAY choose to localize the error.  Services MUST use the value provided by <code>Accept-Language</code> in the original request to localize the <code>userMessage</code> and store the language in <code>userLocale</code>.  A service MUST provide a <code>userLocale</code> if it provides a <code>userMessage</code>.
+Error messages are for developer use only and are not intended to be displayed to an end user to prevent accidental disclosure.  However, in the event that an error message is the preferred delivery of localized strings to an end user (as is often the case in mobile applications) the server MAY choose to localize the error to be passed onto the user.
 
-The client MUST verify the value of <code>userLocale</code> and the value of the <code>Accept-Language</code> header before displaying the message as the server MAY NOT support the requested language and negotiated to an alternative format.
+If a service chooses to localize the error it MUST accept a language identifier in the request as the <code>Accept-Language</code> header value is reserved for the service to use.  The RECOMMENDATION is to use the language identifier provided to the service in the original request to localize a <code>userMessage</code> attribute and store the value witin the <code>userLocale</code> attribute.  A service MUST provide a <code>userLocale</code> if it provides a <code>userMessage</code> to allow the client to verify the language of the request with the response before providing it to the user.  If the service is unwilling to perform this localization service these fields should be omitted in the response.
+
+The client MUST verify the language identifier value stored in <code>userLocale</code> with the requested identifier before displaying the message.  The server MAY not support the requested language and negotiate to an alternative format that differs from the request.
 
 ## Multipart Errors ##
-Often a service will receive a request that contains multiple parts that may prevent the request from succeeding which is commonly the case with creating a user.  If a service decides to offer this support it is RECOMMENDED that a single error be returned identifying the failure and that individual parameters are enumerated within the <code>details</code> field as an array of <code>errorFields</code>.  Any error field MAY contain <code>userMessage</code> that will be localized with the <code>userLocale</code> in the error.  For example:
+Often a service will receive a request containing multiple parts that prevent the request from succeeding; which is a common case with creating a user.  If a service decides to offer this support it is RECOMMENDED that a single error be returned identifying the failure including individual parameters within the <code>details</code> attribute as an array of <code>errorFields</code> attributes.  Any error field MAY contain a <code>userMessage</code> attribute that will be localized with the <code>userLocale</code> in the error.  For example:
 
 ```http
 POST /v1/user HTTP/1.1
