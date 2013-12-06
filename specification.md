@@ -74,7 +74,6 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
 - [Resource Versioning](#resource-versioning)
 - [Base URL and Versioning](#base-url-and-versioning)
 - [Authentication](#authentication)
-- [Localization](#localization)
 - [Design Considerations](#design-considerations)
   - [Asynchronous Actions](#asynchronous-actions)
   - [Canonical Links](#canonical-links)
@@ -347,7 +346,7 @@ Errors MAY include:
   - <code>userLocale:</code> Identifier of the language used to localize the <code>userMessage</code> field.  This SHOULD be the same as the <code>Accept-Language</code> header of the request and applies to all references of <code>userMessage</code> in the response.
   - Any other application-specific information that is available.
 
-The <code>type</code>, <code>code</code>, <code>message</code> and <code>detail</code> are intended for developer use only and MUST NOT be presented directly the end user.  <code>userMessage</code> is considered safe to be relayed to an end user if it is included with the response.  See [client error messages](./situations.md#client-error-messages) for more information.
+The <code>type</code>, <code>code</code>, <code>message</code> and <code>detail</code> are intended for developer use only and MUST NOT be presented directly the end user.  <code>userMessage</code> is considered safe to be relayed to an end user if it is included with the response.  See [client error messages](./recommendations.md#client-error-messages) for more information.
 
 Error responses MUST be returned in the representation format that the client asked for.  If the service cannot cater to the representation requested a 406 Status Code should be returned.
   - It is rude to send an HTML error page back to a client that made a request for JSON.
@@ -1415,11 +1414,6 @@ An API Key consists of a pair of strings called an **access key** and **secret k
 Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
 
 ----------------------------------------
-# Localization #
-
-With the exception of [client error messages](./situations.md#client-error-messages) all textual information in a service response SHOULD be formatted with respect to the value of the Accept-Language header in the request, and MUST when the service handles localized strings.   A service MAY not support the language requested and will identify the language chosen in the Content-Language value of the response.
-
-----------------------------------------
 # Design Considerations #
 
 ## Asynchronous Actions ##
@@ -1429,7 +1423,7 @@ Once an asynchronous action has been fulfilled, the URI provided to the client w
 
 Asynchronous actions MAY fail after having been accepted.
 
-See also: [Batch Processing](./situations.md#batch-processing)
+See also: [Batch Processing](./recommendations.md#batch-processing)
 
 ## Identifiers ##
 Resource Identifiers
