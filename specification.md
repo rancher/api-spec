@@ -748,7 +748,7 @@ Multi-level sorting is not defined.
 ### Filtering ###
 Services MAY support searching/filtering of the collection.  Support for this is indicated by <code>collectionFilters:</code> in the schema, and the presence of a <code>filters:</code> map in the collection response.
 
-#### Client request ####
+#### Client Request ####
 The client performs a search by starting with the URL for a standard query request.  If they've already done a query and want to filter the results, the <code>self:</code> link of the result can be used instead.  The client then adds on query string parameters for <code>{filter name}{"_"+modifier}={value}</code>.
   - The underscore and modifier are optional if the desired modifier is <code>eq</code>.
     - <code>name_eq=a</code> and <code>name=a</code> are equivalent.
@@ -758,11 +758,11 @@ The client performs a search by starting with the URL for a standard query reque
     - <code>name_notlike=%.jpg&name_notlike=%.png</code>
 
 All special characters in filter values MUST be [URL-encoded](http://tools.ietf.org/html/rfc3986#section-2.4).
-Note: "%" characters are shown here for clarity, but would be "%25" in an actual request.  All special characters MUST be [URL-encoded](http://tools.ietf.org/html/rfc3986#section-2.4).
+Note: "%" characters are shown here for clarity, but would be "%25" in an actual request.
 
 There is no mechanism defined for OR-ing conditions.  All filters are AND-ed together.
 
-#### Collection response ####
+#### Collection Response ####
 Collections that support filtering SHOULD have a <code>filter:</code> map in the response, with an attribute for each field that can be filtered on.
   - If any filter was applied for that field, the value should be an array describing the filters.
   - If no filters were applied for that field, the value should be null.
@@ -813,7 +813,7 @@ modifier               | meaning
 <code>"gt"</code>      | greater than
 <code>"gte"</code>     | greater than or equal to
 <code>"prefix"</code>  | starts with
-<code>"like"</code>    | matches, as in SQL:<br/>&bull; underscore ("_") for exactly one character<br/>&bull; percent ("%") for 0 or more characters<br/>&bull; "\_" for one underscore character<br/>&bull;"\%" for one percent character.
+<code>"like"</code>    | matches, as in SQL:<br/>&bull; underscore ("\_") for exactly one character<br/>&bull; percent ("\%") for 0 or more characters<br/>&bull; "\_" for one underscore character<br/>&bull;"\%" for one percent character.
 <code>"notlike"</code> | does not match (as above)
 <code>"null"</code>    | value is NULL
 <code>"notnull"</code> | value is not NULL
@@ -1533,7 +1533,7 @@ Several keywords are reserved by this standard and have specific meanings.  Thes
   - In query strings:
     - For pagination: <code>marker</code>, <code>limit</code>
     - For sorting: <code>sort</code>, <code>order</code>
-    - For usability: <code>_accept</code>, <code>_format</code>, <code>_method</code>, <code>suppress_response_code</code>
+    - For usability: <code>\_accept</code>, <code>\_format</code>, <code>\_method</code>, <code>suppress\_response\_code</code>
 
 Some additional guidelines:
   - Names and attribute keys should be a single word when practical.
