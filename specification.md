@@ -213,14 +213,11 @@ Code | Meaning
 --------------------------|----------------------------
 200 OK | The request was successful
 201 Created | Success, and a new resource has been created.  A Location header to the resource SHOULD be included.
-302 Found | Temporary redirect.  The requested resource has moved and clients should request this URI again for future requests.
-304 Not Modified | The client requested a resource that allows a previous version to be used.  No response will be sent.
+202 Accepted | The request has been received but has not completed.  See [Asynchronous Actions](#asynchronous-actions)
 400 Bad Request | The request was malformed in some way.  Used for general errors that can be corrected by the client.
 401 Unauthorized | Authentication information was not sent or is invalid.
 403 Forbidden | The authenticated user is not allowed access to the requested resource.
 404 Not Found | These are not the droids you are looking for.
-409 Conflict | [Resource versioning](#resource-versioning) is enabled, and the requested operation conflicts with the current state.
-410 Gone | The resource requested has left.  It will not come back.
 422 Unprocessable Entity | The request was well-formed (400) and in a supported format (415), but cannot be processed.  Typically used for application-specific validation errors.
 500&nbsp;Internal&nbsp;Server&nbsp;Error | A generic message for an error on the server.  The client should try their request again later at which point it **may** succeed (or produce a 4xx error).
 
@@ -229,10 +226,13 @@ The remaining HTTP Status Codes will be used under certain specific circumstance
 
 Code | Meaning
 --------------------------|----------------------------
-202 Accepted | The request has been received but has not completed.  See [Asynchronous Actions](#asynchronous-actions)
 301 Moved Permanently | Permanent redirect.  The requested resource has moved **permanently** and clients should never request this URI again.  If in doubt, use a 302.
+302 Found | Temporary redirect.  The requested resource has moved and clients should request this URI again for future requests.
+304 Not Modified | The client requested a resource that allows a previous version to be used.  No response will be sent.
 405 Method Not Allowed | The requested HTTP method is not allowed for this URL.
 406 Not Acceptable | The service does not support the representation that the client **requested**.
+409 Conflict | [Resource versioning](#resource-versioning) is enabled, and the requested operation conflicts with the current state.
+410 Gone | The resource requested has left.  It will not come back.
 413 Entity Too Large | The request body is larger than the service is willing to process.
 414 Request-URI Too Long | The requested URL is longer than is accepted by the service.
 415 Unsupported Media Type | The service does not support the representation type that the client **sent**.
