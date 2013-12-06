@@ -974,7 +974,7 @@ Content-Length: 123
 
 ----------------------------------------
 # Create Operation #
-The create operation allows a client to create a new resource in a collection.  The URL of the request SHOULD NOT contain a query component, to differentiate a create request from an [action](#action-operation) request.
+The create operation allows a client to create a new resource in a collection.
 
 The body of the request MUST contain a representation of the resource to be created.  If any of the fields that are required by the schema for this resource are not included or are invalid, a 422 error SHOULD be returned, with information about what specifically is wrong.
 
@@ -1290,7 +1290,7 @@ X-API-Schemas: https://base/v1/schemas
 # Action Operation #
 The action operation allows a client to manipulate a resource or collection in a way that cannot be done with any of the other standard operations.  The request MAY include a body with additional information (arguments), and the response MAY contain a response body with result info.
 
-Actions MAY (and generally SHOULD) incur side effects.  The request URL for an operation MUST contain a query component, to distinguish it from a [create](#create-operation) operation.  The actions that may be possible for given a resource type are defined in its [schema](#schemas).  The <code>actions:</code> attribute in a resource specifies which actions are actually available for this particular resource and the URL to request to perform them.
+Actions MAY (and generally SHOULD) incur side effects.  The actions that may be possible for given a resource type are defined in its [schema](#schemas).  The <code>actions:</code> attribute in a resource specifies which actions are actually available for this particular resource and the URL to request to perform them.
 
 ```http
 POST /v1/folders/b1b2e7006be?encrypt HTTP/1.1
