@@ -1,26 +1,15 @@
 # What is this thing? #
-This document defines the REST API specification implemented by public Go Daddy&reg; APIs.
+This document defines the technical specification implemented by public Go Daddy&reg; RESTful JSON APIs.  
 
-Our goal is to make APIs that are as easy to use as possible.  Each service has [documentation](http://docs.cloud.secureserver.net/) available, but this should be a supplement, not required reading.  Armed with just the URL and credentials, a user should be able to navigate their way through the API in a web browser to learn about what resources and operations it has.  In other words, the API should be _discoverable_.  Once you're familar with what's available, requests can be made with simple tools like cURL or any basic HTTP request library.
-
-# Why are you publishing it? #
-
-Maybe you'd like to build your own tools that work with our services.  Or maybe you want to build your own service that follows the same style as ours.  We'd love it if you did either one and want to give you all the information you need.  This is also the same documentation our internal teams use to build their APIs.
-
-# What if I just want to use one of your APIs? #
-There is information about each API on our [documentation page](http://docs.cloud.secureserver.net/).  We also have clients for various languages:
-  - [PHP](https://github.com/godaddy/gdapi-php)
-  - [C#](https://github.com/godaddy/gdapi-csharp)
-  - Python &mdash; coming soon
-  - Command Line &mdash; coming soon
-  - Node.js &mdash; coming soon
-  - Java &mdash; coming soon
+If you are interested in communicating or exposing a service, see our list of [clients and libraries](./#what-if-i-just-want-to-use-one-of-your-apis) as they include all the details in this specification.
 
 # Contact #
-For questions, comments, corrections, suggestions, etc, you can use the usual tools in GitHub or email us at [apispec@godaddy.com](mailto:apispec@godaddy.com).  Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API, product, or account.
+For questions, comments, corrections, suggestions, etc., open an [issue](https://github.com/godaddy/gdapi/issues) or email us at [apispec@godaddy.com](mailto:apispec@godaddy.com).  
+
+Please use our normal [support page](http://support.godaddy.com/) for questions or problems about a specific API, product, or account.
 
 # License #
-Copyright &copy; 2012 Go Daddy Operating Company, LLC 
+Copyright &copy; 2012-2013 Go Daddy Operating Company, LLC 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -29,26 +18,33 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # Examples #
-Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request.  Examples generally show JSON request and responses, but several [request](#request-format) types are available and other [response](#response-format) types may be defined in the future.
+Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP request and response information is shown, additional standard HTTP headers will be present in a real request.  Examples generally show JSON request and responses, but several [request](#format) types are available and other [response](#format) types may be defined in the future.
 
 ----------------------------------------
 
 # Table of Contents #
 
 - [Terminology](#terminology)
-- [Status Codes](#status-codes)
 - [Representations](#representations)
-  - [Request Format](#request-format)
-  - [Response Format](#response-format)
-  - [JSON](#json)
   - [Dates](#dates)
+  - [Format](#format)
+  - [Special Headers](#special-headers)
+  - [Special Characters](#special-characters)
   - [HTML UI](#html-ui)
-- [Errors](#errors)
+- [Status Codes](#status-codes)
 - [Resources](#resources)
 - [Collections](#collections)
+  - [Inheritance](#inheritance)
+- [Errors](#errors)
 - [Links](#links)
-- [Actions](#actions)
+  - [Construction](#construction)
 - [Schemas](#schemas)
+  - [Schema Fields](#schema-fields)
+      - [Field Validation](#field-validation)
+      - [Character Ranges](#character-ranges)
+- [Actions](#actions)
+  - [In Resources](#in-resources)
+  - [In Schema](#in-schema)
 - [Operations](#operations)
   - [Query](#query-operation)
       - [Pagination](#pagination)
@@ -79,15 +75,20 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
 - [Base URL and Versioning](#base-url-and-versioning)
 - [Authentication](#authentication)
 - [Design Considerations](#design-considerations)
-  - [Naming Conventions](#naming-conventions)
-  - [What to Link](#what-to-link)
+  - [Asynchronous Actions](#asynchronous-actions)
   - [Canonical Links](#canonical-links)
-  - [Regions](#regions)
-  - [Caching](#caching)
-  - [ETag](#etag)
-  - [Last-Modified](#last-modified)
-  - [Cache-Control](#cache-control)
-  - [Compression](#compression)
+  - [Identifiers](#identifiers)
+  - [In-line Data](#inline-data)
+  - [Naming Conventions](#naming-conventions)
+  - [Performance](#performance)
+    - [Caching](#caching)
+	 - [Cache-Control](#cache-control)
+      - [ETag](#etag)
+      - [Last-Modified](#last-modified)
+    - [Compression](#compression)
+  - [Query String Length](#query-string-length)
+  - [Regions & Geographic Diversity](#regions--geographic-diversity)
+  - [What to Link](#what-to-link)
 
 ----------------------------------------
 
@@ -99,7 +100,7 @@ A **RE**presentational **S**tate **T**ransfer service is a style of API where a 
 A **resource** is an object or concept that can be manipulated by the API.  In our file storage example, they will be things like a 'Folder' and a 'File'.  Resources are the building blocks of an API, the nouns in the language describing the system.  All operations in the API manipulate the resources or their state.  Resources should be organized in a way that is useful to the client.  This is the most important part of the design of an API; if your resources just match your database schema one-to-one, chances are your API is not going to be very easy to use.
 
 **Representation:**
-REST APIs transfer **representations** of resources back and forth between the client and the service.  These are documnents that describe resources.  Representations are most commonly JSON-formatted, but can be of any type.
+REST APIs transfer **representations** of resources back and forth between the client and the service.  These are documents that describe resources.  Representations are most commonly JSON-formatted, but can be of any type.
 
 **Attribute:**
 Representations of resources consist of a series of **attributes** names and values as key-value pairs.
@@ -125,41 +126,6 @@ An **action** is an operation that can be performed on a resource but does not f
 **Discoverability:**
 **Discoverability** is a method of self-documenting.  Each API has a collection of schemas that define what resource types are available and what attributes they have.  Each response contains information about how to find related resources and what actions are available.
 
-Since this documentation is in a computer-readable form, it is easy to make a generic client library that will speak to any API that implements this specification, with no code related to a particular service.  We provide several [client libraries](/godaddy/gdapi) for different languages, and if you load the API in a browser we respond with a built-in JavaScript client that provides a friendly UI for experimentation.
-
-----------------------------------------
-
-# Status Codes #
-Every HTTP response contains a **status code**.  This is the primary mechanism that a client uses to determine the result of their request, so it is very important that they be clearly defined and used consistently.  Requests that were successfully handled MUST return a response with a 2xx or 3xx status code.  Requests that cannot be processed MUST return a 4xx or 5xx code.
-
-Code | Meaning
---------------------------|----------------------------
-**2xx** | **Success**
-200 OK | The request was successful.
-201 Created | Success, and a new resource has been created.<br/>&bull; A Location header to the resource SHOULD be included.
-202 Accepted | The request has been received but has not completed.  It MAY be completed in the future.<br/>&bull; This is typically used for requests that produce a long-running process that will be performed asynchronously.
-204 No Content | The request was successful, and the response will have no body portion.
-| 
-**3xx** | **Redirect**
-301 Moved Permanently | Permanent redirect.  The requested resource is somewhere else now and will never be coming back.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull; The operative word here is *permanent*; clients may remember this and never request the old URL again.<br/>&bull; If in doubt, use 302.
-302 Found | Temporary redirect.  The requested resource isn't here right now.<br/>&bull; The new location MUST be specified in the Location header.<br/>&bull;The client will ask for the original URL if it wants this resource again in the future.
-304 Not Modified | The client made a conditional GET request for a resource, and that resource matches the condition so the response body does not need to be sent.
-| 
-**4xx** | **Client Error** &mdash; The client did something wrong.<br/>&bull; Sending the same request again **will** result in the same error.
-400 Bad Request | The request was malformed in some way or the input did not pass validation; the client should feel bad.
-401 Unauthorized | Authentication information was not sent or is invalid.
-403 Forbidden | Authentication information was validated, but does not give the client access to the requested resource.
-404 Not Found | These are not the droids you are looking for.
-405 Method Not Allowed | The requested HTTP method is not allowed for this URL.
-406 Not Acceptable | The service does not support the representation content type that the client requested/sent.
-409 Conflict | [Resource versioning](#resource-versioning) is enabled, and the requested operation conflicts with the current state.
-410 Gone | The requested API version is no longer supported.
-418 I'm a teapot | The request attempted to brew coffee with a teapot service that is not compliant with [RFC2324](http://tools.ietf.org/html/rfc2324).
-| 
-**5xx** | **Service Error** &mdash; Something bad happened within the service.<br/>&bull; There is nothing the client can do about this.<br/>&bull; The same request will succeed (or produce a 4xx error) if re-submitted in the future.
-500&nbsp;Internal&nbsp;Server&nbsp;Error | Something is broken on our side; the service should feel bad.
-503 Service Unavailable | The request couldn't be handled due to maintenance or overload.
-
 ----------------------------------------
 
 # Representations #
@@ -168,53 +134,43 @@ A representation is the way a resource is described/serialized in a HTTP request
 - JSON (application/json) for both requests and responses.
   - This is the primary representation used by all APIs.
 - HTML (text/html; charset=utf8) for responses
-  - This is a small HTML wrapper around the JSON format which displays the [HTML UI](#html-ui).
+  - This is a small HTML wrapper around the JSON format which presents the [HTML UI](#html-ui).
   - The HTML response format is only intended for use in a web browser, not for clients to parse.
 - Forms ([multipart/form-data](http://tools.ietf.org/html/rfc2388) and [application/x-www-form-urlencoded](http://www.w3.org/TR/html401/interact/forms.html#form-content-type)) for requests.
   - These are needed for the [HTML UI](#html-ui) and are easy to create with browsers and command-line tools like cURL.
 
-Other representation Content-Types that make sense for the particular application MAY also be supported.
+Services MAY support other representations that make sense for the particular application.  These will be defined in the service docuemtnation which a client can specifify by sending the value in the <code>Accept</code> header of the request.
 
-## Request Format ##
-When clients are sending a representation to the service, they MUST specify the format using the [Content-Type](http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type) header.  If the service does not support the specified Content-Type, it SHOULD return a 406 error.
-
-## Response Format ##
-Clients MAY specify their preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header.  Service SHOULD be lenient in mapping this to one of their acceptable formats.  For example <code>application/json</code>, <code>text/json;charset=utf-8</code>, and <code>text/json</code> should all be interpreted as JSON.
-
-JSON SHOULD be assumed as the preferred representation, unless the request is from a web browser.
-  - The suggested definiton of "a web browser" is that the Accept header contains "*/*" and the User-Agent header contains "mozilla".
-  - This matches all the common graphical web browsers but not HTTP request libraries or command-line browsers.
-
-A query parameter of <code>&#95;format=json</code> overrides any defaults or Accept header present and MUST make the response representation JSON.
-
-In practice, if you only support HTML and JSON, your detection logic should look something like:
-
-```
-if ( query parameter "_format" is present and equals "json" )
-  respond with json
-else if ( accepts header contains "*/*" AND user-agent header to lowercase contains "mozilla" )
-  respond with html
-else
-  respond with json
-```
-
-## JSON ##
-JSON responses SHOULD be pretty-printed, at least to the extent of having occasional newlines.  This adds minimal overhead and makes it much more readable.
-
-Escaping the forward slash ("/") character is not required in the [JSON specification](http://json.org/)
-  - When responding as raw JSON, slashes SHOULD NOT be escaped.
-  - When responding as HTML, strings in the JSON data portion MUST have forward slashes escaped, typically as "\/".
-    - Failure to do this exposes the page to an XSS attack using strings that contain "&lt;/script&gt;".
+The representation is returned in the <code>Content-Type</code> header of the response.
 
 ## Dates ##
-Dates SHOULD always be in UTC.  If you have a very good reason to use something else, the attribute name SHOULD indicate that it is "local" or similar to avoid confusion.
+Dates MUST be represented as an [ISO-8601](http://www.w3.org/TR/NOTE-datetime) formatted string.
+  - If a time component is included, a time zone designator MUST BE included and SHOULD always be UTC ("Z").
+  - If you have a very good reason to use something other than UTC, the attribute name SHOULD indicate that it is "local", "user", or similar to avoid confusion.
+  - e.g. "birthday": "1982-02-24", "created": "2012-09-27T18:39:53Z", "yourLocalTime": "2013-09-27T11:30:42-07:00"
 
-For JSON, dates SHOULD should be returned in 2 formats:
-  - An [ISO-8601](http://www.w3.org/TR/NOTE-datetime) formatted UTC string.
-    - e.g. created: "2012-02-24T15:42:00Z"
-  - The number of milliseconds since 1/1/1970 (a "UNIX timestamp" or "epoch time") as the same name with "TS" appended
-    - e.g. createdTS: 1330098120000
-    - Note: The "TS" version SHOULD NOT appear in the schema and therefore cannot be writable.
+## Format ##
+Clients MAY request a preferred representation by including an appropriate [Accept](http://tools.ietf.org/html/rfc2616#section-14.1) header.
+  - Service SHOULD be lenient in mapping this to one of their acceptable formats.
+  - For example <code>application/json</code>, <code>text/json;charset=utf-8</code>, and <code>text/json</code> can all be interpreted as JSON.
+
+If the request is from a web browser, the response SHOULD be HTML.
+  - The suggested definition of "a web browser" is that the Accept header contains "*/*" and the User-Agent header contains (case-insensitive) "mozilla".
+  - This matches all the common graphical web browsers but not HTTP request libraries or command-line browsers.
+
+When clients are sending a representation to the service (e.g. creating a resource), they MUST specify the format using the [Content-Type](http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type) header.
+  - If the service does not support the specified Content-Type, it SHOULD return a 406 error.
+
+## Special Headers ##
+A <code>X-API-Schemas:</code> header MUST be present in all responses.  The value tells the client the URI where they can find the collection of schemas to understand your responses.
+  - The URI SHOULD be for the particular [API version](#api-versioning) the request is for.
+  - If the request is for the [root level](#root-level), it SHOULD be for the latest version.
+
+## Special Characters ##
+Escaping the forward slash ("/") character is not required by the [JSON specification](http://json.org/), but requires consideration.
+  - When responding as JSON, slashes SHOULD NOT be escaped.
+  - When responding as HTML, strings in the JSON data portion MUST have forward slashes escaped, typically as "\/".
+    - Failure to do this exposes the page to an XSS attack (using strings that contain "&lt;/script&gt;").
 
 ## HTML UI ##
 Services provide a HTML version of their API by wrapping the JSON response with the snippet below.  It includes JavaScript and CSS that pretty-prints the response and displays a bar that provides buttons for operations, actions, sorting, filtering, pagination, etc.
@@ -223,72 +179,85 @@ Services provide a HTML version of their API by wrapping the JSON response with 
 <!DOCTYPE html>
 <!-- If you are reading this, there is a good chance you would prefer sending an
 "Accept: application/json" header and receiving actual JSON responses. -->
-<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/1.2.8/ui.css" />
-<script src="http://img1.wsimg.com/ucp/api/1.2.8/ui.js"></script>
+<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/1.2.12/ui.css" />
+<script src="http://img1.wsimg.com/ucp/api/1.2.12/ui.js"></script>
 <script>
 var docs = "http://url-to-your-docs/site";
+var schemas = "http://url-to-your-api/v1/schemas";
 var data = { 
   /* ... JSON response ... */
 };
 </script>
 ```
-
 ----------------------------------------
 
-## Errors ##
-Error responses MUST have a [resource](#resources) body which gives more information about the error.  At a minimum, this MUST include:
-  - <code>type:</code> "error"
-  - <code>status:</code> the HTTP status code of the response
-  - <code>code:</code> A short identifier for the error, suitable for identifying what specific kind of error this is with code.
+# Status Codes #
+Every HTTP response contains a **status code** and is the primary indicator of the success of a request.  Requests that were successfully handled MUST return a response with a 2xx (Success) or 3xx (Redirection) status code.  Requests that cannot be processed MUST return a 4xx (Client Error) or 5xx (Server Error) code.  It is important that these codes be applied correctly and consistently.
 
-Errors SHOULD also include:
-- <code>message:</code> A short description of the error for a human to read
-- <code>detail:</code> Additional detail about the error, if available
-- Any other application-specific information that is available.
+With over 70 HTTP Status Codes defined by [IANA](http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml), it is difficult to remember all of them.  To address this a simple rule must be followed:  Use HTTP Status Codes if they apply completely.  
 
-Error responses MUST be returned in the representation appropriate for what the request asked for.
-- It's rude to send an HTML error page back to a client that made a request for JSON.
-- Also consider responses that might be returned from application servers and web proxies in your stack but outside your API code.
-- If the error is with [content negotiation](#content-negotiation) itself, return in the default format (JSON).
+If there is any question, use a more generic status, such as a 400 or 500, describing the condition in detail following [Error](#errors) guidelines. For more information on when to use specific codes consult [Wikipedia](http://en.wikipedia.org/wiki/HTTP_status_code) or [RFC 2616](http://tools.ietf.org/html/rfc2616#section-10).
 
-```javascript
-{
-  "type":    "error",
-  "status":  404,
-  "code":    "FolderNotFound",
-  "message": "The specified folder does not exist",
-  /* ... more application-specific info ... */
-}
-```
+HTTP Status Codes come in five categories that identify their meaning:
+* 1xx: Informational - Request was received, more information was returned.
+* 2xx: Success - The request was successfully received, understood and accepted.
+* 3xx: Redirection - The request must be performed elsewhere to be completed.
+* 4xx: Client Error - The request contained invalid information that the **client** must address.  Attempting the same request will result in the same error.
+* 5xx: Server Error - The request could not be fulfilled by the **server**.  The same request may succeed (or produce a 4xx error) if attempted later.
 
+## Core Codes ##
+At a minimum the following HTTP Status Codes should be well known and used.
+
+Code | Meaning
+--------------------------|----------------------------
+200 OK | The request was successful
+201 Created | Success, and a new resource has been created.  A Location header to the resource SHOULD be included.
+202 Accepted | The request has been received but has not completed.  See [Asynchronous Actions](#asynchronous-actions)
+400 Bad Request | The request was malformed in some way.  Used for general errors that can be corrected by the client.
+401 Unauthorized | Authentication information was not sent or is invalid.
+403 Forbidden | The authenticated user is not allowed access to the requested resource.
+404 Not Found | These are not the droids you are looking for.
+422 Unprocessable Entity | The request was well-formed (400) and in a supported format (415), but cannot be processed.  Typically used for application-specific validation errors.
+500&nbsp;Internal&nbsp;Server&nbsp;Error | A generic message for an error on the server.  The client should try their request again later at which point it **may** succeed (or produce a 4xx error).
+
+## Extended Codes ##
+The remaining HTTP Status Codes will be used under certain specific circumstances.
+
+Code | Meaning
+--------------------------|----------------------------
+301 Moved Permanently | Permanent redirect.  The requested resource has moved **permanently** and clients should never request this URI again.  If in doubt, use a 302.
+302 Found | Temporary redirect.  The requested resource has moved and clients should request this URI again for future requests.
+304 Not Modified | The client requested a resource that allows a previous version to be used.  No response will be sent.
+405 Method Not Allowed | The requested HTTP method is not allowed for this URL.
+406 Not Acceptable | The service does not support the representation that the client **requested**.
+409 Conflict | [Resource versioning](#resource-versioning) is enabled, and the requested operation conflicts with the current state.
+410 Gone | The resource requested has left.  It will not come back.
+413 Entity Too Large | The request body is larger than the service is willing to process.
+414 Request-URI Too Long | The requested URL is longer than is accepted by the service.
+415 Unsupported Media Type | The service does not support the representation type that the client **sent**.
+418 I'm a teapot | The request attempted to brew coffee with a teapot service that is not compliant with [RFC2324](http://tools.ietf.org/html/rfc2324).
+503 Service Unavailable | The request couldn't be handled due to maintenance or overload.
 ----------------------------------------
 
-## Resources ##
+# Resources #
+Resource representations MUST have these attributes:
+  - <code>type:</code> A string that uniquely identifies the kind, or type, of resource this is.
+    - The value MUST be the id of a [schema](#schemas).
 
-Resource representations MUST have several attributes:
-  - <code>type:</code> A string that uniquely identifies the kind of resource this is.
-    - Types SHOULD be singular, not plural, and MUST correspond to a [schema](#schemas) id.
-  - <code>id:</code> A string which uniquey identifies this resource.
-    - MUST be unique among other resources of the same type and consist only of URL-safe characters.
-    - SHOULD be globally unique when practical.
-    - SHOULD NOT be an auto-incrementing id from a database.  Exposing this value reveals information about the size and growth of the service, and easily allows attackers to iterate over the entire valid id range.
-    - In general something like a GUID is best if there will be many of the resource or they are dynamically created.
-    - If there is a very limited set of possible resources then a short readable string is good.
-      - e.g. "facebook", "twitter", "myspace", "googleplus" for a social network resource.
-  - <code>rev:</code> A string identifying the resource revision, if [resource versioning](#resource-versioning) is implemented.
+SHOULD have, in almost all cases:
+  - <code>id:</code> A string which uniquely identifies this resource.  (See [identifier](#identifiers) design considerations).
   - <code>links:</code> A map with [links](#links) to:
     - <code>self:</code> The location of the resource itself.
-    - <code>schemas:</code> The location of the schemas collection.
-      - This is required **only** at the root level of the response.  If it contains nested resources (e.g. a collection) they do not need this link.
-    - Any related resources/collections, as appropriate.
-  - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them.
-    - This MAY be omitted if the resource type has no actions.
+  - Other application-specific information attributes
+ 
+And MAY have, when appropriate:
+  - Additional <code>links:</code> entries for related resources and collections.
+  - <code>actions:</code> A map of [action](#actions) names &rarr; the URL that is used to invoke them.
 
 ```javascript
 {
   "id":      "b1b2e7006be", 
   "type":    "file",
-  "rev":     "rev0d41cb806a",
   "links":   { /* see links */ },
   "actions": { /* see actions */ },
   "name":    "ultimate_answer.txt",
@@ -299,49 +268,36 @@ Resource representations MUST have several attributes:
 
 ----------------------------------------
 
-## Collections ##
-
-Collections are a special case of resource.  They do not need to have an identifier attribute, and have a "data" array that contains an array of resources.
+# Collections #
+Collections are a special kind of resource.  They have a "data" array that contains an array of resources.
 
 Collection representations MUST have:
   - <code>type:</code> "collection"
-  - <code>resourceType:</code> The name of the primary schema type this collection holds.
-  - <code>links:</code> A map with [links](#links) to:
-    - <code>self:</code> The location of the resource itself.
-    - <code>schemas:</code> The location of the schemas collection.
-      - This is required **only** at the top level of the response.  The resources within the collection do not need this link.
-    - Any related resources/collections, as appropriate.
+  - <code>resourceType:</code> The id of the [schema](#schemas) for the type of resource this collection holds.
   - <code>data:</code> An array containing resource representations
     - This MUST always be present and be an array, even if there are 0 or 1 entries in it.
 
-And SHOULD have (when appropriate):
-  - <code>createTypes:</code> A map of the names of types that can be created in this collection &rarr; the URL where the resource SHOULD be posted.
-    - This SHOULD be present only if a type other than <code>resourceType</code> can be created.
-    - Each entry/type SHOULD be an "extension" the primary <code>resourceType</code>.  That is, it should have all the same fields and filters, plus additional info.
-    - If the primary <code>resourceType</code> can be created, it SHOULD also be present in the map.
-    - The URL can just be the same as the "self" link, but MAY also be any other location, and different for each createType to provide additional flexibility.
-    - <code>createDefaults:</code> A map of field names &rarr; their values.
-    - This can be used to specify a context-specific default value for fields when the client is creating a new resource.
-  - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them.
-    - This MAY be omitted if the resource type has no actions.
+SHOULD have, in almost all cases:
+  - <code>links:</code> A map with [links](#links) to:
+    - <code>self:</code> The location of the resource itself.
+
+And MAY have, when appropriate:
+  - Additional <code>links:</code> entries for related resources and collections.
+  - Additional application-specific attributes (on the collection, as it is itself a resource).
+  - <code>actions:</code> A map of action names &rarr; the URL that can be requested to perform them (on the collection).
   - <code>pagination:</code> See [pagination](#pagination).
   - <code>sort:</code> See [sorting](#sorting).
   - <code>filters:</code> See [filtering](#filtering).
-
-Collections MAY also include additional application-specific attributes.
+  - <code>createDefaults:</code> A map of field names &rarr; their values.
+    - This values provide a context-specific default value for fields which a client MAY use when creating a new resource in the collection.
+  - <code>createTypes:</code> See inheritance, below.
 
 ```javascript
 {
   "type": "collection",
   "resourceType": "file",
-  "createTypes": {
-    "file":      "https://base/v1/files",
-    "textFile":  "https://base/v1/files",
-    "imageFile": "https://base/v1/files",
-  },
   "links": { 
     "self":     "https://base/v1/files",
-    "schemas":  "https://base/v1/schemas"
     /* ... more links ... */
   },
   "actions":    { /* see actions */ },
@@ -357,25 +313,77 @@ Collections MAY also include additional application-specific attributes.
 }
 ```
 
+### Inheritance ###
+Collections MAY support multiple resource types through simple inheritance:
+  - The <code>resourceType:</code> SHOULD refer to the 'base' resource type.
+  - Define additional sub-types that have all the same fields and filters as the base type, plus additional info.
+  - Return a <code>createTypes:</code> map in the collection, with a mapping of type ids that can be created &rarr; the URL where they SHOULD be POSTed.
+    - If the 'base' type can also be created, it SHOULD be present in the map.
+    - The URL for each entry MAY be the same as the collection's self link, or it can be different to provide additional flexibility in the service.
+
+```javascript
+  "createTypes": {
+    "file":      "https://base/v1/files",
+    "textFile":  "https://base/v1/files",
+    "imageFile": "https://base/v1/files?image=1",
+  },
+```
+
 ----------------------------------------
 
-## Links ##
-Links provide a trail for the client to follow to get to related information that is not included in the response.  Clients SHOULD use the links to retrieve related information instead of hard-coding or constructing URLs from strings on their own.  Services SHOULD provide the appropriate links so that clients don't have to resort to that sort of thing.
+# Errors #
+Error responses MUST be a valid [resource](#resources) which gives more information about the error.  At a minimum, they MUST include:
+  - <code>type:</code> "error"
+  - <code>status:</code> the HTTP status code of the response
+  - <code>code:</code> A short identifier for the error, suitable for identifying what specific kind of error this is within client code.
 
-Links in responses MUST be absolute URLs, including the protocol (https), host, port (if not 443), and [API Version](#api-versioning).
-  - This prevents the client needing resolve relative URLs into absolute ones.
-  - [HTTP compression](#compression) will make the overhead of transmitting absolute URLs negligible.
+Errors SHOULD include:
+  - <code>message:</code> A short description of the error suitable for a human developer to read.  
+  - <code>detail:</code> Additional more detailed information, if available.
 
-Slashes:
-  - Trailing slashes SHOULD NOT be included on URLs in responses.
-  - But they SHOULD have no effect on the response produced if a client sends one.
-  - Multiple slashes in a URL SHOULD be treated the same as a single slash.
+Errors MAY include:
+  - <code>userMessage:</code> Localized message that MAY differ from the <code>Content-Language</code> header of the response.
+  - <code>userLocale:</code> Identifier of the language used to localize the <code>userMessage</code> field.  This SHOULD be the same as the <code>Accept-Language</code> header of the request and applies to all references of <code>userMessage</code> in the response.
+  - Any other application-specific information that is available.
+
+The <code>type</code>, <code>code</code>, <code>message</code> and <code>detail</code> are intended for developer use only and MUST NOT be presented directly the end user.  <code>userMessage</code> is considered safe to be relayed to an end user if it is included with the response.  See [client error messages](./recommendations.md#client-error-messages) for more information.
+
+Error responses MUST be returned in the representation format that the client asked for.  If the service cannot cater to the representation requested a 406 Status Code should be returned.
+  - It is rude to send an HTML error page back to a client that made a request for JSON.
+  - Consider responses that might be returned from application servers and web proxies within your stack.
+  - Respond with no body if it is not possible to respond in the correct format, or if an error occurs within [content negotiation](#format).
+
+```javascript
+{
+  "type":    "error",
+  "status":  404,
+  "code":    "FolderNotFound",
+  "message": "The specified folder does not exist",
+  "folderName": "Documents",
+  /* ... more application-specific info ... */
+}
+```
+
+----------------------------------------
+
+
+# Links #
+Links provide a trail for the client to follow to get to related information that is not included in the response.
+
+Clients
+  - SHOULD use the links provided to navigate resources.
+  - SHOULD NOT hard-code or string-concatenate URLs (other than the version root).
+
+Services
+  - SHOULD provide all appropriate links to that a client can get to anything exclusively by navigating resource links.
+  - SHOULD strive to keep URL layout stable, as clients may save link values and expect to be able to retrieve them later.
+  - MAY alter URL layout and link values, if necessary.
+    - This is not considered a [breaking change](#api-versioning), but the Service SHOULD redirect old URLs to the new ones.
 
 ```javascript
 {
   "links": {
     "self":     "https://base/v1/files/b1b2e7006be",
-    "schemas":  "https://base/v1/schemas",
     "content":  "https://base/v1/files/b1b2e7006be/content",
     "folder":   "https://base/v1/folders/19c3932wef",
     "public":   "http://documents.your-files.com/ultimate_answer.txt"
@@ -384,101 +392,58 @@ Slashes:
   /* ...other attributes... */ 
 }
 ```
-Link entries SHOULD only be included if they lead to a valid destination.  
-  - For example, if this resource does not have a public link, the public field SHOULD be omitted, rather than having a null value or a URL that will lead to a 404 response.
+
+Link entries SHOULD lead to a valid destination.  For example, if you know a resource has no "public" URL because it is not shared, do not include the "public" attribute.
 
 See also: [What to link](#what-to-link)
 
-----------------------------------------
+### Construction ###
+Link values are strings and MUST be an absolute URL, including the scheme, host, port, and [API Version](#api-versioning).
+  - This prevents the client needing resolve relative URLs into absolute ones.
+  - [HTTP compression](#compression) makes the overhead of transmitting absolute vs relative URLs negligible.
+  - Port SHOULD be omitted if it is the default for the scheme (e.g. 443 for https).
 
-# Actions #
-Actions perform an operation on a resource (or collection) and optionally returns a result.  Actions may have several inputs and typically do something that requires application logic beyond what could be done with a simple [create](#create-operation), [update](#update-operation), or [delete](#delete-operation) operation.
-
-The schema for types that have actions available have an <code>actions</code> and/or <code>collectionActions</code> map in their schema detailing all the actions that are possible and their input/output schema.  For example, there may be "share", "encrypt", and "decrypt" actions on a file.  See [schemas](#schemas) for more information.
-
-### Schema ###
-Actions are defined by a map with 2 attributes:
-  - <code>input:</code> The ID of the schema that the inputs will conform to
-  - <code>output:</code> The ID of the schema that the outputs will conform to
-
-The appropriate pair MAY be omitted if there are no inputs or outputs to the action.
-
-```javascript
-{
-  "id":      "file",
-  "type":    "schema",
-  "resourceActions": {
-    "share": {
-      "input": "shareInput",
-    },
-    "decrypt": {
-      "input": "cryptInput",
-      "output": "file",
-    },
-    "encrypt": {
-      "input": "cryptInput",
-      "output": "file",
-    },
-    /* ... other actions ... */
-  },
-  /* ... other schema attributes ... */
-}
-```
-
-### Resource Representation ###
-Resources (and collections) of types that have actions defined have a <code>actions</code> attribute that details what actions are available for this particular resource, and what URL is to be accessed to perform them.  For example if only one of "encrypt" and "decrypt" are possible for a given file, only the one currently available would appear in the resource:
-
-```javascript
-{
-  "id": "b1b2e7006be",
-  "type": "file",
-  "actions": {
-    "share":   "https://base/v1/files/b1b2e7006be?share",
-    "encrypt": "https://base/v1/files/b1b2e7006be?encrypt"
-  },
-  /* ... other resource attributes ... */
-}
-```
+Handling forward slashes:
+  - Trailing slashes SHOULD NOT be included on URLs produced by a service.
+  - SHOULD have no effect on the response if a client sends one.
+  - Multiple slashes in a URL SHOULD be treated as a single slash.
 
 ----------------------------------------
 
 # Schemas #
-
-Each service MUST have a top-level collection called "schemas" which contains "schema" resource for each resource type.  The information contained in the schema provides enough information to build a smart client that knows what actions are available, what fields make up a resource, etc.
+Each service MUST have a top-level collection called "schemas" which contains "schema" resource for each resource type.  The information contained in the schemas provides enough information to build a smart client that knows what actions are available, what fields make up a resource, etc.
 
 The "schemas" collection MUST also have a link to the base URL of the API version.
-  - This makes the schema collection (https://base//v1/schemas) a single URL that provides a client everything they need to know about the service, similar to a WSDL in a SOAP service.
+  - This makes the schema collection (https://base/v1/schemas) a single URL that provides a client everything they need to know about the service, similar to a WSDL in a SOAP service.
 
 Each schema resource MUST describe:
-  - <code>id:</code>: The name of the resource type (e.g. "files").
+  - <code>id:</code>: The name of the resource type (e.g. "folder").
   - <code>type:</code> "schema"
   - <code>links:</code>: 
-    - <code>self:</code>: The URL for this schema
+    - <code>self:</code>: The URL for this schema (e.g. "https://base/v1/schemas/folder")
     - <code>collection:</code> If this type can be queried/listed, the URL for doing so (e.g. "http://base/v1/folders").
       - This SHOULD correspond to the collections that are linked at the [version root](#version-root).
       - This link is used by API clients to generate object stubs as the URL to fetch data from.
       - This link is used by the [HTML UI](#html-ui) to provide a dropdown of choices for fields that are of type reference.
-
-And MUST describe if applicable:
-  - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
   - <code>resourceFields:</code>: A map of attribute names available in **resources** of this type &rarr; descriptions of that field (see [fields](#schema-fields)).
+
+And SHOULD describe if applicable:
+  - <code>resourceMethods:</code>: An array of HTTP methods that are available to some (but not necessarily all) **resources** of this type.
   - <code>resourceActions:</code>: A map detailing the actions available to **resources** of this type (see [actions](#actions)).
   - <code>collectionMethods:</code>: An array of HTTP methods that are available to a **collection** of this type.
   - <code>collectionActions:</code>: A map detailing the actions available to **collections** of this type (see [actions](#actions)).
   - <code>collectionFields:</code>: A map detailing the non-standard attribute fields that the **collection** has. (see [fields](#schema-fields)).
   - <code>collectionFilters:</code>: A map detailing the filters that are available to **collections** of this type (see [filters](#filtering)).
 
-Entries here the value would be an empty map/array MAY be omitted from the response.
-
-### Schema Fields ###
+## Schema Fields ##
 Each field is defined by a map of properties.  Fields MUST have a <code>type:</code>, which may be a "simple" type:
 
 type        | description
 ------------|------------
 "string"    | UTF-8 string
 "password"  | String that should not be displayed
-"float"     | JavaScript uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
-"int"       | "int"s are just floats in JavaScript, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may have signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
+"float"     | JSON uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
+"int"       | "int"s are just floats in JSON, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may have signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
 "date"      | As a string, see [dates](#dates)
 "blob"      | Binary data, encoded as a string
 "boolean"   | Boolean
@@ -488,12 +453,12 @@ Or a non-simple type:
 type                                  | description
 --------------------------------------|-------------
 "enum"                                | One choice out of an enumeration of possible values
-"reference[<code>schema_name</code>]" | The id of another resource with type <code>schema_name</code>
-"type[<code>schema_name</code>]"      | The actual representation of a resource with type <code>schema_name</code>
-"array[<code>another_type</code>]"    | An array of entries of type <code>another_type</code>
-"map[<code>another_type</code>]"      | Key/value pairs.  Values are of type <code>another_type</code>
+"reference[<code>schema_name</code>]" | The value is the id of a resource of type <code>schema_name</code>
+"<code>schema_name</code>"            | The value is the representation of a resource of type <code>schema_name</code>
+"array[<code>another_type</code>]"    | The value is an array of entries of type <code>another_type</code>
+"map[<code>another_type</code>]"      | Key/value pairs.  Keys are strings, Values are of type <code>another_type</code>
 
-Additional metadata SHOULD be provided for each field when available:
+Additional metadata SHOULD be provided for each field when applicable:
 
 name                              | type                              | description
 ----------------------------------|-----------------------------------|--------------
@@ -509,14 +474,14 @@ name                              | type                              | descript
 <code>max:</code>                 | int                               | For ints and floats, the maximum allowed value (inclusive)
 <code>options:</code>             | array[<code>same as field</code>] | For enums, the list of possible values
 <code>validChars:</code>          | string                            | For strings, only these characters are allowed (see [character ranges](#character-ranges))
-<code>invalidChars:</code>        | string                            | For strings, these characters are not allwoed (see [character ranges](#character-ranges))
+<code>invalidChars:</code>        | string                            | For strings, these characters are not allowed (see [character ranges](#character-ranges))
 <code>referenceCollection:</code> | string                            | For references, a query URL that can be used to find valid resources of the reference type
 
-### Validation ###
-The additional fields above provide enough info for a client to do basic validation of values before submitting them to a service.  They are not intended to be completly comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of it's conditions, it should return a 400 error with enough detail for the client to fix the problem and re-submit the reuqest.
+### Field Validation ###
+The additional fields above provide enough info for a client to do basic validation of values before submitting them to a service.  They are not intended to be completely comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of its conditions, it should return a 422 error with enough detail for the client to fix the problem and re-submit the request.
 
-#### Character Ranges ####
-The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive and may contain ranges as in a simple regular expression.  For example alphanumerics may be represented as "a-zA-Z0-9".  Unicode characters should be represented as <code>\uXXXX</code> or <code>\uXXXXXX</code>, where X are the hexadecimal representation of the codepoint.
+### Character Ranges ###
+The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive and may contain ranges as in a simple regular expression.  For example alphanumeric strings may be represented as "a-zA-Z0-9".  Unicode characters should be represented as <code>\uXXXX</code> or <code>\uXXXXXX</code>, where X are the hexadecimal representation of the codepoint.
 
 ```javascript
 {
@@ -565,7 +530,66 @@ The <code>validChars:</code> and <code>invalidChars:</code> are case-sensitive a
 
 ----------------------------------------
 
+# Actions #
+Actions perform an operation on a resource and (optionally) return a result.  They may take an input resource and typically do something that requires application logic beyond what could be done with a simple [create](#create-operation), [update](#update-operation), or [delete](#delete-operation) operation.
+
+Types that have actions available have an <code>actions:</code> and/or <code>collectionActions:</code> map in their schema detailing all the actions that are possible and their input/output schema.  For example a file resource may have "share", "encrypt", and "decrypt" actions.  See [schemas](#schemas) for more information.
+
+## In Resources ##
+Resources have a <code>actions:</code> attribute that details what actions are available for this particular resource, and what URL is to be accessed to perform them.  For example if only one of "encrypt" and "decrypt" are possible for a given file, only the one currently available would appear in the resource:
+
+```javascript
+{
+  "id": "b1b2e7006be",
+  "type": "file",
+  "actions": {
+    "share":   "https://base/v1/files/b1b2e7006be?share",
+    "encrypt": "https://base/v1/files/b1b2e7006be?encrypt"
+  },
+  /* ... other resource attributes ... */
+}
+```
+
+Action URLs MUST be considered opaque strings to the client.  A simple query parameter is suggested, but services may construct URLs in any format they desire.  Examples:
+  - "https://base/v1/files/b1b2e7006be?encrypt"
+  - "https://base/v1/files/b1b2e7006be?action=encrypt"
+  - "https://base/v1/files/b1b2e7006be/encrypt"
+  - "https://base/v1/actions/encryptFile/b1b2e7006be"
+
+## In Schema ##
+Actions are defined by a map with 2 attributes:
+  - <code>input:</code> The ID of the schema that the inputs will conform to
+  - <code>output:</code> The ID of the schema that the outputs will conform to
+
+Inputs and outputs are resources and MUST have an associated schema.  If the action takes no input or has no output, the appropriate attribute SHOULD be omitted.
+
+```javascript
+{
+  "id":      "file",
+  "type":    "schema",
+  "resourceActions": {
+    "share": {
+      "input": "shareInput",
+    },
+    "decrypt": {
+      "input": "cryptInput",
+      "output": "file",
+    },
+    "encrypt": {
+      "input": "cryptInput",
+      "output": "file",
+    },
+    /* ... other actions ... */
+  },
+  /* ... other schema attributes ... */
+}
+```
+
+----------------------------------------
+
 # Operations #
+
+Operations are logical actions with their corresponding HTTP Methods, or Verbs.  These operations are listed below and described in detail further below that.
 
 Operation | HTTP Method | Request URL | Description
 ----------|-----------------|-----------------------------------|--------------------
@@ -574,7 +598,20 @@ Operation | HTTP Method | Request URL | Description
 [Create](#create-operation) | POST | https://base/v1/{collection_name} | Creates one or more resources
 [Update](#update-operation) | PUT | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Change one or more existing resources
 [Delete](#delete-operation) | DELETE | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Delete one or more existing resources
+[Replace](#replace-operation) | REPLACE | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Query, Delete and Create one or more resources in one atomic transaction
 [Action](#action-operation) | POST | https://base/v1/{collection_name}/{resource_id}?{action_name}<br>https://base/v1/{collection_name}?{action_name} | Perform an action on a resource or collection
+
+When to use a POST over a PUT to create a resource is better described in an example.  A POST would be used when the service generates an ID, where a PUT is used when a resource should be created at a specific location:
+
+A POST is used to create a resource that generates an ID:
+```http
+POST /v1/files HTTP/1.1
+```
+
+A PUT is used to create a resource where the ID is known:
+```http
+PUT /v1/files/b1b2e7006be HTTP/1.1
+```
 
 ----------------------------------------
 
@@ -585,18 +622,18 @@ The query operation allows a client to list the resources that are in a collecti
 GET /v1/folders HTTP/1.1
 Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
-
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "type": "collection",
   "resourceType": "folder",
   "links": {
     "self":    "https://base/v1/folders",
-    "schemas": "https://base/v1/schemas"
     /* ... more links ... */
   },
   "data": [
@@ -614,7 +651,7 @@ Content-Type: application/json
   },
   "pagination": { /* see pagination */ },
   "sort":       { /* see sorting */ },
-  "filters":    { /* see filters */ }
+  "filters":    { /* see filtering */ }
 }
 ```
 
@@ -632,7 +669,7 @@ Services SHOULD allow the client to specify how many results they would like per
 
 If the collection supports pagination, the response MUST contain a "pagination" object containing:
   - <code>limit:</code> The number of items that are returned in each result set.
-  - <code>partial:</code> Whether this result is the complete set or if it's been truncated.
+  - <code>partial:</code> Whether this result is the complete set (true) or if it's been truncated (false).
 
 If the result has been truncated, it SHOULD also contain:
   - <code>first:</code> The URL of a page containing the first resource in the result set (this SHOULD be the same URL, without a marker).
@@ -667,7 +704,7 @@ URLs included in this section SHOULD include all query parameters needed to main
 ```
 
 ### Sorting ###
-Services SHOULD allow clients to request a sorted list of resources in a collection by adding <code>sort={sort name}</code> and <code>order={asc or desc}</code> query string parameters to the request.  Clients MAY use these directly when constructing their query, but SHOULD use the links contained in results.
+Services MAY allow clients to request a sorted list of resources in a collection by adding <code>sort={sort name}</code> and <code>order={asc or desc}</code> query string parameters to the request.  Clients MAY use these directly when constructing their query, but SHOULD use the links contained in results.
 
 If a collection can be sorted, the response SHOULD contain a <code>sortLinks:</code> object, a mapping of attributes that can be sorted &rarr; the URL to produce that sort.
 
@@ -680,11 +717,14 @@ If no sort is specified by the client, services SHOULD either:
   - Choose a default, and include the <code>sort:</code> attribute as if it were requested
   - Or return results in an undefined/unstable order, with no <code>sort:</code> attribute).
 
-Sorts MUST be "stable".  This means they must produce a unique and repeatable ordering so that the same query will always return results in the same order.  This is what a client would expect, and is also necessary for [pagination](#pagination).
+Sorts MUST be "stable".  This means they must produce a unique and repeatable ordering such that the same query will always return results in the same order.
+  - This is necessary for [pagination](#pagination), and is generally what a client would expect.
+  - For example the "size" of a file is not unique, so the results should be sorted by something else to make it stable.
+  - A simple way to do this is to always sort by what the user wants, then by ID or unique name.
 
-URLs included in this section SHOULD include all parameters needed to maintain the current [filter](#filtering), but SHOULD NOT include information about pagination.  When folloing a link to a different sort order, the client SHOULD end up back on the first page of results again.
+URLs included in this section SHOULD include all parameters needed to maintain the current [filter](#filtering), but SHOULD NOT include information about pagination.  When following a link to a different sort order, the client SHOULD end up back on the first page of results again.
 
-Multi-level sorting is not defined.  Services SHOULD pick something reasonable to actually sort on.  This may include sorting on multiple attributes for a single sort name.  For example "size" of a file is not unique, so your implementation might actually sort by "size", then "name".
+Multi-level sorting is not defined.
 
 ```javascript
 {
@@ -707,55 +747,21 @@ Multi-level sorting is not defined.  Services SHOULD pick something reasonable t
 ### Filtering ###
 Services MAY support searching/filtering of the collection.  Support for this is indicated by <code>collectionFilters:</code> in the schema, and the presence of a <code>filters:</code> map in the collection response.
 
-#### Schema ####
-In the schema, the value of each filter attribute SHOULD be an object describing:
-  - <code>modifiers:</code> What modifiers are supported, if any
-  - <code>options:</code> What specific values are allowed, if the attribute is enumerable
-
-Modifiers allow things like "greater than" or "not equal to".  The standard modifiers are:
-
-modifier               | meaning
------------------------|---------------------
-<code>"eq"</code>      | equal to<br/>(always available, the default if no modifier is specified)
-<code>"ne"</code>      | not equal to
-<code>"lt"</code>      | less than
-<code>"lte"</code>     | less than or equal to
-<code>"gt"</code>      | greater than
-<code>"gte"</code>     | greater than or equal to
-<code>"prefix"</code>  | starts with
-<code>"like"</code>    | matches, as in SQL:<br/>&bull; "_" for exactly one character<br/>&bull; "%" for 0 or more characters
-<code>"notlike"</code> | does not match (as above)
-<code>"null"</code>    | value is NULL
-<code>"notnull"</code> | value is not NULL
-
-Services MAY define (and document) their own modifiers.
-
-```javascript
-{
-  /* ... other collection attributes ... */
-  "filters": {
-    "name":   {"modifiers": ["eq","ne","prefix","suffix"]},
-    "date":   {"modifiers": ["eq","lt","gt","lte","gte","prefix"]}
-    "size":   {"modifiers": ["eq","lt","gt","lte","gte"] }
-    "access": {"modifiers": ["eq","ne"], "options": ["public","private","requirepassword"]}
-    /* ... more filters ... */
-  },
-  /* ... other collection attributes ... */
-}
-```
-
-#### Client request ####
-The client performs a search by starting with the URL for a standard query request.  If they've already done a query and want to filter the results, the <code>self:</code> link of the result can be used instead.  Then the client adds on query string parameters for <code>{filter name}{"_"+modifier}={value}</code>.
+#### Client Request ####
+The client performs a search by starting with the URL for a standard query request.  If they've already done a query and want to filter the results, the <code>self:</code> link of the result can be used instead.  The client then adds on query string parameters for <code>{filter name}{"_"+modifier}={value}</code>.
   - The underscore and modifier are optional if the desired modifier is <code>eq</code>.
-  - For example to search for files starting with "a" and greater than 1kb, the client would append:
+    - <code>name_eq=a</code> and <code>name=a</code> are equivalent.
+  - For example to search for filenames starting with "a" and greater than 1kb, the client would append:
     - <code>name_prefix=a&size_gt=1024</code>
   - To search for non-image files, they could append:
     - <code>name_notlike=%.jpg&name_notlike=%.png</code>
-  - Note: % characters are shown here for clarity.  In an actual request they need to be escaped into "%25" according ot normal [URL-encoding rules](http://tools.ietf.org/html/rfc3986#section-2.4).
+
+All special characters in filter values MUST be [URL-encoded](http://tools.ietf.org/html/rfc3986#section-2.4).
+Note: "%" characters are shown here for clarity, but would be "%25" in an actual request.
 
 There is no mechanism defined for OR-ing conditions.  All filters are AND-ed together.
 
-#### Collection response ####
+#### Collection Response ####
 Collections that support filtering SHOULD have a <code>filter:</code> map in the response, with an attribute for each field that can be filtered on.
   - If any filter was applied for that field, the value should be an array describing the filters.
   - If no filters were applied for that field, the value should be null.
@@ -791,12 +797,49 @@ Collections that support filtering SHOULD have a <code>filter:</code> map in the
 }
 ```
 
+#### Schema ####
+In the schema, the value of each filter attribute SHOULD be an object describing:
+  - <code>modifiers:</code> What modifiers are supported, if any
+  - <code>options:</code> What specific values are allowed, if the attribute is enumerable
+
+Modifiers allow things like "greater than" or "not equal to".  The standard modifiers are:
+
+modifier               | meaning
+-----------------------|---------------------
+<code>"eq"</code>      | equal to<br/>(always available, the default if no modifier is specified)
+<code>"ne"</code>      | not equal to
+<code>"lt"</code>      | less than
+<code>"lte"</code>     | less than or equal to
+<code>"gt"</code>      | greater than
+<code>"gte"</code>     | greater than or equal to
+<code>"prefix"</code>  | starts with
+<code>"like"</code>    | matches, as in SQL:<br/>&bull; underscore ("\_") for exactly one character<br/>&bull; percent ("%") for 0 or more characters<br/>&bull; "\_" for one underscore character<br/>&bull;"%" for one percent character.
+<code>"notlike"</code> | does not match (as above)
+<code>"null"</code>    | value is NULL
+<code>"notnull"</code> | value is not NULL
+
+Services MAY define (and document) their own modifiers.
+
+```javascript
+{
+  /* ... other collection attributes ... */
+  "collectionFilters": {
+    "name":   {"modifiers": ["eq","ne","prefix","suffix"]},
+    "date":   {"modifiers": ["eq","lt","gt","lte","gte","prefix"]}
+    "size":   {"modifiers": ["eq","lt","gt","lte","gte"] }
+    "access": {"modifiers": ["eq","ne"], "options": ["public","private","requirepassword"]}
+    /* ... more filters ... */
+  },
+  /* ... other collection attributes ... */
+}
+```
 ----------------------------------------
+
 # Read Operation #
 The read operation allows a client to get a single resource.  Read operations MUST NOT incur side effects.
 
 ### Root Level ###
-GETting the base URL of a service SHOULD return a collection of API version resources.  It SHOULD include a link to the <code>latest:</code> stable version of the API.  Links that point to a specific version at this level (e.g. schemas) SHOULD point to this latest version.
+GETting the base URL of a service SHOULD return a collection of <code>apiVersion</code> resources.  It SHOULD include a link to the <code>latest:</code> stable version of the API.
 
 Versions that are not the latest MAY have a <code>deprecated: true</code> flag to indicate support for this version will be removed in the near future.
 
@@ -806,12 +849,11 @@ Versions that are not the latest MAY have a <code>deprecated: true</code> flag t
   "links": {
     "self":   "https://base/",
     "latest": "https://base/v3",
-    "schemas": "https://base/v3/schemas"
   },
   "data": [ 
     {
       "id":    "v1",
-      "type":  "apiversion",
+      "type":  "apiVersion",
       "deprecated": true,
       "links": {
         "self": "https://base/v1",
@@ -822,7 +864,7 @@ Versions that are not the latest MAY have a <code>deprecated: true</code> flag t
     },
     {
       "id":    "v2",
-      "type":  "apiversion",
+      "type":  "apiVersion",
       "deprecated": false,
       "links": {
         "self": "https://base/v2"
@@ -833,7 +875,7 @@ Versions that are not the latest MAY have a <code>deprecated: true</code> flag t
     },
     {
       "id":    "v3",
-      "type":  "apiversion",
+      "type":  "apiVersion",
       "deprecated": false,
       "links": {
         "self": "https://base/v3",
@@ -855,17 +897,18 @@ Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "id": "v1",
-  "type":  "apiversion",
+  "type":  "apiVersion",
   "deprecated": true,
   "links": {
     "self":    "https://base/v1",
-    "schemas": "https://base/v1/schemas",
     "file":    "https://base/v1/files",
     "folder":  "https://base/v1/folders"
     /* ... other collections and resources ... */
@@ -882,9 +925,11 @@ Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "id": "b1b2e7006be",
@@ -902,9 +947,11 @@ Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
+
 ```
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 Content-Length: 234
 
 ```
@@ -916,9 +963,11 @@ Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
+
 ```
 HTTP/1.1 404 Not Found
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 Content-Length: 123
 
 ```
@@ -927,7 +976,7 @@ Content-Length: 123
 # Create Operation #
 The create operation allows a client to create a new resource in a collection.  The URL of the request SHOULD NOT contain a query component, to differentiate a create request from an [action](#action-operation) request.
 
-The body of the request MUST contain a representation of the resource to be created.  If any of the fields that are required by the schema for this resource are not included or are invalid, a 400 error SHOULD be returned, with information about what specifically is wrong.
+The body of the request MUST contain a representation of the resource to be created.  If any of the fields that are required by the schema for this resource are not included or are invalid, a 422 error SHOULD be returned, with information about what specifically is wrong.
 
 If the created resource is immediately available, a 201 Created status code SHOULD be returned, and the body SHOULD be the representation of the new resource.  If the resource cannot be created and read immediately, a 202 Accepted status SHOULD be returned instead.  At least the resource id should be returned if at all possible.
 
@@ -944,9 +993,11 @@ Content-Type: application/json
   "name": "Documents"
 }
 ```
+
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 Location: https://base/v1/folders/ab391827x31
 
 {
@@ -956,7 +1007,7 @@ Location: https://base/v1/folders/ab391827x31
 }
 ```
 
-### Single resource - form post ###
+### Single resource - Form Post ###
 Services SHOULD also support create calls which are HTML Form encoded, <code>Content-Type: multipart/form-data</code> or <code>Content-Type: application/x-www-form-urlencoded</code>.  These are easy for a client to construct with a HTML form or cURL, and also allow for simple uploading of binary data/files.  A file management API might allow creating a file resource like:
 
 ```bash
@@ -990,6 +1041,7 @@ Content-Type: text/plain
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 Location: https://base/v1/files/b1b2e7006be
 
 {
@@ -1020,8 +1072,10 @@ Content-Type: application/json
   /* ... more resource representations ... */
 ]
 ```
+
 ```http
 HTTP/1.1 201 Created
+X-API-Schemas: https://base/v1/schemas
 Content-Type: application/json
 
 {
@@ -1035,16 +1089,15 @@ Content-Type: application/json
   /* ... more collection attributes ... */
 }
 ```
-
 ----------------------------------------
-# Update Operation #
 
+# Update Operation #
 The update operation allows a client to modify resources.  Update operations MUST be idempotent; making the same update request again should have no effect.
   - Any change which does not have this property is an [action](#action-operation), not an update.
 
 Clients may submit just the attributes that they wish to change, or the entire representation of a resource.  The <code>id:</code>, and <code>rev:</code>(if [resource versioning](#resource-versioning) is enabled) attributes MUST always be included.
 
-The response SHOULD include the entire updated resource representation(s), even if the request did not.  If the resource is a potentially large binary file instead of a JSON document, a 204 status and no body SHOULD be returned.
+The response SHOULD include the entire updated resource representation(s), even if the request did not.  If the resource is a potentially large binary file instead of a JSON document, a 204 status and no response body SHOULD be returned.
 
 ### Single resource ###
 ```http
@@ -1056,12 +1109,14 @@ Content-Type: application/json
 {
   "id":     "b1b2e7006be",
   "rev":    "8d2e54afd",
-  "access": "private
+  "access": "private"
 }
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "id":     "b1b2e7006be",
@@ -1099,9 +1154,11 @@ Content-Type: application/json
   }
 ]
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "type": "collection",
@@ -1135,8 +1192,8 @@ The delete operation deletes the item given by the request URL.
 DELETE /v1/folders/b1b2e7006be HTTP/1.1
 Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
-
 ```
+
 ```http
 HTTP/1.1 204 No Content
 
@@ -1159,6 +1216,7 @@ Content-Type: text/json
   /* ... more resource IDs ... */
 ]
 ```
+
 ```http
 HTTP/1.1 204 No Content
 
@@ -1199,7 +1257,7 @@ Replace performs all this in one convenient and atomic action for the client.
 
 The response SHOULD return the list of newly created resources, just as if the request were a normal create.
 
-Note: this operation uses a non-standard HTTP method.  There's nothing wrong with that, but some clients may not support abitrary methods.
+Note: this operation uses a non-standard HTTP method.  There's nothing wrong with that, but some clients may not support arbitrary methods.
 
 ```
 REPLACE /v1/firewalls/42/allow HTTP/1.1
@@ -1212,9 +1270,11 @@ Content-Type: application/json
   {"ip": "10.1.2.3"}
 ]
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "type": "collection",
@@ -1225,7 +1285,6 @@ Content-Type: application/json
   /* ... more collection attributes ... */
 }
 ```
-
 
 ----------------------------------------
 # Action Operation #
@@ -1243,9 +1302,11 @@ Content-Type: application/json
   "password": "purple monkey dishwasher"
 }
 ```
+
 ```http
 HTTP/1.1 202 Accepted
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   /* ... updated representation of the resource ... */
@@ -1263,9 +1324,11 @@ Accept: application/json
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "type": "collection",
@@ -1299,10 +1362,11 @@ GET /v1/files/b1b2e7006be/content HTTP/1.1
 Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
 
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: text/plain
-Conetent-Length: 2
+Content-Length: 2
 
 42
 ```
@@ -1322,9 +1386,9 @@ For resources that implement versioning:
 The base URL that users access your API with SHOULD be of the form:
 <code>https://api{-optional-region-code}.{your product domain}/</code>
 
-APIs SHOULD have a separate DNS record from the your web/app load balancers, so that the API can be scaled separately from the rest of your stack.  The name can always point to the web/app servers if this scale is not needed yet
+APIs SHOULD have a separate DNS record from the your web/app, so that the API can be scaled separately from the rest of your stack.  The name can always point to the web/app servers if this scale is not yet needed.
 
-All APIs that require authentication MUST be accessible to the public **only** over HTTPS.  Unauthenticated public APIs MAY be provided over HTTP, but SHOULD also offer HTTPS.
+All public APIs that require authentication MUST be accessible over HTTPS, authenticated public APIs MUST NOT be accessible over a non-encrypted channel.  Unauthenticated public APIs MAY be provided over HTTP, but SHOULD also offer HTTPS.
 
 ## API Versioning ##
 APIs MUST support more than one version of their implementation.  Clients MUST specify the particular version they want, and the application MUST NOT make changes that are not backwards compatible to that version.
@@ -1333,7 +1397,7 @@ Breaking changes should be avoided when possible, but you are eventually going t
 
 Versions resources  MAY also have a "revision" string attribute that changes on each release.  This can be useful to help debug issues caused by changes made within a version that are supposed to be compatible with each other.
 
-Outdated versions SHOULD be deprecated and eventually removed from the service.  A request for a version that has been removed SHOULD return a 410 error.
+Outdated versions SHOULD be deprecated and eventually removed from the service.  A request for a version that has been removed SHOULD return a 404 error.
 
 ### Listing ###
 Clients MUST be able to make a GET request to the base URL (without a version fragment) to find out what versions are available.  This request SHOULD NOT require authentication.  Clients SHOULD check the "latest" link periodically and take action if they are no longer using the latest version.
@@ -1348,66 +1412,50 @@ Most APIs that do something useful will need some form of authentication to dete
 An API Key consists of a pair of strings called an **access key** and **secret key**.  These are randomly generated opaque strings assigned by the service to each API user.  The access key is analogous to a username and the secret key to a password.
 
 ### HTTP Basic ###
-Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic auth, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
+Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
 
 ----------------------------------------
 # Design Considerations #
 
-### Naming Conventions ###
-Several keywords are reserved by this standard and have specific meanings.  These words MUST ONLY be used for their documented purpose:
-  - In resources: 
-    - <code>id:</code>, <code>type:</code>, <code>rev:</code>
-    - <code>links:</code>, <code>actions:</code>
-  - In collections: 
-    - (Everything reserved for resources)
-    - <code>filters:</code>, <code>pagination:</code>,
-    - <code>sort:</code>, <code>sortLinks:</code>,
-    - <code>createTypes:</code>, <code>createDefaults:</code>
-    - <code>data:</code>
-  - In resource and collection <code>links:</code>:
-    - <code>self:</code>, <code>schemas:</code>
-  - In query strings:
-    - For pagination: <code>marker</code>, <code>limit</code>
-    - For sorting: <code>sort</code>, <code>order</code>
+## Asynchronous Actions ##
+Interactions that involve longer processing than a single HTTP transaction should wait or for interactions that have reduced urgency may adopt an asynchronous (queued) behavior over a synchronous (blocking) one.  A server that accepts a request from a client MUST respond with a HTTP 201 Accepted result and provide a method to retrieve the results in the response body that include a URI of where the results will be and an absolute time that the client should attempt again.
 
-Some additional guidelines:
-  - Names and attribute keys should be a single word when practical.
-  - Single-word collection, resource, attribute names SHOULD be all lowercase.
-  - Multiple words SHOULD be interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
-  - Resource names SHOULD be singular, not plural.
-    - These appear in a [resources's](#resources) <code>type:</code> and [schema's](#schemas) <code>id:</code>.
+Once an asynchronous action has been fulfilled, the URI provided to the client will return the results as if it had been performed synchronously, including a typical 2xx or 4xx status code and corresponding response body.
 
-### What to Link ###
-Guidelines for creating links:
-  - Every reference to the <code>id:</code> of another resource SHOULD have a corresponding link.
-    - For example if a file resource has a <code>folderId:</code> field, there should be a <code>folder:</code> link.
-  - Links to a single resource SHOULD be singular.
-    - e.g. <code>"content": "https://base/v1/files/b1b2e7006be/content"</code>
-  - Links to a collection SHOULD be plural.
-    - e.g. <code>"files": "https://base/v1/folders/d5a80ee7/files"</code>
-  - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
-  - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
-  - Services SHOULD NOT change the format or construction of URLs within an API version
-    - In theory, everyone uses the discoverability features and follows links, so services may change URL formats at any time.
-    - But some clients will inevitably ignore disoverability and hardcode paths into their code.
-    - So if a URL needs to be changed, provide a 301/302 redirect or release a new [API version](#api-versioning).
+Asynchronous actions MAY fail after having been accepted.
 
-### Canonical Links ###
+See also: [Batch Processing](./recommendations.md#batch-processing)
+
+## Identifiers ##
+Resource Identifiers
+  - MUST be unique among other resources of the same type.
+  - MUST consist only of URL-safe characters.
+  - SHOULD be globally unique, if practical.
+  - SHOULD be a string.  Numbers require care to avoid eventual overflow.
+  - MAY be represented as [base32](http://www.crockford.com/wrmg/base32.html) for enhanced readability and error resistance.
+  - SHOULD NOT be an auto-incrementing ID from a database.
+    - Exposing this value reveals information about the size and growth of the service, and easily allows attackers to guess other valid IDs.
+
+In general something along the lines of a [GUID](http://www.ietf.org/rfc/rfc4122.txt) is best if there will be many of the resource or they are dynamically created.  A short human-readable string may be appropriate if there is a very limited set of possible resources.
+
+## Canonical Links ##
 Each resource SHOULD have a single canonical URL and the representation of that resource SHOULD NOT change depending on how the client got to it.
   
 If a file resource is accessible at <code>https://base/v1/files/b1b2e7006be</code> and as a data item in a collection <code>https://base/v1/folders/d5a80ee7/files</code>, both representations SHOULD be exactly the same.
-  - The links inside the resource will reflect the canonical URL.
-    - This prevents the service from generating arbitrarily long link URLs that contain unnecessary history of how the client got to where they are.
-  - One exception is that the "schemas" link MUST be present in the former response, but does not have to be in the latter, as it is only required at the top-level of the response.
+  - The links inside the resource SHOULD reflect the canonical URL.
+  - This prevents the service from generating arbitrarily long link URLs that contain unnecessary history of how the client got to where they are.
+  - It also makes it possible to compare 2 representations and determine if they are in fact the same resource.
 
 ```http
 GET /v1/files/b1b2e7006be HTTP/1.1
 Accept: application/json
 
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "id":      "b1b2e7006be", 
@@ -1432,9 +1480,11 @@ GET /v1/folders/d5a80ee7/files HTTP/1.1
 Accept: application/json
 
 ```
+
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
 
 {
   "type": "collection",
@@ -1454,15 +1504,45 @@ Content-Type: application/json
 }
 ```
 
-### Regions ###
-Many services have resources that exist in multiple geographic regions.
+## In-line Data ##
+Wherever possible binary (or non-textual) data should not be contained within its represented state, such as JSON or XML.  The preferred method is for the representation to contain an absolute URI to the resource.
 
-To provide the easiest management for the user, APIs SHOULD provide a single unified endpoint that can manage resources in all regions.  This endpoint MAY have servers in each region and use geographic load balancing to direct the requests to the closest region.
+If it is desired to embed small amounts of information within a representation, it is advised to conform to the [Data URI Scheme](http://en.wikipedia.org/wiki/Data_URI_scheme) as found in CSS and HTML.  When utilizing this format services MUST use discrete fields in schema to identify when to expect a URI or inline data.  The two should NEVER share the same field.
 
-In applications where centralized management is not possible, each region MAY have a separate endpoint with a region code identified in the base URL.
+## Naming Conventions ##
+Several keywords are reserved by this standard and have specific meanings.  These words MUST ONLY be used for their documented purpose:
+  - In schemas:
+    - <code>resourceRepresentations:</code>
+  - In resources: 
+    - <code>id:</code>, <code>type:</code>, <code>rev:</code>
+    - <code>links:</code>, <code>actions:</code>
+  - In collections: 
+    - (Everything reserved for resources)
+    - <code>filters:</code>, <code>pagination:</code>,
+    - <code>sort:</code>, <code>sortLinks:</code>,
+    - <code>createTypes:</code>, <code>createDefaults:</code>
+    - <code>data:</code>
+  - In resource and collection <code>links:</code>:
+    - <code>self:</code>
+  - In query strings:
+    - For pagination: <code>marker</code>, <code>limit</code>
+    - For sorting: <code>sort</code>, <code>order</code>
+    - For usability: <code>\_accept</code>, <code>\_format</code>, <code>\_method</code>, <code>suppress\_response\_code</code>
+
+Some additional guidelines:
+  - Names and attribute keys should be a single word when practical.
+  - Single-word collection, resource, attribute names SHOULD be all lowercase.
+  - Multiple words SHOULD be interCaps (also known as camelCase), not dash-separated, under_scored, or TitleCase.
+  - Resource names SHOULD be singular, not plural.
+    - These appear in a [resources's](#resources) <code>type:</code> and [schema's](#schemas) <code>id:</code>.
+
+## Performance ##
 
 ### Caching ###
 Services SHOULD do everything they can to enable the clients to take advantage of caching as much as possible.
+
+#### Cache-Control ####
+Read and Query operations SHOULD return a [Cache-Control](http://tools.ietf.org/html/rfc2616#section-14.9) header with values that are appropriate for the information being returned.  If the data changes infrequently, allow clients to cache it for a reasonable period of time.
 
 #### ETag ####
 Read operations SHOULD return a HTTP [ETag](http://tools.ietf.org/html/rfc2616#section-14.19) header with an opaque value.  The opaque value MUST uniquely describe the entire resource, and change if any part of the resource is changed.  This can often be done as a hash of the serialized resource representation, e.g. convert the resource to a JSON string and return a sha-sum of the string.
@@ -1472,12 +1552,35 @@ Query operations SHOULD also return an ETag.  The opaque value MUST uniquely des
 Clients MAY send an [If-None-Match](http://tools.ietf.org/html/rfc2616#section-14.26) header along with their query or read operation.  The service SHOULD compute its response, and if that response has the same ETag value, return a 304 status instead of transmitting the entire response again.
 
 #### Last-Modified ####
-Whenver possible, services SHOULD keep a last modified date and return a [Last-Modified](http://tools.ietf.org/html/rfc2616#section-13.3) header on Read and Query operations.
+Whenever possible, services SHOULD keep a last modified date and return a [Last-Modified](http://tools.ietf.org/html/rfc2616#section-13.3) header on Read and Query operations.
 
 Clients MAY send an [If-Modified-Since](http://tools.ietf.org/html/rfc2616#section-14.25) header.  The service SHOULD return a 304 status instead of transmitting the entire response again if it hasn't changed since the time given.
 
-#### Cache-Control ####
-Read and Query operations SHOULD return a [Cache-Control](http://tools.ietf.org/html/rfc2616#section-14.9) header with values that are appropriate for the information being returned.  If the data changes infrequently, allow clients to cache it for a reasonable period of time.
-
 ### Compression ###
 API Services SHOULD support gzip and deflate compression and deliver responses with an appropriate [Content-Encoding](http://tools.ietf.org/html/rfc2616#section-14.11) header according to the [Accept-Encoding](http://tools.ietf.org/html/rfc2616#section-14.3) requested by the client.
+
+## Query String Length ##
+Many clients, frameworks, and web servers limit the length of query strings and the request URL as a whole.  Services SHOULD be designed so that clients never have any good reason to make a request for a URL longer than 2048 bytes.  Services MAY return a 413 error if a request URL is longer than they wish to handle.
+
+## Regions & Geographic Diversity ##
+Many services have resources that exist in multiple geographic regions.
+
+To provide the easiest management for the user, APIs SHOULD provide a single unified endpoint that can manage resources in all regions.  This endpoint MAY have servers in each region and use geographic load balancing (Geographic DNS, Shortest Cost Network Path, etc.) to direct the requests to the closest region.
+
+In applications where centralized management is not possible, each region MAY have a separate endpoint with a region code identified in the base URL.
+
+
+## What to Link ##
+Guidelines for creating links:
+  - Every reference to the <code>id:</code> of another resource SHOULD have a corresponding link.
+    - For example if a file resource has a <code>folderId:</code> field, there should be a <code>folder:</code> link.
+  - Links to a single resource SHOULD be singular.
+    - e.g. <code>"content": "https://base/v1/files/b1b2e7006be/content"</code>
+  - Links to a collection SHOULD be plural.
+    - e.g. <code>"files": "https://base/v1/folders/d5a80ee7/files"</code>
+  - Limit your URL namespace as much as possible.  The less surface area you have exposed the less there is that might need to change later.
+  - Path components and query parameter names SHOULD be short, meaningful words in all lowercase, easy for a human to read.
+  - Services SHOULD NOT change the format or construction of URLs within an API version
+    - In theory, everyone uses the discoverability features and follows links, so services may change URL formats at any time.
+    - But some clients will inevitably ignore discoverability and hardcode paths into their code.
+    - So if a URL needs to be changed, provide a 301/302 redirect or release a new [API version](#api-versioning).
