@@ -155,7 +155,7 @@ Clients MAY request a preferred representation by including an appropriate [Acce
   - For example <code>application/json</code>, <code>text/json;charset=utf-8</code>, and <code>text/json</code> can all be interpreted as JSON.
 
 If the request is from a web browser, the response SHOULD be HTML.
-  - The suggested definition of "a web browser" is that the Accept header contains "*/*" and the User-Agent header contains (case-insensitive) "mozilla".
+  - The suggested definition of "a web browser" is that the Accept header contains "\*/\*" and the User-Agent header contains (case-insensitive) "mozilla".
   - This matches all the common graphical web browsers but not HTTP request libraries or command-line browsers.
 
 When clients are sending a representation to the service (e.g. creating a resource), they MUST specify the format using the [Content-Type](http://tools.ietf.org/html/rfc2616#section-14.17 Content-Type) header.
