@@ -31,6 +31,7 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
   - [Special Headers](#special-headers)
   - [Special Characters](#special-characters)
   - [HTML UI](#html-ui)
+- [Authentication](#authentication)
 - [Status Codes](#status-codes)
 - [Resources](#resources)
 - [Collections](#collections)
@@ -73,7 +74,6 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
 - [Nesting](#nesting)
 - [Resource Versioning](#resource-versioning)
 - [Base URL and Versioning](#base-url-and-versioning)
-- [Authentication](#authentication)
 - [Design Considerations](#design-considerations)
   - [Asynchronous Actions](#asynchronous-actions)
   - [Canonical Links](#canonical-links)
@@ -189,6 +189,44 @@ var data = {
 };
 </script>
 ```
+
+----------------------------------------
+
+# Authentication #
+As authentication lies at the heart of all service interactions, client authentication to an API will be performed using the [JavaScript Web Token](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) (JWT) format, a proposed IETF draft that is a subset of the oAuth specification.
+
+A client will obtain a set of API Keys, randomly generated opaque strings similar to a username and password, from the developer portal.  These keys can then be sent to the authorization system over an SSL enabled channel using [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication to obtain a signed JWT token.  Clients will provide this JWT token to services within the HTTP Authorization header, with the scheme set to idp-jwt.  
+
+Request a JWT Token:
+```http
+POST /v1/authorize HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
+
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
+
+{ 
+  "result": "success",
+  "token": "eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl1Qveqd2E"
+}
+```
+
+Provide the JWT Token to a service:
+```http
+POST /v1/files HTTP/1.1
+Accept: application/json
+Authorization: idp-jwt eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl1Qveqd2E
+
+```
+
+## Portability ##
+To increase developer friendliness services MUST look for the <code>Authorization</code> HTTP header then for a <code>auth_idp</code> cookie.  This allows developers to authorize into the developer portal and browse APIs through a browser.
+
 ----------------------------------------
 
 # Status Codes #
@@ -1403,16 +1441,6 @@ Outdated versions SHOULD be deprecated and eventually removed from the service. 
 Clients MUST be able to make a GET request to the base URL (without a version fragment) to find out what versions are available.  This request SHOULD NOT require authentication.  Clients SHOULD check the "latest" link periodically and take action if they are no longer using the latest version.
 
 See the [root level](#root-level) and [individual version](#individual-version) read operation for more info.
-
-----------------------------------------
-# Authentication #
-Most APIs that do something useful will need some form of authentication to determine what user is making the request and validate that they should be allowed to make it.  A user is identified by a set of credentials called an API Key pair.
-
-### API Keys ###
-An API Key consists of a pair of strings called an **access key** and **secret key**.  These are randomly generated opaque strings assigned by the service to each API user.  The access key is analogous to a username and the secret key to a password.
-
-### HTTP Basic ###
-Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
 
 ----------------------------------------
 # Design Considerations #
