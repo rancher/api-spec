@@ -1,6 +1,6 @@
-# Situations #
+# Recommendations #
 
-Situations fall outside of the technical specification but are listed to provide guidance for edge cases while remaining within the specification.  This document is not meant to be an all-inclusive list but rather provide a way to use the specification to accommodate specific needs.
+This guide provides guidance to situations that are too specific to be included within the [technical specification](./specification.md) yet require guidance to still comply with the specification as a whole.  This guide is not meant to be an all-inclusive list but rather provide a way to use the specification to accommodate specific needs.  If a use case requires review please contact [apispec@godaddy.com](mailto:apispec@godaddy.com) or open an [issue](https://github.com/godaddy/gdapi/issues) and we would be happy to review.
 
 ----------------------------------------
 
