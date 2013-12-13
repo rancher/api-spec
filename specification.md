@@ -602,18 +602,6 @@ Operation | HTTP Method | Request URL | Description
 [Replace](#replace-operation) | REPLACE | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Query, Delete and Create one or more resources in one atomic transaction
 [Action](#action-operation) | POST | https://base/v1/{collection_name}/{resource_id}?{action_name}<br>https://base/v1/{collection_name}?{action_name} | Perform an action on a resource or collection
 
-When to use a POST over a PUT to create a resource is better described in an example.  A POST would be used when the service generates an ID, where a PUT is used when a resource should be created at a specific location:
-
-A POST is used to create a resource that generates an ID:
-```http
-POST /v1/files HTTP/1.1
-```
-
-A PUT is used to create a resource where the ID is known:
-```http
-PUT /v1/files/b1b2e7006be HTTP/1.1
-```
-
 ----------------------------------------
 
 # Query Operation #
@@ -1090,6 +1078,20 @@ Content-Type: application/json
   /* ... more collection attributes ... */
 }
 ```
+
+### POST vs. PUT ###
+When to use a POST over a PUT to create a resource is better described in an example.  A POST would be used when the service generates an ID, where a PUT is used when a resource should be created at a specific location:
+
+A POST is used to create a resource that generates an ID:
+```http
+POST /v1/files HTTP/1.1
+```
+
+A PUT is used to create a resource where the ID is known:
+```http
+PUT /v1/files/b1b2e7006be HTTP/1.1
+```
+
 ----------------------------------------
 
 # Update Operation #
