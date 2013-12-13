@@ -227,6 +227,8 @@ Authorization: idp-jwt eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl
 ## Portability ##
 To increase developer friendliness services MUST look for the <code>Authorization</code> HTTP header then for a <code>auth_idp</code> cookie.  This allows developers to authorize into the developer portal and browse APIs through a browser.
 
+Services SHOULD look for the authorization token at the cookie then the header.  If both are present the service MUST deny the request and return a 401 with a DuplicateAuthorizationToken [error](#errors) to prevent session poisoning.
+
 ----------------------------------------
 
 # Status Codes #
