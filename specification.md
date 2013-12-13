@@ -1384,6 +1384,7 @@ For resources that implement versioning:
   - The service MUST change the <code>rev:</code> attribute whenever a field in the resource changes.
 
 ----------------------------------------
+
 # Base URL and Versioning #
 The base URL that users access your API with SHOULD be of the form:
 <code>https://api{-optional-region-code}.{your product domain}/</code>
@@ -1395,7 +1396,7 @@ All public APIs that require authentication MUST be accessible over HTTPS, authe
 ## API Versioning ##
 APIs MUST support more than one version of their implementation.  Clients MUST specify the particular version they want, and the application MUST NOT make changes that are not backwards compatible to that version.
 
-Breaking changes should be avoided when possible, but you are eventually going to have to make a breaking change so it is far better to have a way to handle this built in from the start.  The suggested format for the version string is the letter "v" followed by a single integer which increases by one for each revision.  The version SHOULD be treated as an opaque string to the client, so any other format MAY be used.
+Breaking changes should be avoided when possible, but you are eventually going to have to make a breaking change and it is far better to plan for it from the start.  The suggested format for the version string is the letter "v" followed by a single integer which increases by one for each revision (e.g. **v1**, **v2**, **v3**, etc.).  The version should be places at the first level of the services URI structure  The version SHOULD be treated as an opaque string to the client, so any other format MAY be used.
 
 Versions resources  MAY also have a "revision" string attribute that changes on each release.  This can be useful to help debug issues caused by changes made within a version that are supposed to be compatible with each other.
 
