@@ -74,6 +74,7 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
 - [Resource Versioning](#resource-versioning)
 - [Base URL and Versioning](#base-url-and-versioning)
 - [Authentication](#authentication)
+- [Localization](#localization)
 - [Design Considerations](#design-considerations)
   - [Asynchronous Actions](#asynchronous-actions)
   - [Canonical Links](#canonical-links)
@@ -1287,6 +1288,7 @@ X-API-Schemas: https://base/v1/schemas
 ```
 
 ----------------------------------------
+
 # Action Operation #
 The action operation allows a client to manipulate a resource or collection in a way that cannot be done with any of the other standard operations.  The request MAY include a body with additional information (arguments), and the response MAY contain a response body with result info.
 
@@ -1313,8 +1315,8 @@ X-API-Schemas: https://base/v1/schemas
 }
 ```
 
-
 ----------------------------------------
+
 # Nesting #
 Resources and collections MAY be nested.  For example, folders might be associated to files, and files to a collection of tags:
 
@@ -1405,6 +1407,7 @@ Clients MUST be able to make a GET request to the base URL (without a version fr
 See the [root level](#root-level) and [individual version](#individual-version) read operation for more info.
 
 ----------------------------------------
+
 # Authentication #
 Most APIs that do something useful will need some form of authentication to determine what user is making the request and validate that they should be allowed to make it.  A user is identified by a set of credentials called an API Key pair.
 
@@ -1415,6 +1418,17 @@ An API Key consists of a pair of strings called an **access key** and **secret k
 Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
 
 ----------------------------------------
+
+# Localization #
+
+Services are designed with the developer in mind and should honor requests in a consistent format to prevent contaminating developer information with end user information.  As such APIs should communicate languages in a consistent way.  Services MUST specify the language of the result in the <code>Content-Language</code> header which is intended for developer consumption and is RECOMMENDED that services communicate in the **en-us** locale.
+
+Services that perform localization services MUST accept an input parameter specifying the language intended for the end user.  It cannot be inferred from the <code>Accept-Language</code> header of the request to prevent contamination of logs and other developer information sources.
+
+See [client error messages](./recommendations.md#client-error-messages). 
+
+----------------------------------------
+
 # Design Considerations #
 
 ## Asynchronous Actions ##
