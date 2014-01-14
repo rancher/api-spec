@@ -193,7 +193,16 @@ var data = {
 ----------------------------------------
 
 # Authentication #
-As authentication lies at the heart of all service interactions, client authentication to an API will be performed using the [JavaScript Web Token](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) (JWT) format, a proposed IETF draft that is a subset of the oAuth specification.
+Most APIs that do something useful will need some form of authentication to determine what user is making the request and validate that they should be allowed to make it.  A user is identified by a set of credentials called an API Key pair.
+
+### API Keys ###
+An API Key consists of a pair of strings called an **access key** and **secret key**.  These are randomly generated opaque strings assigned by the service to each API user.  The access key is analogous to a username and the secret key to a password.
+
+### HTTP Basic ###
+Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
+
+## Next Generation Authentication ##
+As authentication lies at the heart of all service interactions, client authentication to an API will be performed using the [JavaScript Web Token](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) (JWT) format, a proposed IETF subset of the oAuth specification.
 
 A client will obtain a set of API Keys, randomly generated opaque strings similar to a username and password, from the developer portal.  These keys can then be sent to the authorization system over an SSL enabled channel using [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication to obtain a signed JWT token.  Clients will provide this JWT token to services within the HTTP Authorization header, with the scheme set to idp-jwt.  
 
@@ -223,6 +232,9 @@ Accept: application/json
 Authorization: idp-jwt eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl1Qveqd2E
 
 ```
+
+## Authentication Migration ##
+Support for JWT is expected to release in early Q22014.  Until the developer portal and ticking signing authority is esablished it is important that services exposed do not pass several pieces of information as parameters.  These include the <code>shopper id</code>, <code>private label id</code> and <code>impersonation context</code>.  It is suggested that services pass these values in custom HTTP header values (e.g. <code>X-Shopper-Id</code>) until the switchover occurs, identifying these so they may be addressed easily.
 
 ## Portability ##
 To increase developer friendliness services MUST look for the <code>Authorization</code> HTTP header then for a <code>auth_idp</code> cookie.  This allows developers to authorize into the developer portal and browse APIs through a browser.
