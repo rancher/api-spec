@@ -31,6 +31,7 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
   - [Special Headers](#special-headers)
   - [Special Characters](#special-characters)
   - [HTML UI](#html-ui)
+- [Authentication](#authentication)
 - [Status Codes](#status-codes)
 - [Resources](#resources)
 - [Collections](#collections)
@@ -73,7 +74,6 @@ Examples demonstrate a hypothetical file storage API.  Only the relevant HTTP re
 - [Nesting](#nesting)
 - [Resource Versioning](#resource-versioning)
 - [Base URL and Versioning](#base-url-and-versioning)
-- [Authentication](#authentication)
 - [Design Considerations](#design-considerations)
   - [Asynchronous Actions](#asynchronous-actions)
   - [Canonical Links](#canonical-links)
@@ -193,6 +193,57 @@ var user = "jsmith";  // Displays the user who is logged in next to the Log Out 
 var curlUser = "something"; // Replaces "${GDAPI_ACCESS_KEY}:${GDAPI_SECRET_KEY}" when displaying cURL commands
 </script>
 ```
+
+----------------------------------------
+
+# Authentication #
+Most APIs that do something useful will need some form of authentication to determine what user is making the request and validate that they should be allowed to make it.  A user is identified by a set of credentials called an API Key pair.
+
+### API Keys ###
+An API Key consists of a pair of strings called an **access key** and **secret key**.  These are randomly generated opaque strings assigned by the service to each API user.  The access key is analogous to a username and the secret key to a password.
+
+### HTTP Basic ###
+Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
+
+## Next Generation Authentication ##
+As authentication lies at the heart of all service interactions, client authentication to an API will be performed using the [JavaScript Web Token](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) (JWT) format, a proposed IETF subset of the oAuth specification.
+
+A client will obtain a set of API Keys, randomly generated opaque strings similar to a username and password, from the developer portal.  These keys can then be sent to the authorization system over an SSL enabled channel using [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication to obtain a signed JWT token.  Clients will provide this JWT token to services within the HTTP Authorization header, with the scheme set to idp-jwt.  
+
+Request a JWT Token:
+```http
+POST /v1/authorize HTTP/1.1
+Accept: application/json
+Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
+
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-API-Schemas: https://base/v1/schemas
+
+{ 
+  "result": "success",
+  "token": "eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl1Qveqd2E"
+}
+```
+
+Provide the JWT Token to a service:
+```http
+POST /v1/files HTTP/1.1
+Accept: application/json
+Authorization: idp-jwt eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl1Qveqd2E
+
+```
+
+## Authentication Migration ##
+Support for JWT is expected to release in early Q22014.  Until the developer portal and ticking signing authority is esablished it is important that services exposed do not pass several pieces of information as parameters.  These include the <code>shopper id</code>, <code>private label id</code> and <code>impersonation context</code>.  It is suggested that services pass these values in custom HTTP header values (e.g. <code>X-Shopper-Id</code>) until the switchover occurs, identifying these so they may be addressed easily.
+
+## Portability ##
+To increase developer friendliness services MUST look for the <code>Authorization</code> HTTP header then for a <code>auth_idp</code> cookie.  This allows developers to authorize into the developer portal and browse APIs through a browser.
+
+Services SHOULD look for the authorization token at the cookie then the header.  If both are present the service MUST deny the request and return a 401 with a DuplicateAuthorizationToken [error](#errors) to prevent session poisoning.
 
 ----------------------------------------
 
@@ -605,18 +656,6 @@ Operation | HTTP Method | Request URL | Description
 [Delete](#delete-operation) | DELETE | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Delete one or more existing resources
 [Replace](#replace-operation) | REPLACE | https://base/v1/{collection_name}/{resource_id}<br>https://base/v1/{collection_name} | Query, Delete and Create one or more resources in one atomic transaction
 [Action](#action-operation) | POST | https://base/v1/{collection_name}/{resource_id}?{action_name}<br>https://base/v1/{collection_name}?{action_name} | Perform an action on a resource or collection
-
-When to use a POST over a PUT to create a resource is better described in an example.  A POST would be used when the service generates an ID, where a PUT is used when a resource should be created at a specific location:
-
-A POST is used to create a resource that generates an ID:
-```http
-POST /v1/files HTTP/1.1
-```
-
-A PUT is used to create a resource where the ID is known:
-```http
-PUT /v1/files/b1b2e7006be HTTP/1.1
-```
 
 ----------------------------------------
 
@@ -1094,6 +1133,20 @@ Content-Type: application/json
   /* ... more collection attributes ... */
 }
 ```
+
+### POST vs. PUT ###
+When to use a POST over a PUT to create a resource is better described in an example.  A POST would be used when the service generates an ID, where a PUT is used when a resource should be created at a specific location:
+
+A POST is used to create a resource that generates an ID:
+```http
+POST /v1/files HTTP/1.1
+```
+
+A PUT is used to create a resource where the ID is known:
+```http
+PUT /v1/files/b1b2e7006be HTTP/1.1
+```
+
 ----------------------------------------
 
 # Update Operation #
@@ -1292,6 +1345,7 @@ X-API-Schemas: https://base/v1/schemas
 ```
 
 ----------------------------------------
+
 # Action Operation #
 The action operation allows a client to manipulate a resource or collection in a way that cannot be done with any of the other standard operations.  The request MAY include a body with additional information (arguments), and the response MAY contain a response body with result info.
 
@@ -1318,8 +1372,8 @@ X-API-Schemas: https://base/v1/schemas
 }
 ```
 
-
 ----------------------------------------
+
 # Nesting #
 Resources and collections MAY be nested.  For example, folders might be associated to files, and files to a collection of tags:
 
@@ -1387,6 +1441,7 @@ For resources that implement versioning:
   - The service MUST change the <code>rev:</code> attribute whenever a field in the resource changes.
 
 ----------------------------------------
+
 # Base URL and Versioning #
 The base URL that users access your API with SHOULD be of the form:
 <code>https://api{-optional-region-code}.{your product domain}/</code>
@@ -1398,7 +1453,7 @@ All public APIs that require authentication MUST be accessible over HTTPS, authe
 ## API Versioning ##
 APIs MUST support more than one version of their implementation.  Clients MUST specify the particular version they want, and the application MUST NOT make changes that are not backwards compatible to that version.
 
-Breaking changes should be avoided when possible, but you are eventually going to have to make a breaking change so it is far better to have a way to handle this built in from the start.  The suggested format for the version string is the letter "v" followed by a single integer which increases by one for each revision.  The version SHOULD be treated as an opaque string to the client, so any other format MAY be used.
+Breaking changes should be avoided when possible, but you are eventually going to have to make a breaking change and it is far better to plan for it from the start.  The suggested format for the version string is the letter "v" followed by a single integer which increases by one for each revision (e.g. **v1**, **v2**, **v3**, etc.).  The version should be places at the first level of the services URI structure  The version SHOULD be treated as an opaque string to the client, so any other format MAY be used.
 
 Versions resources  MAY also have a "revision" string attribute that changes on each release.  This can be useful to help debug issues caused by changes made within a version that are supposed to be compatible with each other.
 
@@ -1410,16 +1465,7 @@ Clients MUST be able to make a GET request to the base URL (without a version fr
 See the [root level](#root-level) and [individual version](#individual-version) read operation for more info.
 
 ----------------------------------------
-# Authentication #
-Most APIs that do something useful will need some form of authentication to determine what user is making the request and validate that they should be allowed to make it.  A user is identified by a set of credentials called an API Key pair.
 
-### API Keys ###
-An API Key consists of a pair of strings called an **access key** and **secret key**.  These are randomly generated opaque strings assigned by the service to each API user.  The access key is analogous to a username and the secret key to a password.
-
-### HTTP Basic ###
-Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
-
-----------------------------------------
 # Design Considerations #
 
 ## Asynchronous Actions ##

@@ -1,11 +1,13 @@
-# Situations #
+# Recommendations #
 
-Situations fall outside of the technical specification but are listed to provide guidance for edge cases while remaining within the specification.  This document is not meant to be an all-inclusive list but rather provide a way to use the specification to accommodate specific needs.
+This guide provides guidance to situations that are too specific to be included within the [technical specification](./specification.md) yet require guidance to still comply with the specification as a whole.  This guide is not meant to be an all-inclusive list but rather provide a way to use the specification to accommodate specific needs.  If a use case requires review please contact [apispec@godaddy.com](mailto:apispec@godaddy.com) or open an [issue](https://github.com/godaddy/gdapi/issues) and we would be happy to review.
 
 ----------------------------------------
 
 # Table of Contents #
 
+- [Naming Conventions](#naming-conventions)
+  - [URI Conventions](#uri-conventions)
 - [Errors](#errors)
   - [Client Error Messages](#client-error-messages)
   - [Multipart Errors](#multipart-errors)
@@ -16,6 +18,33 @@ Situations fall outside of the technical specification but are listed to provide
   - [Clients with Limitations](#clients-with-limitations)
 
 ----------------------------------------
+
+# Naming Conventions #
+
+## URI Conventions ##
+REST URI conventions are a flexible concept by nature allowing no "wrong" way to generate one.  With usability in mind there are two general rules that SHOULD be followed:
+
+* Resource URIs should remain static
+* Simple and short is better than long and explicit
+
+Resources can be classified into two categories, singular and complex relationships.  Singular resources are those that stand alone without requiring other resources to function.  Complex resources on the other hand have relationships with other resources and can be represented in multiple ways.  Take for example a users shopping cart, a <code>user</code> has a <code>basket</code>, a basket has <code>item</code>s.  A useful set of URIs for resources would be:
+
+```
+/v1/users				# List all Users
+/v1/users/1234/basket	# Get the basket for User 1234
+/v1/basket/5678			# Get Basket 5678
+/v1/basket/5678/items	# List all Items in Basket 5678
+/v1/items				# List all Items
+/v1/items/9012			# Get Item 9012
+
+```
+
+In other words, it is RECCOMMENDED that complex types follow a <code>/resource/id/subresource</code> model.  
+
+See [Canonical Links](./specification.md#canonical-links)
+
+----------------------------------------
+
 # Errors #
 
 ## Client Error Messages ##
