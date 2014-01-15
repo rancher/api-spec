@@ -9,9 +9,6 @@ The full [technical specification](./specification.md) contains the complete det
 # Common Use Cases #
 Several use cases require a bit more guidance but are not appropriate for inclusion into the technical specification but are worth review.  These can be found in the [recommendations guide](./recommendations.md) and establish a set of best practices of common situations while remaining compliant with the specification.
 
-# Why are you publishing it? #
-Maybe you'd like to build your own tools that work with our services.  Or maybe you want to build your own service that follows the same style as ours.  We'd love it if you did either one and want to give you all the information you need.  This is also the same documentation our internal teams use to build their APIs.
-
 # What if I just want to use one of your APIs? #
 See the documentation for the specific API you are interested in.  There are clients for various languages available:
   - [PHP](https://github.com/godaddy/gdapi-php)
@@ -21,7 +18,10 @@ See the documentation for the specific API you are interested in.  There are cli
   - Node.js &mdash; coming soon
   - Java &mdash; coming soon
 
-# Why not use other RESTful API Specifications? #
+# Why are you publishing it? #
+Maybe you'd like to build your own tools that work with our services.  Or maybe you want to build your own service that follows the same style as ours.  We'd love it if you did either one and want to give you all the information you need.  This is also the same documentation our internal teams use to build their APIs.
+  
+# Why Create Another Specification? #
 This is a good question, but difficult to answer.  In short, we needed a specification to ensure a common experience across all of our services that was general enough to create clients and libraries that implemented the boiler plate code allowing information to be consumed or exposed consistently and more rapidly.
 
 Until a true standard emerges for RESTful API's we will continue to use and evolve this specification with the help of industry best practices and core concepts.  This specification may not apply for every API out there, but it works for us and hope it will for you.
