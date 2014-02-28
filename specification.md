@@ -179,8 +179,8 @@ Services provide a HTML version of their API by wrapping the JSON response with 
 <!DOCTYPE html>
 <!-- If you are reading this, there is a good chance you would prefer sending an
 "Accept: application/json" header and receiving actual JSON responses. -->
-<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/1.2.17/ui.css" />
-<script src="http://img1.wsimg.com/ucp/api/1.2.17/ui.js"></script>
+<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/1.2.20/ui.css" />
+<script src="http://img1.wsimg.com/ucp/api/1.2.20/ui.js"></script>
 <script>
 var schemas = "http://url-to-your-api/v1/schemas";
 var data = { 
@@ -190,7 +190,8 @@ var data = {
 // Optional variables which you can also set:
 var docs = "http://url-to-your-docs/site"; // Adds a documentation link in the header
 var user = "jsmith";  // Displays the user who is logged in next to the Log Out link in the header
-var curlUser = "something"; // Replaces "${GDAPI_ACCESS_KEY}:${GDAPI_SECRET_KEY}" when displaying cURL commands
+var logout = false; // Disable the display of the Log Out link
+var curlUser = "something"; // Replaces the default "${GDAPI_ACCESS_KEY}:${GDAPI_SECRET_KEY}" auth user when displaying cURL commands; false to omit the -u option entirely.
 </script>
 ```
 
