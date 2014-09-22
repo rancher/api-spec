@@ -179,8 +179,8 @@ Services provide a HTML version of their API by wrapping the JSON response with 
 <!DOCTYPE html>
 <!-- If you are reading this, there is a good chance you would prefer sending an
 "Accept: application/json" header and receiving actual JSON responses. -->
-<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/1.2.20/ui.css" />
-<script src="http://img1.wsimg.com/ucp/api/1.2.20/ui.js"></script>
+<link rel="stylesheet" type="text/css" href="http://img1.wsimg.com/ucp/api/2.0.6/ui.css" />
+<script src="http://img1.wsimg.com/ucp/api/2.0.6/ui.js"></script>
 <script>
 var schemas = "http://url-to-your-api/v1/schemas";
 var data = { 
