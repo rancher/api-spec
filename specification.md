@@ -195,6 +195,8 @@ var curlUser = "something"; // Replaces the default "${GDAPI_ACCESS_KEY}:${GDAPI
 </script>
 ```
 
+The full source for the HTML UI is available in [godaddy/gdapi-ui](http://github.com/godaddy/gdapi-ui).
+
 ----------------------------------------
 
 # Authentication #
