@@ -163,7 +163,7 @@ Services provide a HTML version of their API by wrapping the JSON response with 
 <script src="//cdn.rancher.io/api-ui/1.0.0/ui.js"></script>
 <script>
 var schemas = "http://url-to-your-api/v1/schemas";
-var data = { 
+var data = {
   /* ... JSON response ... */
 };
 
@@ -175,7 +175,7 @@ var curlUser = "something"; // Replaces the default "${API_ACCESS_KEY}:${API_SEC
 </script>
 ```
 
-The full source for the HTML UI is available in [rancher/api-ui](http://github.com/rancher/api-ui).
+The full source for the HTML UI is available in [rancher/api-ui](http://github.com/rancher/api-ui) if you''d like to compile and host it yourself.
 
 ----------------------------------------
 
@@ -187,46 +187,6 @@ An API Key consists of a pair of strings called an **access key** and **secret k
 
 ### HTTP Basic ###
 Services MUST support [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication.  In Basic authentication, the client sends their access key and secret key in the Authorization header.  The service then reads these and validates the keys.
-
-## Next Generation Authentication ##
-As authentication lies at the heart of all service interactions, client authentication to an API will be performed using the [JavaScript Web Token](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) (JWT) format, a proposed IETF subset of the oAuth specification.
-
-A client will obtain a set of API Keys, randomly generated opaque strings similar to a username and password, from the developer portal.  These keys can then be sent to the authorization system over an SSL enabled channel using [HTTP Basic](http://tools.ietf.org/html/rfc2617#section-2) authentication to obtain a signed JWT token.  Clients will provide this JWT token to services within the HTTP Authorization header, with the scheme set to idp-jwt.  
-
-Request a JWT Token:
-```http
-POST /v1/authorize HTTP/1.1
-Accept: application/json
-Authorization: Basic YWNjZXNzX2tleTpzZWNyZXRfa2V5
-
-```
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-X-API-Schemas: https://base/v1/schemas
-
-{ 
-  "result": "success",
-  "token": "eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl1Qveqd2E"
-}
-```
-
-Provide the JWT Token to a service:
-```http
-POST /v1/files HTTP/1.1
-Accept: application/json
-Authorization: idp-jwt eyJhbGciOiJSUzI1NiIsImtp…zpsEabFfYMGkbIZCrayNoVD47DEuFl1Qveqd2E
-
-```
-
-## Authentication Migration ##
-Support for JWT is expected to release in early Q22014.  Until the developer portal and ticking signing authority is esablished it is important that services exposed do not pass several pieces of information as parameters.  These include the `shopper id`, `private label id` and `impersonation context`.  It is suggested that services pass these values in custom HTTP header values (e.g. `X-Shopper-Id`) until the switchover occurs, identifying these so they may be addressed easily.
-
-## Portability ##
-To increase developer friendliness services MUST look for the `Authorization` HTTP header then for a `auth_idp` cookie.  This allows developers to authorize into the developer portal and browse APIs through a browser.
-
-Services SHOULD look for the authorization token at the cookie then the header.  If both are present the service MUST deny the request and return a 401 with a DuplicateAuthorizationToken [error](#errors) to prevent session poisoning.
 
 ----------------------------------------
 
