@@ -1502,7 +1502,7 @@ Several keywords are reserved by this standard and have specific meanings.  Thes
     - `resourceRepresentations:`
   - In resources: 
     - `id:`, `type:`, `rev:`
-    - `links:`, `actions:`
+    - `links:`, `actions:`, `length:`
   - In collections: 
     - (Everything reserved for resources)
     - `filters:`, `pagination:`,
@@ -1514,7 +1514,7 @@ Several keywords are reserved by this standard and have specific meanings.  Thes
   - In query strings:
     - For pagination: `marker`, `limit`
     - For sorting: `sort`, `order`
-    - For usability: `\_accept`, `\_format`, `\_method`, `suppress\_response\_code`
+    - For usability: `_accept`, `_format`, `_method`
 
 Some additional guidelines:
   - Names and attribute keys should be a single word when practical.
