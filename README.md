@@ -13,9 +13,9 @@ See the documentation for the specific API you are interested in.  There are cli
 Maybe you'd like to build your own tools that work with our services.  Or maybe you want to build your own service that follows the same style as ours.  We'd love it if you did either one and want to give you all the information you need.  This is also the same documentation our internal teams use to build their APIs.
 
 # Contact #
-For questions, comments, corrections, suggestions, etc., open an issue in [rancherio/rancher](//github.com/rancherio/rancher/issues) with a title starting with `[api-spec] `.
+For questions, comments, corrections, suggestions, etc., open an issue in [rancher/rancher](//github.com/rancher/rancher/issues) with a title starting with `[api-spec] `.
 
-Or just [click here](//github.com/rancherio/rancher/issues/new?title=%5Bapi-spec%5D%20) to create a new issue.
+Or just [click here](//github.com/rancher/rancher/issues/new?title=%5Bapi-spec%5D%20) to create a new issue.
 
 # License #
 Copyright &copy; 2012-2014 [Go Daddy Operating Company, LLC ](http://godaddy.com)
