@@ -119,7 +119,7 @@ A representation is the way a resource is described/serialized in a HTTP request
 - Forms ([multipart/form-data](http://tools.ietf.org/html/rfc2388) and [application/x-www-form-urlencoded](http://www.w3.org/TR/html401/interact/forms.html#form-content-type)) for requests.
   - These are needed for the [HTML UI](#html-ui) and are easy to create with browsers and command-line tools like cURL.
 
-Services MAY support other representations that make sense for the particular application.  These will be defined in the service docuemtnation which a client can specifify by sending the value in the `Accept` header of the request.
+Services MAY support other representations that make sense for the particular application.  These will be defined in the service documentation which a client can specify by sending the value in the `Accept` header of the request.
 
 The representation is returned in the `Content-Type` header of the response.
 
