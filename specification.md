@@ -166,16 +166,10 @@ var schemas = "http://url-to-your-api/v1/schemas";
 var data = {
   /* ... JSON response ... */
 };
-
-// Optional variables which you can also set:
-var docs = "http://url-to-your-docs/site"; // Adds a documentation link in the header
-var user = "jsmith";  // Displays the user who is logged in next to the Log Out link in the header
-var logout = false; // Disable the display of the Log Out link
-var curlUser = "something"; // Replaces the default "${API_ACCESS_KEY}:${API_SECRET_KEY}" auth user when displaying cURL commands; false to omit the -u option entirely.
 </script>
 ```
 
-The full source for the HTML UI is available in [rancher/api-ui](http://github.com/rancher/api-ui) if you''d like to compile and host it yourself.
+There are several other options you can set to configure the UI.  The full source is available in [rancher/api-ui](http://github.com/rancher/api-ui), see it if you''d like to compile and host it yourself or to learn about the options.
 
 ----------------------------------------
 
@@ -435,9 +429,10 @@ Each field is defined by a map of properties.  Fields MUST have a `type:`, which
 type        | description
 ------------|------------
 "string"    | UTF-8 string
-"password"  | String that should not be displayed
+"password"  | Same as string, but hint to the client that they should use a password field
+"multiline" | Same as string, but hint to the client that they should use a textarea
 "float"     | JSON uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
-"int"       | "int"s are just floats in JSON, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may have signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
+"int"       | "int"s are just floats in JSON, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may use signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
 "date"      | As a string, see [dates](#dates)
 "blob"      | Binary data, encoded as a string
 "boolean"   | Boolean
