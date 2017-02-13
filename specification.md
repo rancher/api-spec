@@ -436,6 +436,7 @@ type        | description
 "date"      | As a string, see [dates](#dates)
 "blob"      | Binary data, encoded as a string
 "boolean"   | Boolean
+"json"      | Arbitrary JSON-parseable string.  You should feel bad about using this, but sometimes a field really isn't strongly-typed.
 
 Or a non-simple type:
 
