@@ -429,14 +429,16 @@ Each field is defined by a map of properties.  Fields MUST have a `type:`, which
 type        | description
 ------------|------------
 "string"    | UTF-8 string
-"password"  | Same as string, but hint to the client that they should use a password field
-"multiline" | Same as string, but hint to the client that they should use a textarea
+"multiline" | Same as string, but hint to the client that the string may have multiple lines (for HTML: `<textarea>`)
+"masked"    | Same as string, but hint to the client that they should mask display of the text (for HTML: `<input type="password">`)
+"password"  | Same as masked, but hint to the client to additionally offer a password generator
 "float"     | JSON uses double-precision [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point)
 "int"       | "int"s are just floats in JSON, so the min/max safe values are &#177; 2<sup>53</sup>.  Other clients may use signed 32-bit integers, so be careful with any values that may approach 2<sup>31</sup>.
 "date"      | As a string, see [dates](#dates)
 "blob"      | Binary data, encoded as a string
 "boolean"   | Boolean
 "json"      | Arbitrary JSON-parseable string.  You should feel bad about using this, but sometimes a field really isn't strongly-typed.
+"version"   | Semantic version string.
 
 Or a non-simple type:
 
@@ -466,6 +468,7 @@ name                              | type                              | descript
 `validChars:`          | string                            | For strings, only these characters are allowed (see [character ranges](#character-ranges))
 `invalidChars:`        | string                            | For strings, these characters are not allowed (see [character ranges](#character-ranges))
 `referenceCollection:` | string                            | For references, a query URL that can be used to find valid resources of the reference type
+`satisfies:`           | string                            | For versions, a semver range which the version must satisfy
 
 ### Field Validation ###
 The additional fields above provide enough info for a client to do basic validation of values before submitting them to a service.  They are not intended to be completely comprehensive; A service will often have additional restrictions on values that cannot be represented here.  If the service is given a value that does not match all of its conditions, it should return a 422 error with enough detail for the client to fix the problem and re-submit the request.
