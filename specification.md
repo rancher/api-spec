@@ -794,7 +794,7 @@ modifier               | meaning
 `"gt"`      | greater than
 `"gte"`     | greater than or equal to
 `"prefix"`  | starts with
-`"like"`    | matches, as in SQL:<br/>&bull; underscore ("\_") for exactly one character<br/>&bull; percent ("%") for 0 or more characters<br/>&bull; "\_" for one underscore character<br/>&bull;"%" for one percent character.
+`"like"`    | matches, as in SQL:<br/>&bull; underscore ("\_") for exactly one character<br/>&bull; percent ("%") for 0 or more characters<br/>&bull; "\\\_" for one underscore character<br/>&bull;"\\%" for one percent character.
 `"notlike"` | does not match (as above)
 `"null"`    | value is NULL
 `"notnull"` | value is not NULL
